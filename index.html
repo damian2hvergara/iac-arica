@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Import American Cars | Vehículos USA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+        
+        // Función para trackear eventos
+        function trackEvent(eventName, eventCategory, eventLabel) {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', eventName, {
+                    'event_category': eventCategory,
+                    'event_label': eventLabel
+                });
+            }
+        }
+    </script>
+    
     <style>
         /* Sistema de diseño minimalista tipo Apple */
         :root {
@@ -17,6 +37,9 @@
             --blue: #0066cc;
             --green: #00a651;
             --orange: #ff9500;
+            --import-red: rgb(99, 11, 11);
+            --import-red-light: rgba(99, 11, 11, 0.1);
+            --import-red-dark: rgb(79, 9, 9);
             --border: 1px solid #d2d2d7;
             --radius: 12px;
             --shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
@@ -68,24 +91,66 @@
             letter-spacing: -0.5px;
         }
         
-        /* Hero section */
+        .logo .import-text {
+            color: var(--import-red);
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--black);
+            font-size: 14px;
+            font-weight: 400;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-link:hover {
+            opacity: 0.7;
+        }
+        
+        /* Hero con fondo de imagen */
         .hero {
+            position: relative;
             margin-top: 44px;
             padding: 80px 22px;
             text-align: center;
             background: var(--gray-50);
+            overflow: hidden;
+            z-index: 1;
         }
-        
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+            filter: brightness(0.4) contrast(1.2);
+        }
+
+        .hero h1,
+        .hero-subtitle,
+        .stock-indicators {
+            position: relative;
+            z-index: 2;
+        }
+
         .hero h1 {
             font-size: 48px;
             font-weight: 700;
             letter-spacing: -0.003em;
             margin-bottom: 18px;
+            color: var(--white);
         }
-        
+
         .hero-subtitle {
             font-size: 21px;
-            color: #86868b;
+            color: rgba(255, 255, 255, 0.9);
             max-width: 600px;
             margin: 0 auto 40px;
             line-height: 1.381;
@@ -105,11 +170,15 @@
             transition: transform 0.3s;
             padding: 16px;
             border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .indicator:hover {
             transform: translateY(-2px);
-            background: rgba(0, 0, 0, 0.02);
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
         }
         
         .indicator-number {
@@ -120,7 +189,7 @@
         
         .indicator-label {
             font-size: 12px;
-            color: #86868b;
+            color: rgba(255, 255, 255, 0.8);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -128,6 +197,34 @@
         .status-stock { color: var(--green); }
         .status-transit { color: var(--blue); }
         .status-reserve { color: var(--orange); }
+        
+        /* CONTADOR DE VEHÍCULOS IMPORTADOS */
+        .success-counter {
+            background: var(--import-red);
+            color: var(--white);
+            padding: 40px 22px;
+            text-align: center;
+            margin-top: -1px; /* Para unir con hero */
+        }
+        
+        .counter-container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+        
+        .counter-number {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+        
+        .counter-text {
+            font-size: 21px;
+            opacity: 0.9;
+            max-width: 500px;
+            margin: 0 auto;
+        }
         
         /* Grid de vehículos */
         .vehicles-section {
@@ -143,6 +240,13 @@
             letter-spacing: -0.003em;
         }
         
+        .section-subtitle {
+            color: #86868b;
+            font-size: 17px;
+            margin-bottom: 32px;
+            max-width: 600px;
+        }
+        
         .vehicles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -156,6 +260,7 @@
             border-radius: var(--radius);
             overflow: hidden;
             transition: all 0.3s;
+            cursor: pointer;
         }
         
         .vehicle-card:hover {
@@ -168,6 +273,7 @@
             height: 200px;
             object-fit: cover;
             background: var(--gray-100);
+            cursor: pointer;
         }
         
         .vehicle-info {
@@ -211,11 +317,16 @@
             color: var(--orange);
         }
         
+        .status-badge-sold {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+        
         /* Botones minimalistas */
         .button {
             display: inline-block;
             padding: 12px 22px;
-            background: var(--black);
+            background: var(--import-red);
             color: var(--white);
             text-decoration: none;
             border-radius: var(--radius);
@@ -224,7 +335,6 @@
             transition: all 0.3s;
             border: none;
             cursor: pointer;
-            width: 100%;
             text-align: center;
         }
         
@@ -258,12 +368,251 @@
         }
         
         .filter-button.active {
-            background: var(--black);
+            background: var(--import-red);
             color: var(--white);
-            border-color: var(--black);
+            border-color: var(--import-red);
         }
         
-        /* Modal de personalización responsive */
+        /* TEMPORIZADOR PARA VEHÍCULOS EN TRÁNSITO */
+        .transit-timer {
+            background: rgba(0, 102, 204, 0.1);
+            border: 1px solid rgba(0, 102, 204, 0.2);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .timer-icon {
+            color: var(--blue);
+            font-size: 20px;
+        }
+        
+        .timer-text {
+            font-size: 14px;
+            color: var(--blue);
+            font-weight: 500;
+        }
+        
+        .timer-display {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        /* SECCIÓN DE TESTIMONIOS */
+        .testimonials-section {
+            background: var(--gray-50);
+            padding: 80px 22px;
+        }
+        
+        .testimonials-container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        
+        .testimonial-card {
+            background: var(--white);
+            border: var(--border);
+            border-radius: var(--radius);
+            padding: 32px;
+            transition: transform 0.3s;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
+            object-fit: cover;
+            margin-right: 16px;
+        }
+        
+        .testimonial-info h4 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .testimonial-info p {
+            font-size: 14px;
+            color: #86868b;
+        }
+        
+        .testimonial-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--black);
+            font-style: italic;
+        }
+        
+        .testimonial-rating {
+            color: #ff9500;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+        
+        /* SECCIÓN INSTAGRAM */
+        .instagram-section {
+            padding: 80px 22px;
+            background: var(--white);
+        }
+        
+        .instagram-container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+        
+        .instagram-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+        
+        .instagram-post {
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: var(--border);
+            transition: transform 0.3s;
+            height: 200px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .instagram-post:hover {
+            transform: scale(1.05);
+        }
+        
+        .instagram-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .instagram-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .instagram-post:hover .instagram-overlay {
+            opacity: 1;
+        }
+        
+        .instagram-icon {
+            color: white;
+            font-size: 24px;
+        }
+        
+        /* SECCIÓN BLOG/ARTICLES */
+        .blog-section {
+            background: var(--gray-50);
+            padding: 80px 22px;
+        }
+        
+        .blog-container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+        
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+        
+        .article-card {
+            background: var(--white);
+            border: var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+        
+        .article-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        
+        .article-content {
+            padding: 24px;
+        }
+        
+        .article-category {
+            font-size: 12px;
+            color: var(--import-red);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        
+        .article-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .article-excerpt {
+            font-size: 15px;
+            color: #86868b;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .article-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--import-red);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .article-link:hover {
+            text-decoration: underline;
+        }
+        
+        /* Modal general */
         .modal {
             display: none;
             position: fixed;
@@ -271,18 +620,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 2000;
             overflow-y: auto;
         }
         
         .modal-content {
             background: var(--white);
-            max-width: 800px;
+            max-width: 1200px;
             margin: 80px auto;
             border-radius: var(--radius);
             position: relative;
             animation: modalAppear 0.3s ease-out;
+            width: 95%;
         }
         
         @keyframes modalAppear {
@@ -298,18 +648,409 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            color: #86868b;
+            color: var(--white);
             z-index: 10;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        /* Personalización responsive */
+        /* GALERÍA PARA DETALLES DEL VEHÍCULO */
+        .vehicle-gallery {
+            margin-bottom: 32px;
+        }
+        
+        .main-image-container {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: var(--border);
+            height: 400px;
+            margin-bottom: 16px;
+        }
+        
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .gallery-thumbnails {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+        }
+        
+        .thumbnail {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .thumbnail:hover, .thumbnail.active {
+            border-color: var(--import-red);
+            transform: scale(1.05);
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            margin-top: 16px;
+            border: var(--border);
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* NUEVO: GALERÍA TIPO INSTAGRAM - ZOOM */
+        .instagram-gallery-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 3000;
+            cursor: pointer;
+        }
+        
+        .instagram-gallery-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-slide {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            display: none;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .gallery-slide.active {
+            display: block;
+        }
+        
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            cursor: zoom-in;
+        }
+        
+        .gallery-slide img.zoomed {
+            cursor: zoom-out;
+            transform: scale(1.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .gallery-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .gallery-nav.prev {
+            left: 20px;
+        }
+        
+        .gallery-nav.next {
+            right: 20px;
+        }
+        
+        .gallery-counter {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .gallery-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .gallery-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .gallery-dots {
+            position: absolute;
+            bottom: 30px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px;
+        }
+        
+        .gallery-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .gallery-dot.active {
+            background: var(--import-red);
+            transform: scale(1.3);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* NUEVO: DISEÑO MEJORADO PARA PERSONALIZACIÓN */
+        
+        /* Comparación visual mejorada */
+        .visual-comparison {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            margin-bottom: 40px;
+        }
+        
+        @media (min-width: 768px) {
+            .visual-comparison {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .comparison-image-container {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: var(--border);
+            background: var(--white);
+            height: 300px;
+        }
+        
+        .comparison-label {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: var(--black);
+            color: var(--white);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 2;
+        }
+        
+        .comparison-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        
+        /* NUEVO: Pestañas de kits laterales compactas */
+        .kit-tabs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 32px;
+        }
+        
+        .kit-tab {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: var(--white);
+            border: var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .kit-tab:hover {
+            border-color: var(--black);
+            transform: translateX(4px);
+        }
+        
+        .kit-tab.selected {
+            border-color: var(--import-red);
+            background: rgba(99, 11, 11, 0.05);
+        }
+        
+        .kit-tab-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+        
+        .kit-tab-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .kit-tab-badge.basic { background: rgba(0, 0, 0, 0.1); color: var(--black); }
+        .kit-tab-badge.sport { background: rgba(255, 149, 0, 0.1); color: var(--orange); }
+        .kit-tab-badge.offroad { background: rgba(0, 166, 81, 0.1); color: var(--green); }
+        .kit-tab-badge.premium { background: rgba(0, 102, 204, 0.1); color: var(--blue); }
+        .kit-tab-badge.extreme { background: rgba(255, 45, 85, 0.1); color: #ff2d55; }
+        
+        .kit-tab-name {
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+        }
+        
+        .kit-tab-price {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--import-red);
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        .kit-tab-price.included {
+            color: #86868b;
+        }
+        
+        /* NUEVO: Detalles de personalización expandidos */
+        .customization-details {
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-top: 24px;
+            border: var(--border);
+        }
+        
+        .customization-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .customization-feature {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--black);
+        }
+        
+        .customization-feature i {
+            color: var(--import-red);
+            font-size: 12px;
+        }
+        
+        /* Vista compacta para móvil */
+        .mobile-compact-comparison {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        
+        .compact-image-container {
+            position: relative;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: var(--border);
+            height: 180px;
+        }
+        
+        .compact-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 2;
+        }
+        
+        /* Layout de modal */
         .customization-container {
             display: grid;
             grid-template-columns: 1fr;
             gap: 0;
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 992px) {
             .customization-container {
                 grid-template-columns: 2fr 1fr;
             }
@@ -325,50 +1066,6 @@
             border-left: var(--border);
         }
         
-        /* Opciones de personalización */
-        .option-group {
-            margin-bottom: 32px;
-        }
-        
-        .option-title {
-            font-size: 17px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        
-        .option-items {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 12px;
-        }
-        
-        .option-item {
-            border: var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .option-item:hover {
-            border-color: var(--black);
-        }
-        
-        .option-item.selected {
-            border-color: var(--black);
-            background: rgba(0, 0, 0, 0.02);
-        }
-        
-        .option-image {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            background: var(--gray-100);
-        }
-        
         /* Footer */
         .footer {
             background: var(--gray-50);
@@ -377,10 +1074,38 @@
             border-top: var(--border);
         }
         
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(99, 11, 11, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--import-red);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+            color: #666;
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
+            .hero {
+                padding: 60px 22px;
+            }
+            
             .hero h1 {
-                font-size: 32px;
+                font-size: 36px;
             }
             
             .hero-subtitle {
@@ -390,6 +1115,14 @@
             .stock-indicators {
                 flex-direction: column;
                 gap: 20px;
+            }
+            
+            .counter-number {
+                font-size: 48px;
+            }
+            
+            .counter-text {
+                font-size: 17px;
             }
             
             .vehicles-grid {
@@ -402,7 +1135,82 @@
             }
             
             .modal-content {
-                margin: 20px;
+                margin: 10px;
+            }
+            
+            .visual-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-image-container {
+                height: 250px;
+            }
+            
+            .mobile-compact-comparison {
+                display: grid;
+            }
+            
+            .comparison-image-container {
+                height: 220px;
+            }
+            
+            .customization-options, .customization-summary {
+                padding: 20px;
+            }
+            
+            .kit-tab {
+                padding: 12px;
+            }
+            
+            .kit-tab-price {
+                min-width: 80px;
+                font-size: 14px;
+            }
+            
+            .customization-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .instagram-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Galería Instagram en móvil */
+            .gallery-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .gallery-nav.prev {
+                left: 10px;
+            }
+            
+            .gallery-nav.next {
+                right: 10px;
+            }
+            
+            .gallery-counter {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            .header-container {
+                flex-direction: column;
+                height: auto;
+                padding: 10px 22px;
+            }
+            
+            .header-container > div {
+                margin-top: 5px;
             }
         }
         
@@ -416,11 +1224,13 @@
     <!-- Header -->
     <header class="header">
         <div class="header-container">
-            <div class="logo">Import American Cars</div>
-            <div style="display: flex; gap: 32px;">
-                <a href="#vehicles" class="nav-link">Vehículos</a>
-                <a href="#customize" class="nav-link">Personalizar</a>
-                <a href="#contact" class="nav-link">Contacto</a>
+            <div class="logo"><span class="import-text">Import</span> American Cars</div>
+            <div style="display: flex; gap: 32px; flex-wrap: wrap;">
+                <a href="#vehicles" class="nav-link" onclick="trackEvent('click', 'Navigation', 'Vehicles')">Vehículos</a>
+                <a href="#customize" class="nav-link" onclick="trackEvent('click', 'Navigation', 'Customize')">Personalizar</a>
+                <a href="#testimonials" class="nav-link" onclick="trackEvent('click', 'Navigation', 'Testimonials')">Testimonios</a>
+                <a href="#blog" class="nav-link" onclick="trackEvent('click', 'Navigation', 'Blog')">Blog</a>
+                <a href="#contact" class="nav-link" onclick="trackEvent('click', 'Navigation', 'Contact')">Contacto</a>
             </div>
         </div>
     </header>
@@ -432,63 +1242,74 @@
         
         <div class="stock-indicators">
             <div class="indicator" onclick="filterVehicles('stock')">
-                <div class="indicator-number status-stock" id="stockCount">8</div>
+                <div class="indicator-number status-stock" id="stockCount">0</div>
                 <div class="indicator-label">En Stock Arica</div>
             </div>
             <div class="indicator" onclick="filterVehicles('transit')">
-                <div class="indicator-number status-transit" id="transitCount">6</div>
+                <div class="indicator-number status-transit" id="transitCount">0</div>
                 <div class="indicator-label">En Tránsito</div>
             </div>
             <div class="indicator" onclick="filterVehicles('reserve')">
-                <div class="indicator-number status-reserve" id="reserveCount">4</div>
+                <div class="indicator-number status-reserve" id="reserveCount">0</div>
                 <div class="indicator-label">Para Reservar</div>
             </div>
+        </div>
+    </section>
+
+    <!-- CONTADOR DE VEHÍCULOS IMPORTADOS -->
+    <section class="success-counter">
+        <div class="counter-container">
+            <div class="counter-number" id="importedVehiclesCounter">142</div>
+            <p class="counter-text">Vehículos americanos importados exitosamente desde USA a Arica</p>
         </div>
     </section>
 
     <!-- Vehículos -->
     <section class="vehicles-section" id="vehicles">
         <h2 class="section-title">Vehículos Disponibles</h2>
+        <p class="section-subtitle">Importación directa con todos los documentos en regla. Personalización disponible durante el proceso.</p>
         
         <div class="filters">
             <button class="filter-button active" onclick="filterVehicles('all')">Todos</button>
             <button class="filter-button" onclick="filterVehicles('stock')">En Stock</button>
             <button class="filter-button" onclick="filterVehicles('transit')">En Tránsito</button>
-            <button class="filter-button" onclick="filterVehicles('reserve')">Para Reservar</button>
-            <button class="filter-button" onclick="filterVehicles('silverado')">Silverado</button>
-            <button class="filter-button" onclick="filterVehicles('tacoma')">Tacoma</button>
-            <button class="filter-button" onclick="filterVehicles('mustang')">Mustang</button>
         </div>
         
         <div class="vehicles-grid" id="vehiclesContainer">
-            <!-- Cargado dinámicamente -->
+            <!-- Loading State -->
+            <div class="col-span-3">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="mt-4">Cargando vehículos desde la base de datos...</p>
+                </div>
+            </div>
         </div>
     </section>
 
     <!-- Personalización -->
     <section class="vehicles-section" id="customize" style="background: var(--gray-50);">
         <h2 class="section-title">Personalización</h2>
-        <p style="color: #86868b; margin-bottom: 40px; max-width: 600px;">Agrega accesorios USA originales durante el proceso de importación.</p>
+        <p class="section-subtitle">Agrega accesorios USA originales durante el proceso de importación. Instalación profesional incluida.</p>
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px;">
             <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--black);">
+                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
                     <i class="fas fa-cog" style="font-size: 24px;"></i>
+                </div>
+                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Kits Personalizados</h3>
+                <p style="color: #86868b; font-size: 14px;">Básico, Sport, Off-Road, Premium</p>
+            </div>
+            
+            <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
+                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
+                    <i class="fas fa-tire" style="font-size: 24px;"></i>
                 </div>
                 <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Llantas USA</h3>
                 <p style="color: #86868b; font-size: 14px;">Fuel, Method, BBS originales</p>
             </div>
             
             <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--black);">
-                    <i class="fas fa-volume-up" style="font-size: 24px;"></i>
-                </div>
-                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Audio Premium</h3>
-                <p style="color: #86868b; font-size: 14px;">Alpine, JBL, Pioneer USA</p>
-            </div>
-            
-            <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--black);">
+                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
                     <i class="fas fa-toolbox" style="font-size: 24px;"></i>
                 </div>
                 <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Kits Off-Road</h3>
@@ -496,7 +1317,7 @@
             </div>
             
             <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--black);">
+                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
                     <i class="fas fa-lightbulb" style="font-size: 24px;"></i>
                 </div>
                 <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Iluminación LED</h3>
@@ -511,572 +1332,1308 @@
         </div>
     </section>
 
+    <!-- SECCIÓN DE TESTIMONIOS -->
+    <section class="testimonials-section" id="testimonials">
+        <div class="testimonials-container">
+            <h2 class="section-title">Lo Que Dicen Nuestros Clientes</h2>
+            <p class="section-subtitle">Más de 140 clientes satisfechos con nuestro servicio de importación y personalización.</p>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
+                             alt="Carlos M." class="testimonial-avatar">
+                        <div class="testimonial-info">
+                            <h4>Carlos M.</h4>
+                            <p>Importó Silverado 2022</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"El proceso fue transparente desde el inicio. La personalización quedó exactamente como quería. La legalización fue más rápida de lo esperado. Totalmente recomendado."</p>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616c113a1c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
+                             alt="Ana R." class="testimonial-avatar">
+                        <div class="testimonial-info">
+                            <h4>Ana R.</h4>
+                            <p>Importó Jeep Wrangler 2021</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Excelente atención. Me asesoraron en cada paso del proceso de importación. El kit off-road que instalaron es de primera calidad. Mi Jeep quedó perfecto para las dunas."</p>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
+                             alt="Miguel T." class="testimonial-avatar">
+                        <div class="testimonial-info">
+                            <h4>Miguel T.</h4>
+                            <p>Importó RAM 1500 2020</p>
+                        </div>
+                    </div>
+                    <p class="testimonial-text">"Comparé precios con varias empresas y aquí encontré el mejor valor. La personalización premium valió cada peso. El servicio post-venta ha sido impecable."</p>
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN INSTAGRAM -->
+    <section class="instagram-section">
+        <div class="instagram-container">
+            <h2 class="section-title">Entregas Reales</h2>
+            <p class="section-subtitle">Sigue nuestro Instagram para ver más entregas y proyectos de personalización.</p>
+            
+            <div class="instagram-grid">
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 1')">
+                    <img src="https://images.unsplash.com/photo-1580274455191-1c62238fa333?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                         alt="Silverado entregado" class="instagram-image">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                    </div>
+                </a>
+                
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 2')">
+                    <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                         alt="Kit off-road instalado" class="instagram-image">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                    </div>
+                </a>
+                
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 3')">
+                    <img src="https://images.unsplash.com/photo-1621461133947-f63381c2f7f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                         alt="Tacoma personalizado" class="instagram-image">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                    </div>
+                </a>
+                
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 4')">
+                    <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                         alt="Detailing profesional" class="instagram-image">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                    </div>
+                </a>
+                
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 5')">
+                    <img src="https://images.unsplash.com/photo-1577451550516-7d6e513d1c2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                         alt="Proceso de importación" class="instagram-image">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                    </div>
+                </a>
+                
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 6')">
+                    <img src="https://images.unsplash.com/photo-1563720223485-8d6d5c5c8b9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
+                         alt="Cliente satisfecho" class="instagram-image">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram instagram-icon"></i>
+                    </div>
+                </a>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="https://instagram.com/tu_usuario" target="_blank" class="button button-outline" onclick="trackEvent('click', 'Social', 'Instagram Profile')">
+                    <i class="fab fa-instagram"></i> Síguenos en Instagram
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN BLOG/ARTICLES -->
+    <section class="blog-section" id="blog">
+        <div class="blog-container">
+            <h2 class="section-title">Guías y Comparativas</h2>
+            <p class="section-subtitle">Aprende todo sobre importación de vehículos americanos y toma la mejor decisión.</p>
+            
+            <div class="articles-grid">
+                <article class="article-card">
+                    <img src="https://images.unsplash.com/photo-1493238792000-8113da705763?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="Importación vs Local" class="article-image">
+                    <div class="article-content">
+                        <span class="article-category">Guía de Importación</span>
+                        <h3 class="article-title">¿Por qué importar desde USA vs. comprar local?</h3>
+                        <p class="article-excerpt">Descubre las ventajas reales de importar tu vehículo desde Estados Unidos comparado con comprar en el mercado local chileno.</p>
+                        <a href="https://drive.google.com/file/d/1ABC123def456ghi789/view?usp=sharing" 
+                           target="_blank" 
+                           class="article-link" 
+                           onclick="trackEvent('download', 'PDF', 'Import vs Local')">
+                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="article-card">
+                    <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="Legalización en Chile" class="article-image">
+                    <div class="article-content">
+                        <span class="article-category">Proceso Legal</span>
+                        <h3 class="article-title">Guía completa de legalización en Chile</h3>
+                        <p class="article-excerpt">Todo lo que necesitas saber sobre el proceso de legalización de vehículos importados en Chile. Documentación, costos y tiempos.</p>
+                        <a href="https://drive.google.com/file/d/1XYZ789abc456def123/view?usp=sharing" 
+                           target="_blank" 
+                           class="article-link" 
+                           onclick="trackEvent('download', 'PDF', 'Legalization Guide')">
+                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                        </a>
+                    </div>
+                </article>
+                
+                <article class="article-card">
+                    <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                         alt="Comparativa pickups" class="article-image">
+                    <div class="article-content">
+                        <span class="article-category">Comparativa</span>
+                        <h3 class="article-title">Silverado vs. RAM vs. F-150: ¿Cuál elegir?</h3>
+                        <p class="article-excerpt">Análisis detallado de las tres pickups americanas más populares. Rendimiento, costos de mantenimiento y valor de reventa.</p>
+                        <a href="https://drive.google.com/file/d/1DEF456ghi789jkl012/view?usp=sharing" 
+                           target="_blank" 
+                           class="article-link" 
+                           onclick="trackEvent('download', 'PDF', 'Pickup Comparison')">
+                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                        </a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer" id="contact">
         <div style="max-width: 600px; margin: 0 auto;">
-            <div class="logo" style="margin-bottom: 24px;">Import American Cars</div>
+            <div class="logo" style="margin-bottom: 24px;"><span class="import-text">Import</span> American Cars</div>
             <p style="color: #86868b; margin-bottom: 32px;">Vehículos americanos importados desde USA. Personalización con accesorios originales. Taller en Arica.</p>
-            <a href="https://wa.me/56987654321" class="button" style="width: auto; display: inline-flex; align-items: center; gap: 8px;">
+            <a href="https://wa.me/56938654827" class="button" 
+               style="width: auto; display: inline-flex; align-items: center; gap: 8px;"
+               onclick="trackEvent('click', 'Contact', 'WhatsApp Footer')">
                 <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
             </a>
+            <div style="margin-top: 40px; font-size: 13px; color: #86868b;">
+                <p>📍 Av. Principal 1234, Arica, Chile</p>
+                <p>📞 +56 9 3865 4827</p>
+                <p>✉️ contacto@importamericancars.cl</p>
+            </div>
         </div>
     </footer>
 
-    <!-- Modal de Personalización -->
+    <!-- Modal para Detalles del Vehículo -->
+    <div class="modal" id="vehicleDetailsModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeVehicleDetailsModal()">×</button>
+            <div id="vehicleDetailsContent">
+                <!-- Cargado dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Personalización -->
     <div class="modal" id="customizationModal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeModal()">×</button>
+            <button class="close-modal" onclick="closeCustomizationModal()">×</button>
             <div class="customization-container" id="customizationContent">
                 <!-- Cargado dinámicamente -->
             </div>
         </div>
     </div>
 
+    <!-- NUEVO: Galería Instagram para imágenes del vehículo -->
+    <div class="instagram-gallery-modal" id="instagramGalleryModal">
+        <div class="instagram-gallery-container">
+            <button class="gallery-close" onclick="closeInstagramGallery()">×</button>
+            <div class="gallery-counter" id="galleryCounter">1 / 8</div>
+            
+            <button class="gallery-nav prev" onclick="changeGallerySlide(-1)">‹</button>
+            
+            <div id="gallerySlidesContainer">
+                <!-- Cargado dinámicamente -->
+            </div>
+            
+            <button class="gallery-nav next" onclick="changeGallerySlide(1)">›</button>
+            
+            <div class="gallery-dots" id="galleryDots">
+                <!-- Cargado dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Integration Script -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
-        // Datos de vehículos con imágenes placeholder por tipo
-        const vehicles = [
-            {
-                id: 1,
-                name: "Chevrolet Silverado 1500 LTZ 2021",
-                price: 32900000,
-                status: "stock",
-                location: "Arica",
-                type: "silverado",
-                description: "5.3L V8 • 4x4 • Crew Cab • Cuero • Color Gris",
-                eta: "Disponible inmediato",
-                image: "https://images.unsplash.com/photo-1580274455191-1c62238fa333?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 2,
-                name: "Toyota Tacoma TRD Off-Road 2022",
-                price: 28500000,
-                status: "transit",
-                location: "En tránsito",
-                type: "tacoma",
-                description: "3.5L V6 • 4x4 • TRD Package • Color Blanco",
-                eta: "Llega en 15 días",
-                image: "https://images.unsplash.com/photo-1621461133947-f63381c2f7f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 3,
-                name: "Ford Mustang GT Premium 2020",
-                price: 26500000,
-                status: "stock",
-                location: "Arica",
-                type: "mustang",
-                description: "5.0L V8 • Convertible • 460 HP • Color Blanco",
-                eta: "Disponible inmediato",
-                image: "https://images.unsplash.com/photo-1626808642875-0aa545482dfb?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 4,
-                name: "Chevrolet Silverado 2500HD 2020",
-                price: 38900000,
-                status: "reserve",
-                location: "Subasta USA",
-                type: "silverado",
-                description: "6.6L Duramax • Diesel • 4x4 • Color Negro",
-                eta: "3-4 meses",
-                image: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 5,
-                name: "Toyota Tacoma Limited 2021",
-                price: 27500000,
-                status: "transit",
-                location: "En barco",
-                type: "tacoma",
-                description: "3.5L V6 • 4x4 • Limited • Color Azul",
-                eta: "Llega en 30 días",
-                image: "https://images.unsplash.com/photo-1576808591885-7045c9d4a5c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 6,
-                name: "Ford Mustang Ecoboost 2021",
-                price: 22500000,
-                status: "stock",
-                location: "Arica",
-                type: "mustang",
-                description: "2.3L EcoBoost • Premium • Color Rojo",
-                eta: "Disponible inmediato",
-                image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 7,
-                name: "Chevrolet Silverado RST 2022",
-                price: 34500000,
-                status: "transit",
-                location: "En tránsito",
-                type: "silverado",
-                description: "5.3L V8 • RST Package • Color Rojo",
-                eta: "Llega en 20 días",
-                image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
-            },
-            {
-                id: 8,
-                name: "Toyota Tacoma SR5 2020",
-                price: 24500000,
-                status: "stock",
-                location: "Arica",
-                type: "tacoma",
-                description: "3.5L V6 • 4x4 • SR5 • Color Gris",
-                eta: "Disponible inmediato",
-                image: "https://images.unsplash.com/photo-1563720223485-8d6d5c5c8b9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+        // ============================================
+        // CONFIGURACIÓN SUPABASE - TUS CREDENCIALES
+        // ============================================
+        const SUPABASE_CONFIG = {
+            url: 'https://cflpmluvhfldewiitymh.supabase.co',
+            anonKey: 'sb_secret_su3AIpWkxPUYW1HLzT1NOw_ssNlHwwT',
+            tables: {
+                vehiculos: 'vehiculos_publicos',
+                inventario: 'inventario_vehiculos',
+                personalizaciones: 'personalizaciones'
             }
-        ];
-
-        // Opciones de personalización
-        const customizationOptions = {
-            wheels: [
-                { id: "w1", name: "Standard", price: 0, description: "Llantas de fábrica" },
-                { id: "w2", name: "Fuel Off-Road 20\"", price: 1200000, description: "Negras, diseño off-road" },
-                { id: "w3", name: "Method Race 17\"", price: 1800000, description: "Para off-road extremo" },
-                { id: "w4", name: "BBS Sport 19\"", price: 2500000, description: "Deportivas, ligero" }
-            ],
-            audio: [
-                { id: "a1", name: "Standard", price: 0, description: "Audio de fábrica" },
-                { id: "a2", name: "Pioneer Premium", price: 750000, description: "Con subwoofer" },
-                { id: "a3", name: "JBL Complete", price: 1200000, description: "Sistema 1200W" },
-                { id: "a4", name: "Alpine Competition", price: 2000000, description: "Sistema 2000W" }
-            ],
-            lighting: [
-                { id: "l1", name: "Standard", price: 0, description: "Iluminación standard" },
-                { id: "l2", name: "Kit LED Completo", price: 650000, description: "Faros, niebla, traseras" },
-                { id: "l3", name: "LED Premium", price: 950000, description: "LED adaptativo" }
-            ]
         };
 
-        // Estado
+        // ============================================
+        // INICIALIZAR SUPABASE
+        // ============================================
+        const supabase = window.supabase.createClient(
+            SUPABASE_CONFIG.url,
+            SUPABASE_CONFIG.anonKey
+        );
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
         let currentFilter = "all";
-        let selectedVehicle = null;
-        let selectedOptions = {
-            wheels: customizationOptions.wheels[0],
-            audio: customizationOptions.audio[0],
-            lighting: customizationOptions.lighting[0]
-        };
+        let allVehicles = [];
+        let currentInstagramGallery = null;
+        let currentInstagramSlide = 0;
 
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            updateStockCounts();
-            loadVehicles();
-            setupFilters();
-        });
+        // ============================================
+        // FUNCIONES PRINCIPALES
+        // ============================================
 
-        // Actualizar contadores
-        function updateStockCounts() {
-            const stockCount = vehicles.filter(v => v.status === "stock").length;
-            const transitCount = vehicles.filter(v => v.status === "transit").length;
-            const reserveCount = vehicles.filter(v => v.status === "reserve").length;
-            
-            document.getElementById('stockCount').textContent = stockCount;
-            document.getElementById('transitCount').textContent = transitCount;
-            document.getElementById('reserveCount').textContent = reserveCount;
-        }
-
-        // Formatear precio
-        function formatPrice(price) {
-            return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        // Cargar vehículos
-        function loadVehicles(filter = "all") {
-            const container = document.getElementById('vehiclesContainer');
-            let filteredVehicles = vehicles;
-            
-            if (filter !== "all") {
-                if (["stock", "transit", "reserve"].includes(filter)) {
-                    filteredVehicles = vehicles.filter(v => v.status === filter);
-                } else {
-                    filteredVehicles = vehicles.filter(v => v.type === filter);
+        /**
+         * Carga TODOS los vehículos publicados desde Supabase
+         */
+        async function cargarVehiculosDesdeSupabase() {
+            try {
+                console.log('📡 Conectando a Supabase...');
+                
+                const { data: vehiculos, error } = await supabase
+                    .from(SUPABASE_CONFIG.tables.vehiculos)
+                    .select('*')
+                    .eq('publicado', true)
+                    .order('destacado', { ascending: false })
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('❌ Error cargando vehículos:', error);
+                    mostrarError('Error al cargar vehículos');
+                    return [];
                 }
+                
+                console.log(`✅ ${vehiculos.length} vehículos cargados`);
+                allVehicles = vehiculos || [];
+                
+                // Actualizar contadores
+                actualizarContadores(allVehicles);
+                
+                // Renderizar vehículos
+                renderizarVehiculosEnGrid(allVehicles);
+                
+                return allVehicles;
+            } catch (error) {
+                console.error('❌ Error en conexión:', error);
+                mostrarError('Error de conexión con la base de datos');
+                return [];
+            }
+        }
+
+        /**
+         * Actualiza los contadores en el hero section
+         */
+        function actualizarContadores(vehiculos) {
+            if (!vehiculos || !Array.isArray(vehiculos)) return;
+            
+            const stockCount = vehiculos.filter(v => 
+                v.estado_venta === 'disponible' && 
+                !v.en_transito
+            ).length;
+            
+            const transitCount = vehiculos.filter(v => 
+                v.en_transito === true && 
+                v.estado_venta === 'disponible'
+            ).length;
+            
+            const reserveCount = vehiculos.filter(v => 
+                v.estado_venta === 'reservado'
+            ).length;
+            
+            // Actualizar elementos en el HTML
+            const stockElement = document.getElementById('stockCount');
+            const transitElement = document.getElementById('transitCount');
+            const reserveElement = document.getElementById('reserveCount');
+            
+            if (stockElement) stockElement.textContent = stockCount;
+            if (transitElement) transitElement.textContent = transitCount;
+            if (reserveElement) reserveElement.textContent = reserveCount;
+            
+            // Actualizar contador total importado
+            const totalVendidos = vehiculos.filter(v => v.estado_venta === 'vendido').length;
+            const totalImported = 142 + totalVendidos;
+            const counterElement = document.getElementById('importedVehiclesCounter');
+            if (counterElement) {
+                counterElement.textContent = totalImported;
+            }
+        }
+
+        /**
+         * Renderiza los vehículos en el grid
+         */
+        function renderizarVehiculosEnGrid(vehiculos) {
+            const container = document.getElementById('vehiclesContainer');
+            if (!container) {
+                console.warn('⚠️ No se encontró #vehiclesContainer');
+                return;
             }
             
-            // Actualizar botones de filtro
-            document.querySelectorAll('.filter-button').forEach(btn => {
-                if (btn.textContent.toLowerCase() === filter || 
-                    (filter === "all" && btn.textContent === "Todos")) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
+            // Si no hay vehículos, mostrar mensaje
+            if (!vehiculos || vehiculos.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-3 text-center py-12">
+                        <i class="fas fa-car text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-700">No hay vehículos disponibles</h3>
+                        <p class="text-gray-500">Pronto llegarán nuevos vehículos desde USA</p>
+                    </div>
+                `;
+                return;
+            }
             
-            container.innerHTML = filteredVehicles.map(vehicle => `
-                <div class="vehicle-card" onclick="showVehicleDetails(${vehicle.id})">
-                    <img src="${vehicle.image}" alt="${vehicle.name}" class="vehicle-image">
+            // Renderizar cada vehículo
+            container.innerHTML = vehiculos.map(vehiculo => {
+                return crearTarjetaVehiculo(vehiculo);
+            }).join('');
+            
+            // Agregar event listeners
+            agregarEventListeners();
+        }
+
+        /**
+         * Crea el HTML de una tarjeta de vehículo
+         */
+        function crearTarjetaVehiculo(vehiculo) {
+            // Formatear precio
+            const precioFormateado = formatPrecioCLP(vehiculo.precio_clp);
+            const precioAnteriorFormateado = vehiculo.precio_anterior_clp ? 
+                formatPrecioCLP(vehiculo.precio_anterior_clp) : null;
+            
+            // Determinar estado y clase CSS
+            let estadoTexto, estadoClase;
+            
+            if (vehiculo.estado_venta === 'vendido') {
+                estadoTexto = 'Vendido';
+                estadoClase = 'status-badge-sold';
+            } else if (vehiculo.estado_venta === 'reservado') {
+                estadoTexto = 'Reservado';
+                estadoClase = 'status-badge-reserve';
+            } else if (vehiculo.en_transito) {
+                estadoTexto = 'En Tránsito';
+                estadoClase = 'status-badge-transit';
+            } else {
+                estadoTexto = 'En Stock';
+                estadoClase = 'status-badge-stock';
+            }
+            
+            // Crear array de imágenes
+            const imagenes = [
+                vehiculo.imagen_1,
+                vehiculo.imagen_2,
+                vehiculo.imagen_3,
+                vehiculo.imagen_4,
+                vehiculo.imagen_5,
+                vehiculo.imagen_6,
+                vehiculo.imagen_7,
+                vehiculo.imagen_8
+            ].filter(img => img && img.trim() !== '');
+            
+            // Si no hay imagen principal, usar la primera disponible
+            const imagenPrincipal = vehiculo.imagen_1 || 
+                                 (imagenes.length > 0 ? imagenes[0] : 
+                                 'https://images.unsplash.com/photo-1580274455191-1c62238fa333');
+            
+            return `
+                <div class="vehicle-card" data-id="${vehiculo.id}">
+                    <!-- Estado -->
+                    <div class="px-4 pt-4">
+                        <span class="vehicle-status ${estadoClase}">
+                            ${estadoTexto.toUpperCase()}
+                        </span>
+                        ${vehiculo.destacado ? '<span class="ml-2 px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-medium">DESTACADO</span>' : ''}
+                    </div>
+                    
+                    <!-- Imagen principal -->
+                    <img src="${imagenPrincipal}" 
+                         alt="${vehiculo.titulo}" 
+                         class="vehicle-image"
+                         data-id="${vehiculo.id}"
+                         onclick="mostrarGaleriaImagenes('${vehiculo.id}')">
+                    
+                    <!-- Información básica -->
                     <div class="vehicle-info">
-                        <div class="vehicle-status ${vehicle.status === 'stock' ? 'status-badge-stock' : vehicle.status === 'transit' ? 'status-badge-transit' : 'status-badge-reserve'}">
-                            ${vehicle.status === 'stock' ? 'En Stock Arica' : vehicle.status === 'transit' ? 'En Tránsito' : 'Para Reservar'}
+                        <h3 class="vehicle-title">${vehiculo.titulo}</h3>
+                        <p class="text-gray-600 mb-2">${vehiculo.marca} ${vehiculo.modelo} - ${vehiculo.año}</p>
+                        
+                        <!-- Precio -->
+                        <div class="vehicle-price">
+                            <span style="color: #1e40af;">$${precioFormateado} CLP</span>
+                            ${precioAnteriorFormateado ? `
+                                <span class="text-sm ml-2 line-through text-red-600">$${precioAnteriorFormateado}</span>
+                            ` : ''}
                         </div>
-                        <h3 class="vehicle-title">${vehicle.name}</h3>
-                        <div class="vehicle-price">$${formatPrice(vehicle.price)} CLP</div>
-                        <p style="color: #86868b; font-size: 14px; margin-bottom: 16px;">${vehicle.description}</p>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="button" onclick="event.stopPropagation(); contactVehicle(${vehicle.id});" style="flex: 1;">
-                                Consultar
+                        
+                        <!-- Descripción corta -->
+                        <p class="text-gray-500 text-sm mb-3">${vehiculo.descripcion_corta || ''}</p>
+                        
+                        <!-- Temporizador si está en tránsito -->
+                        ${vehiculo.en_transito && vehiculo.dias_transito ? `
+                            <div class="transit-timer">
+                                <div class="timer-icon">
+                                    <i class="fas fa-shipping-fast"></i>
+                                </div>
+                                <div>
+                                    <div class="timer-text">Llega en</div>
+                                    <div class="timer-display">${vehiculo.dias_transito} días</div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Botones -->
+                        <div class="flex gap-2 mt-4">
+                            <button class="button flex-1" onclick="mostrarDetallesVehiculo('${vehiculo.id}')">
+                                Ver Detalles
                             </button>
-                            <button class="button button-outline" onclick="event.stopPropagation(); customizeVehicle(${vehicle.id});" style="flex: 1;">
+                            <button class="button button-outline flex-1" onclick="mostrarPersonalizaciones('${vehiculo.id}')">
                                 Personalizar
                             </button>
                         </div>
                     </div>
                 </div>
-            `).join('');
-            
-            // Scroll a la sección de vehículos si no es filtro "all"
-            if (filter !== "all" && filteredVehicles.length > 0) {
-                setTimeout(() => {
-                    document.getElementById('vehicles').scrollIntoView({ behavior: 'smooth' });
-                }, 300);
+            `;
+        }
+
+        /**
+         * Formatea precio en formato chileno
+         */
+        function formatPrecioCLP(precio) {
+            if (!precio) return '0';
+            return precio.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        /**
+         * Agrega event listeners a los botones
+         */
+        function agregarEventListeners() {
+            // Los event listeners ya están en los botones con onclick
+        }
+
+        /**
+         * Muestra detalles de un vehículo específico
+         */
+        async function mostrarDetallesVehiculo(vehicleId) {
+            try {
+                trackEvent('view', 'Vehicle Details', vehicleId);
+                
+                // 1. Obtener datos del vehículo
+                const { data: vehiculo, error } = await supabase
+                    .from(SUPABASE_CONFIG.tables.vehiculos)
+                    .select('*')
+                    .eq('id', vehicleId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // 2. Obtener personalizaciones
+                const { data: personalizaciones } = await supabase
+                    .from(SUPABASE_CONFIG.tables.personalizaciones)
+                    .select('*')
+                    .eq('vehiculo_id', vehicleId)
+                    .eq('disponible', true)
+                    .order('orden', { ascending: true });
+                
+                // 3. Llenar modal con datos
+                llenarModalDetalles(vehiculo, personalizaciones || []);
+                
+                // 4. Mostrar modal
+                document.getElementById('vehicleDetailsModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('Error cargando detalles:', error);
+                mostrarError('Error al cargar los detalles del vehículo');
             }
         }
 
-        // Filtrar vehículos (usado por los indicadores clickeables)
-        function filterVehicles(filter) {
-            currentFilter = filter;
-            loadVehicles(filter);
-        }
-
-        // Configurar filtros
-        function setupFilters() {
-            document.querySelectorAll('.filter-button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const filter = this.textContent.toLowerCase();
-                    if (filter === "todos") {
-                        filterVehicles("all");
-                    } else if (filter === "en stock") {
-                        filterVehicles("stock");
-                    } else if (filter === "en tránsito") {
-                        filterVehicles("transit");
-                    } else if (filter === "para reservar") {
-                        filterVehicles("reserve");
-                    } else {
-                        filterVehicles(filter);
-                    }
-                });
-            });
-        }
-
-        // Mostrar detalles del vehículo
-        function showVehicleDetails(vehicleId) {
-            const vehicle = vehicles.find(v => v.id === vehicleId);
-            if (!vehicle) return;
+        /**
+         * Llena el modal de detalles con datos del vehículo
+         */
+        function llenarModalDetalles(vehiculo, personalizaciones) {
+            const modalContent = document.getElementById('vehicleDetailsContent');
+            if (!modalContent) return;
             
-            selectedVehicle = vehicle;
+            // Formatear precio
+            const precioFormateado = formatPrecioCLP(vehiculo.precio_clp);
+            const precioAnteriorFormateado = vehiculo.precio_anterior_clp ? 
+                formatPrecioCLP(vehiculo.precio_anterior_clp) : null;
             
-            const modalContent = document.getElementById('customizationContent');
+            // Obtener todas las imágenes
+            const imagenes = [
+                vehiculo.imagen_1,
+                vehiculo.imagen_2,
+                vehiculo.imagen_3,
+                vehiculo.imagen_4,
+                vehiculo.imagen_5,
+                vehiculo.imagen_6,
+                vehiculo.imagen_7,
+                vehiculo.imagen_8
+            ].filter(img => img && img.trim() !== '');
+            
+            // Crear contenido del modal
             modalContent.innerHTML = `
-                <div class="customization-options">
-                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">${vehicle.name}</h2>
-                    <p style="color: #86868b; margin-bottom: 24px;">${vehicle.description}</p>
-                    
-                    <div style="background: var(--gray-50); padding: 20px; border-radius: var(--radius); margin-bottom: 32px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <div style="font-size: 32px; font-weight: 700;">$${formatPrice(vehicle.price)} CLP</div>
-                                <div style="color: #86868b; font-size: 14px;">${vehicle.location} • ${vehicle.eta}</div>
+                <div class="customization-container">
+                    <div class="customization-options">
+                        <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">${vehiculo.titulo}</h2>
+                        <p style="color: #86868b; margin-bottom: 24px;">${vehiculo.descripcion_corta}</p>
+                        
+                        <!-- Galería de imágenes -->
+                        <div class="vehicle-gallery">
+                            <div class="main-image-container">
+                                <img src="${imagenes[0] || ''}" alt="${vehiculo.titulo}" 
+                                     class="main-image" id="mainGalleryImage"
+                                     onclick="mostrarGaleriaModal('${vehiculo.id}')">
                             </div>
-                            <div class="vehicle-status ${vehicle.status === 'stock' ? 'status-badge-stock' : vehicle.status === 'transit' ? 'status-badge-transit' : 'status-badge-reserve'}" style="margin: 0;">
-                                ${vehicle.status === 'stock' ? 'En Stock Arica' : vehicle.status === 'transit' ? 'En Tránsito' : 'Para Reservar'}
+                            
+                            ${imagenes.length > 1 ? `
+                                <div class="gallery-thumbnails" id="galleryThumbnails">
+                                    ${imagenes.map((img, index) => `
+                                        <img src="${img}" alt="Vista ${index + 1}" 
+                                             class="thumbnail ${index === 0 ? 'active' : ''}" 
+                                             onclick="cambiarImagenPrincipal(${index}, '${vehiculo.id}')">
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <!-- Descripción larga -->
+                        ${vehiculo.descripcion_larga ? `
+                            <div style="margin-bottom: 32px;">
+                                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 16px;">Descripción</h3>
+                                <p style="color: #666; line-height: 1.6;">${vehiculo.descripcion_larga}</p>
                             </div>
+                        ` : ''}
+                        
+                        <!-- Especificaciones -->
+                        <div style="margin-bottom: 32px;">
+                            <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 16px;">Especificaciones Técnicas</h3>
+                            <div style="background: var(--gray-50); padding: 24px; border-radius: var(--radius);">
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                                    ${vehiculo.motor ? `
+                                        <div>
+                                            <div style="font-size: 12px; color: #86868b; margin-bottom: 4px;">Motor</div>
+                                            <div style="font-weight: 500;">${vehiculo.motor}</div>
+                                        </div>
+                                    ` : ''}
+                                    ${vehiculo.transmision ? `
+                                        <div>
+                                            <div style="font-size: 12px; color: #86868b; margin-bottom: 4px;">Transmisión</div>
+                                            <div style="font-weight: 500;">${vehiculo.transmision}</div>
+                                        </div>
+                                    ` : ''}
+                                    ${vehiculo.kilometraje ? `
+                                        <div>
+                                            <div style="font-size: 12px; color: #86868b; margin-bottom: 4px;">Kilometraje</div>
+                                            <div style="font-weight: 500;">${vehiculo.kilometraje.toLocaleString()} km</div>
+                                        </div>
+                                    ` : ''}
+                                    ${vehiculo.color ? `
+                                        <div>
+                                            <div style="font-size: 12px; color: #86868b; margin-bottom: 4px;">Color</div>
+                                            <div style="font-weight: 500;">${vehiculo.color}</div>
+                                        </div>
+                                    ` : ''}
+                                    ${vehiculo.combustible ? `
+                                        <div>
+                                            <div style="font-size: 12px; color: #86868b; margin-bottom: 4px;">Combustible</div>
+                                            <div style="font-weight: 500;">${vehiculo.combustible}</div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botones de acción -->
+                        <div style="display: flex; gap: 12px;">
+                            <button class="button flex-1" onclick="contactarPorWhatsApp('${vehiculo.titulo}', ${vehiculo.precio_clp})">
+                                <i class="fab fa-whatsapp mr-2"></i> Consultar Disponibilidad
+                            </button>
+                            <button class="button button-outline flex-1" onclick="mostrarPersonalizaciones('${vehiculo.id}')">
+                                <i class="fas fa-cog mr-2"></i> Personalizar
+                            </button>
                         </div>
                     </div>
                     
-                    <div style="display: flex; gap: 12px;">
-                        <button class="button" onclick="contactVehicle(${vehicle.id})" style="flex: 1;">
-                            <i class="fab fa-whatsapp"></i> Reservar Ahora
-                        </button>
-                        <button class="button button-outline" onclick="customizeVehicle(${vehicle.id})" style="flex: 1;">
-                            <i class="fas fa-cog"></i> Personalizar
-                        </button>
-                    </div>
-                </div>
-                <div class="customization-summary">
-                    <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 24px;">Especificaciones</h3>
-                    <div style="color: #86868b; font-size: 14px; line-height: 1.8;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                            <span>Ubicación:</span>
-                            <span>${vehicle.location}</span>
+                    <!-- Resumen -->
+                    <div class="customization-summary">
+                        <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 24px;">Resumen</h3>
+                        
+                        <!-- Precio -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="font-size: 13px; color: #86868b; margin-bottom: 8px;">Precio</div>
+                            <div style="font-size: 32px; font-weight: 700; color: #1e40af;">$${precioFormateado} CLP</div>
+                            ${precioAnteriorFormateado ? `
+                                <div style="color: #dc2626; text-decoration: line-through; font-size: 16px; margin-top: 4px;">
+                                    $${precioAnteriorFormateado} CLP
+                                </div>
+                            ` : ''}
+                            <div style="color: #86868b; font-size: 14px; margin-top: 8px;">
+                                ${vehiculo.ubicacion_actual || 'Arica'} • 
+                                ${vehiculo.en_transito ? 'En Tránsito' : 'Disponible'}
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                            <span>Disponibilidad:</span>
-                            <span>${vehicle.eta}</span>
+                        
+                        <!-- Estado -->
+                        <div style="margin-bottom: 24px;">
+                            ${vehiculo.estado_venta === 'disponible' ? `
+                                <span class="vehicle-status status-badge-stock" style="margin-bottom: 16px;">
+                                    ${vehiculo.en_transito ? 'EN TRÁNSITO DESDE USA' : 'DISPONIBLE EN ARICA'}
+                                </span>
+                            ` : vehiculo.estado_venta === 'reservado' ? `
+                                <span class="vehicle-status status-badge-reserve" style="margin-bottom: 16px;">
+                                    RESERVADO
+                                </span>
+                            ` : `
+                                <span class="vehicle-status status-badge-sold" style="margin-bottom: 16px;">
+                                    VENDIDO
+                                </span>
+                            `}
+                            
+                            <div style="font-size: 14px; color: #86868b; line-height: 1.6;">
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <i class="fas fa-shield-alt" style="color: var(--import-red); margin-right: 8px;"></i>
+                                    <span>Garantía de ${vehiculo.garantia_meses || 12} meses</span>
+                                </div>
+                                ${vehiculo.certificado_reparacion ? `
+                                    <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                        <i class="fas fa-tools" style="color: var(--import-red); margin-right: 8px;"></i>
+                                        <span>Certificado de reparación incluido</span>
+                                    </div>
+                                ` : ''}
+                                <div style="display: flex; align-items: center;">
+                                    <i class="fas fa-file-contract" style="color: var(--import-red); margin-right: 8px;"></i>
+                                    <span>Documentación en regla</span>
+                                </div>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                            <span>Estado:</span>
-                            <span>${vehicle.status === 'stock' ? 'Listo para entrega' : vehicle.status === 'transit' ? 'En camino desde USA' : 'Disponible para reserva'}</span>
+                        
+                        <!-- Incluye -->
+                        <div style="border-top: var(--border); padding-top: 20px;">
+                            <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 12px;">Incluye</h4>
+                            <div style="font-size: 14px; color: #86868b; line-height: 1.6;">
+                                <div>• Revisión mecánica completa</div>
+                                <div>• Limpieza y detailing profesional</div>
+                                <div>• Certificado de origen USA</div>
+                                <div>• Asesoría en legalización</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
-            
-            document.getElementById('customizationModal').style.display = 'block';
         }
 
-        // Personalizar vehículo
-        function customizeVehicle(vehicleId) {
-            const vehicle = vehicles.find(v => v.id === vehicleId);
+        /**
+         * Cambia la imagen principal en la galería
+         */
+        function cambiarImagenPrincipal(index, vehicleId) {
+            const vehicle = allVehicles.find(v => v.id === vehicleId);
             if (!vehicle) return;
             
-            selectedVehicle = vehicle;
+            const imagenes = [
+                vehicle.imagen_1,
+                vehicle.imagen_2,
+                vehicle.imagen_3,
+                vehicle.imagen_4,
+                vehicle.imagen_5,
+                vehicle.imagen_6,
+                vehicle.imagen_7,
+                vehicle.imagen_8
+            ].filter(img => img && img.trim() !== '');
             
-            const modalContent = document.getElementById('customizationContent');
-            modalContent.innerHTML = `
-                <div class="customization-options">
-                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Personalizar ${vehicle.name}</h2>
-                    <p style="color: #86868b; margin-bottom: 32px;">Agrega accesorios USA originales</p>
-                    
-                    <div class="option-group">
-                        <h3 class="option-title">Llantas</h3>
-                        <div class="option-items" id="wheelsOptions">
-                            ${customizationOptions.wheels.map(option => `
-                                <div class="option-item ${selectedOptions.wheels.id === option.id ? 'selected' : ''}" 
-                                     onclick="selectOption('wheels', '${option.id}')">
-                                    <div class="option-image" style="background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: #86868b;">
-                                        <i class="fas fa-tire" style="font-size: 24px;"></i>
-                                    </div>
-                                    <div style="font-weight: 500; margin-bottom: 4px;">${option.name}</div>
-                                    <div style="color: ${option.price > 0 ? 'var(--green)' : '#86868b'}; font-size: 13px;">
-                                        ${option.price > 0 ? `+$${formatPrice(option.price)}` : 'Incluido'}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="option-group">
-                        <h3 class="option-title">Sistema de Audio</h3>
-                        <div class="option-items" id="audioOptions">
-                            ${customizationOptions.audio.map(option => `
-                                <div class="option-item ${selectedOptions.audio.id === option.id ? 'selected' : ''}" 
-                                     onclick="selectOption('audio', '${option.id}')">
-                                    <div class="option-image" style="background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: #86868b;">
-                                        <i class="fas fa-volume-up" style="font-size: 24px;"></i>
-                                    </div>
-                                    <div style="font-weight: 500; margin-bottom: 4px;">${option.name}</div>
-                                    <div style="color: ${option.price > 0 ? 'var(--green)' : '#86868b'}; font-size: 13px;">
-                                        ${option.price > 0 ? `+$${formatPrice(option.price)}` : 'Incluido'}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="option-group">
-                        <h3 class="option-title">Iluminación LED</h3>
-                        <div class="option-items" id="lightingOptions">
-                            ${customizationOptions.lighting.map(option => `
-                                <div class="option-item ${selectedOptions.lighting.id === option.id ? 'selected' : ''}" 
-                                     onclick="selectOption('lighting', '${option.id}')">
-                                    <div class="option-image" style="background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: #86868b;">
-                                        <i class="fas fa-lightbulb" style="font-size: 24px;"></i>
-                                    </div>
-                                    <div style="font-weight: 500; margin-bottom: 4px;">${option.name}</div>
-                                    <div style="color: ${option.price > 0 ? 'var(--green)' : '#86868b'}; font-size: 13px;">
-                                        ${option.price > 0 ? `+$${formatPrice(option.price)}` : 'Incluido'}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-                <div class="customization-summary">
-                    <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 24px;">Tu Configuración</h3>
-                    
-                    <div style="margin-bottom: 24px;">
-                        <div style="font-size: 13px; color: #86868b; margin-bottom: 8px;">Vehículo base</div>
-                        <div style="font-weight: 500;">${vehicle.name}</div>
-                        <div style="font-size: 24px; font-weight: 700; margin-top: 4px;">$${formatPrice(vehicle.price)} CLP</div>
-                    </div>
-                    
-                    <div id="selectedOptionsList" style="margin-bottom: 24px;">
-                        <!-- Opciones seleccionadas -->
-                    </div>
-                    
-                    <div style="border-top: var(--border); padding-top: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div style="font-weight: 600;">Total</div>
-                            <div style="font-size: 32px; font-weight: 700;" id="totalPrice">$${formatPrice(vehicle.price)} CLP</div>
-                        </div>
-                    </div>
-                    
-                    <button class="button" onclick="requestCustomization()" style="margin-top: 24px;">
-                        <i class="fab fa-whatsapp"></i> Solicitar Cotización
-                    </button>
-                </div>
-            `;
-            
-            document.getElementById('customizationModal').style.display = 'block';
-            updateSelectedOptions();
-            updateTotalPrice();
-        }
-
-        // Seleccionar opción
-        function selectOption(category, optionId) {
-            const options = customizationOptions[category];
-            const option = options.find(o => o.id === optionId);
-            
-            if (option) {
-                selectedOptions[category] = option;
+            if (imagenes[index]) {
+                document.getElementById('mainGalleryImage').src = imagenes[index];
                 
-                // Actualizar UI
-                document.querySelectorAll(`#${category}Options .option-item`).forEach(item => {
-                    item.classList.remove('selected');
+                // Actualizar thumbnails activos
+                document.querySelectorAll('#galleryThumbnails .thumbnail').forEach((thumb, i) => {
+                    thumb.classList.toggle('active', i === index);
                 });
-                event.target.closest('.option-item').classList.add('selected');
+            }
+        }
+
+        /**
+         * Muestra personalizaciones de un vehículo
+         */
+        async function mostrarPersonalizaciones(vehicleId) {
+            try {
+                trackEvent('open', 'Customization', vehicleId);
                 
-                updateSelectedOptions();
-                updateTotalPrice();
+                const { data: personalizaciones, error } = await supabase
+                    .from(SUPABASE_CONFIG.tables.personalizaciones)
+                    .select('*')
+                    .eq('vehiculo_id', vehicleId)
+                    .eq('disponible', true)
+                    .order('orden', { ascending: true });
+                
+                if (error) throw error;
+                
+                // Obtener vehículo
+                const vehicle = allVehicles.find(v => v.id === vehicleId);
+                if (!vehicle) throw new Error('Vehículo no encontrado');
+                
+                // Llenar modal de personalización
+                llenarModalPersonalizacion(vehicle, personalizaciones || []);
+                
+                // Mostrar modal
+                document.getElementById('customizationModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('Error cargando personalizaciones:', error);
+                mostrarError('Error al cargar las opciones de personalización');
             }
         }
 
-        // Actualizar opciones seleccionadas
-        function updateSelectedOptions() {
-            const container = document.getElementById('selectedOptionsList');
-            if (!container) return;
-            
-            let html = '';
-            
-            if (selectedOptions.wheels.price > 0) {
-                html += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                        <span>${selectedOptions.wheels.name}</span>
-                        <span style="color: var(--green);">+$${formatPrice(selectedOptions.wheels.price)}</span>
-                    </div>
-                `;
-            }
-            
-            if (selectedOptions.audio.price > 0) {
-                html += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                        <span>${selectedOptions.audio.name}</span>
-                        <span style="color: var(--green);">+$${formatPrice(selectedOptions.audio.price)}</span>
-                    </div>
-                `;
-            }
-            
-            if (selectedOptions.lighting.price > 0) {
-                html += `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
-                        <span>${selectedOptions.lighting.name}</span>
-                        <span style="color: var(--green);">+$${formatPrice(selectedOptions.lighting.price)}</span>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html || '<div style="color: #86868b; font-size: 14px;">No hay accesorios seleccionados</div>';
-        }
-
-        // Actualizar precio total
-        function updateTotalPrice() {
-            if (!selectedVehicle) return;
-            
-            const totalElement = document.getElementById('totalPrice');
-            if (!totalElement) return;
-            
-            const basePrice = selectedVehicle.price;
-            const extrasTotal = 
-                selectedOptions.wheels.price + 
-                selectedOptions.audio.price + 
-                selectedOptions.lighting.price;
-            
-            const total = basePrice + extrasTotal;
-            totalElement.textContent = `$${formatPrice(total)} CLP`;
-        }
-
-        // Mostrar modal de personalización
-        function showCustomizationModal() {
+        /**
+         * Llena el modal de personalización
+         */
+        function llenarModalPersonalizacion(vehicle, personalizaciones) {
             const modalContent = document.getElementById('customizationContent');
+            if (!modalContent) return;
+            
+            // Si no hay personalizaciones, mostrar mensaje
+            if (!personalizaciones || personalizaciones.length === 0) {
+                modalContent.innerHTML = `
+                    <div style="padding: 60px; text-align: center;">
+                        <i class="fas fa-cog text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">Sin personalizaciones disponibles</h3>
+                        <p class="text-gray-500">Este vehículo no tiene opciones de personalización en este momento.</p>
+                        <button class="button mt-6" onclick="contactarPorWhatsApp('${vehicle.titulo}', ${vehicle.precio_clp})">
+                            <i class="fab fa-whatsapp mr-2"></i> Consultar personalizaciones especiales
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Seleccionar primera personalización
+            const primeraPersonalizacion = personalizaciones[0];
+            
             modalContent.innerHTML = `
                 <div class="customization-options">
-                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Simular Personalización</h2>
-                    <p style="color: #86868b; margin-bottom: 32px;">Selecciona un vehículo para comenzar</p>
+                    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">Personalizar ${vehicle.titulo}</h2>
+                    <p style="color: #86868b; margin-bottom: 32px;">${vehicle.descripcion_corta}</p>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                        ${vehicles.slice(0, 3).map(vehicle => `
-                            <div onclick="customizeVehicle(${vehicle.id})" style="cursor: pointer; border: var(--border); border-radius: var(--radius); padding: 20px; text-align: center;">
-                                <img src="${vehicle.image}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 6px; margin-bottom: 12px;">
-                                <div style="font-weight: 500; margin-bottom: 4px;">${vehicle.name}</div>
-                                <div style="font-size: 14px; color: #86868b; margin-bottom: 8px;">${vehicle.description.split('•')[0]}</div>
-                                <div style="font-size: 17px; font-weight: 600;">$${formatPrice(vehicle.price)} CLP</div>
+                    <!-- Opciones de personalización -->
+                    <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 20px;">Selecciona un Kit</h3>
+                    <div class="kit-tabs-container">
+                        ${personalizaciones.map((kit, index) => `
+                            <div class="kit-tab ${index === 0 ? 'selected' : ''}" 
+                                 onclick="seleccionarKit('${kit.id}', '${vehicle.id}')"
+                                 data-kit-id="${kit.id}">
+                                <div class="kit-tab-content">
+                                    <div class="kit-tab-badge ${kit.tipo}">${kit.nombre}</div>
+                                    <div class="kit-tab-name">${kit.descripcion || ''}</div>
+                                </div>
+                                <div class="kit-tab-price ${kit.precio_clp === 0 ? 'included' : ''}">
+                                    ${kit.precio_clp > 0 ? `+$${formatPrecioCLP(kit.precio_clp)}` : 'Incluido'}
+                                </div>
                             </div>
                         `).join('')}
                     </div>
+                    
+                    <!-- Detalles de la personalización seleccionada -->
+                    <div id="kitDetails" class="customization-details">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div style="display: flex; gap: 12px; margin-top: 32px;">
+                        <button class="button flex-1" onclick="solicitarCotizacionPersonalizacion('${vehicle.id}', '${primeraPersonalizacion.id}')">
+                            <i class="fab fa-whatsapp"></i> Solicitar Cotización
+                        </button>
+                        <button class="button button-outline flex-1" onclick="mostrarDetallesVehiculo('${vehicle.id}')">
+                            <i class="fas fa-info-circle"></i> Ver Detalles
+                        </button>
+                    </div>
                 </div>
+                
+                <!-- Resumen -->
                 <div class="customization-summary">
-                    <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 16px;">Beneficios</h3>
-                    <div style="color: #86868b; font-size: 14px; line-height: 1.8;">
-                        <div style="display: flex; align-items: start; margin-bottom: 16px;">
-                            <i class="fas fa-check" style="color: var(--green); margin-right: 12px; margin-top: 4px;"></i>
-                            <span>Accesorios USA originales</span>
+                    <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 24px;">Tu Configuración</h3>
+                    
+                    <!-- Vehículo base -->
+                    <div style="margin-bottom: 24px;">
+                        <div style="font-size: 13px; color: #86868b; margin-bottom: 8px;">Vehículo base</div>
+                        <div style="font-weight: 500;">${vehicle.titulo}</div>
+                        <div style="font-size: 21px; font-weight: 700; margin-top: 4px; color: var(--black);">$${formatPrecioCLP(vehicle.precio_clp)} CLP</div>
+                    </div>
+                    
+                    <!-- Personalización seleccionada -->
+                    <div style="margin-bottom: 24px;">
+                        <div style="font-size: 13px; color: #86868b; margin-bottom: 8px;">Personalización</div>
+                        <div id="selectedKitSummary">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 500;">${primeraPersonalizacion.nombre}</div>
+                                    <div style="font-size: 12px; color: #86868b;">${primeraPersonalizacion.descripcion || ''}</div>
+                                </div>
+                                <div style="font-size: 17px; font-weight: 600; color: ${primeraPersonalizacion.precio_clp > 0 ? 'var(--import-red)' : '#86868b'}">
+                                    ${primeraPersonalizacion.precio_clp > 0 ? `+$${formatPrecioCLP(primeraPersonalizacion.precio_clp)}` : 'Incluido'}
+                                </div>
+                            </div>
                         </div>
-                        <div style="display: flex; align-items: start; margin-bottom: 16px;">
-                            <i class="fas fa-check" style="color: var(--green); margin-right: 12px; margin-top: 4px;"></i>
-                            <span>Instalación profesional en Arica</span>
+                    </div>
+                    
+                    <!-- Total -->
+                    <div style="border-top: var(--border); padding-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-weight: 600; font-size: 17px;">Total estimado</div>
+                            <div style="font-size: 32px; font-weight: 700;" id="totalPrice">
+                                $${formatPrecioCLP(vehicle.precio_clp + primeraPersonalizacion.precio_clp)} CLP
+                            </div>
                         </div>
-                        <div style="display: flex; align-items: start; margin-bottom: 16px;">
-                            <i class="fas fa-check" style="color: var(--green); margin-right: 12px; margin-top: 4px;"></i>
-                            <span>Garantía de 6 meses</span>
-                        </div>
-                        <div style="display: flex; align-items: start;">
-                            <i class="fas fa-check" style="color: var(--green); margin-right: 12px; margin-top: 4px;"></i>
-                            <span>Precio todo incluido</span>
+                        <div style="font-size: 12px; color: #86868b; margin-top: 8px;">
+                            Incluye instalación profesional y garantía
                         </div>
                     </div>
                 </div>
             `;
             
-            document.getElementById('customizationModal').style.display = 'block';
+            // Llenar detalles del primer kit
+            actualizarDetallesKit(primeraPersonalizacion);
         }
 
-        // Contactar por vehículo
-        function contactVehicle(vehicleId) {
-            const vehicle = vehicles.find(v => v.id === vehicleId);
+        /**
+         * Selecciona un kit de personalización
+         */
+        async function seleccionarKit(kitId, vehicleId) {
+            try {
+                // Obtener datos del kit
+                const { data: kit, error } = await supabase
+                    .from(SUPABASE_CONFIG.tables.personalizaciones)
+                    .select('*')
+                    .eq('id', kitId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Obtener vehículo
+                const vehicle = allVehicles.find(v => v.id === vehicleId);
+                if (!vehicle) throw new Error('Vehículo no encontrado');
+                
+                // Actualizar pestañas seleccionadas
+                document.querySelectorAll('.kit-tab').forEach(tab => {
+                    tab.classList.remove('selected');
+                    if (tab.dataset.kitId === kitId) {
+                        tab.classList.add('selected');
+                    }
+                });
+                
+                // Actualizar detalles del kit
+                actualizarDetallesKit(kit);
+                
+                // Actualizar resumen
+                actualizarResumenKit(vehicle, kit);
+                
+            } catch (error) {
+                console.error('Error seleccionando kit:', error);
+            }
+        }
+
+        /**
+         * Actualiza los detalles del kit seleccionado
+         */
+        function actualizarDetallesKit(kit) {
+            const detailsContainer = document.getElementById('kitDetails');
+            if (!detailsContainer) return;
+            
+            detailsContainer.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                    <div>
+                        <h4 style="font-size: 15px; font-weight: 600; margin-bottom: 4px;">${kit.nombre}</h4>
+                        <p style="font-size: 13px; color: #86868b;">${kit.descripcion || ''}</p>
+                    </div>
+                    <div style="font-size: 18px; font-weight: 700; color: ${kit.precio_clp > 0 ? 'var(--import-red)' : '#86868b'}">
+                        ${kit.precio_clp > 0 ? `+$${formatPrecioCLP(kit.precio_clp)}` : 'Incluido'}
+                    </div>
+                </div>
+                
+                ${kit.caracteristicas && kit.caracteristicas.length > 0 ? `
+                    <div style="font-size: 13px; color: #86868b; margin-bottom: 8px;">Incluye:</div>
+                    <div class="customization-features">
+                        ${kit.caracteristicas.map(caracteristica => `
+                            <div class="customization-feature">
+                                <i class="fas fa-check"></i>
+                                <span>${caracteristica}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        /**
+         * Actualiza el resumen con el kit seleccionado
+         */
+        function actualizarResumenKit(vehicle, kit) {
+            const summaryContainer = document.getElementById('selectedKitSummary');
+            const totalContainer = document.getElementById('totalPrice');
+            
+            if (summaryContainer) {
+                summaryContainer.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-weight: 500;">${kit.nombre}</div>
+                            <div style="font-size: 12px; color: #86868b;">${kit.descripcion || ''}</div>
+                        </div>
+                        <div style="font-size: 17px; font-weight: 600; color: ${kit.precio_clp > 0 ? 'var(--import-red)' : '#86868b'}">
+                            ${kit.precio_clp > 0 ? `+$${formatPrecioCLP(kit.precio_clp)}` : 'Incluido'}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (totalContainer) {
+                totalContainer.textContent = `$${formatPrecioCLP(vehicle.precio_clp + kit.precio_clp)} CLP`;
+            }
+        }
+
+        /**
+         * Solicitar cotización por WhatsApp
+         */
+        function solicitarCotizacionPersonalizacion(vehicleId, kitId) {
+            const vehicle = allVehicles.find(v => v.id === vehicleId);
             if (!vehicle) return;
             
-            const message = `Hola, estoy interesado en el vehículo: ${vehicle.name} ($${formatPrice(vehicle.price)} CLP). Estado: ${vehicle.status === 'stock' ? 'En Stock Arica' : vehicle.status === 'transit' ? 'En Tránsito' : 'Para Reservar'}. ¿Podrían darme más información?`;
-            window.open(`https://wa.me/56938654827?text=${encodeURIComponent(message)}`, '_blank');
+            // En una implementación real, aquí obtendrías el kit seleccionado
+            const mensaje = `Hola, estoy interesado en el vehículo: ${vehicle.titulo} ($${formatPrecioCLP(vehicle.precio_clp)} CLP). Quisiera consultar sobre opciones de personalización. ¿Podrían contactarme?`;
+            
+            trackEvent('contact', 'WhatsApp', 'Customization Quote');
+            window.open(`https://wa.me/56938654827?text=${encodeURIComponent(mensaje)}`, '_blank');
         }
 
-        // Solicitar cotización de personalización
-        function requestCustomization() {
-            if (!selectedVehicle) return;
-            
-            const basePrice = selectedVehicle.price;
-            const extrasTotal = 
-                selectedOptions.wheels.price + 
-                selectedOptions.audio.price + 
-                selectedOptions.lighting.price;
-            const total = basePrice + extrasTotal;
-            
-            const message = `Hola, quisiera cotizar esta configuración personalizada:%0A%0A🚗 *Vehículo:* ${selectedVehicle.name}%0A💰 *Precio base:* $${formatPrice(basePrice)} CLP%0A%0A⚙️ *Personalización:*%0A${selectedOptions.wheels.price > 0 ? `• ${selectedOptions.wheels.name}: +$${formatPrice(selectedOptions.wheels.price)}%0A` : ''}${selectedOptions.audio.price > 0 ? `• ${selectedOptions.audio.name}: +$${formatPrice(selectedOptions.audio.price)}%0A` : ''}${selectedOptions.lighting.price > 0 ? `• ${selectedOptions.lighting.name}: +$${formatPrice(selectedOptions.lighting.price)}%0A` : ''}%0A💵 *TOTAL:* $${formatPrice(total)} CLP%0A%0A¿Podemos proceder con esta configuración?`;
-            
-            window.open(`https://wa.me/56987654321?text=${encodeURIComponent(message)}`, '_blank');
+        /**
+         * Muestra galería de imágenes en modal
+         */
+        async function mostrarGaleriaImagenes(vehicleId) {
+            try {
+                const vehicle = allVehicles.find(v => v.id === vehicleId);
+                if (!vehicle) return;
+                
+                // Obtener todas las imágenes
+                const imagenes = [
+                    vehicle.imagen_1,
+                    vehicle.imagen_2,
+                    vehicle.imagen_3,
+                    vehicle.imagen_4,
+                    vehicle.imagen_5,
+                    vehicle.imagen_6,
+                    vehicle.imagen_7,
+                    vehicle.imagen_8
+                ].filter(img => img && img.trim() !== '');
+                
+                if (imagenes.length === 0) return;
+                
+                // Mostrar galería modal
+                mostrarGaleriaModal(vehicleId);
+                
+            } catch (error) {
+                console.error('Error mostrando galería:', error);
+            }
         }
 
-        // Cerrar modal
-        function closeModal() {
+        /**
+         * Muestra modal de galería
+         */
+        function mostrarGaleriaModal(vehicleId) {
+            const vehicle = allVehicles.find(v => v.id === vehicleId);
+            if (!vehicle) return;
+            
+            // Obtener todas las imágenes
+            const imagenes = [
+                vehicle.imagen_1,
+                vehicle.imagen_2,
+                vehicle.imagen_3,
+                vehicle.imagen_4,
+                vehicle.imagen_5,
+                vehicle.imagen_6,
+                vehicle.imagen_7,
+                vehicle.imagen_8
+            ].filter(img => img && img.trim() !== '');
+            
+            if (imagenes.length === 0) return;
+            
+            // Configurar galería
+            currentInstagramGallery = imagenes;
+            currentInstagramSlide = 0;
+            
+            // Crear slides
+            const slidesContainer = document.getElementById('gallerySlidesContainer');
+            const dotsContainer = document.getElementById('galleryDots');
+            
+            if (!slidesContainer || !dotsContainer) return;
+            
+            slidesContainer.innerHTML = imagenes.map((img, index) => `
+                <div class="gallery-slide ${index === 0 ? 'active' : ''}">
+                    <img src="${img}" alt="${vehicle.titulo} - Imagen ${index + 1}" 
+                         onclick="toggleZoom(this)"
+                         ondblclick="toggleZoom(this)"
+                         loading="lazy">
+                </div>
+            `).join('');
+            
+            // Crear dots
+            dotsContainer.innerHTML = imagenes.map((_, index) => `
+                <div class="gallery-dot ${index === 0 ? 'active' : ''}" onclick="goToSlide(${index})"></div>
+            `).join('');
+            
+            // Actualizar contador
+            updateGalleryCounter();
+            
+            // Mostrar modal
+            document.getElementById('instagramGalleryModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            trackEvent('open', 'Gallery', vehicle.titulo);
+        }
+
+        /**
+         * Navegación de galería
+         */
+        function changeGallerySlide(direction) {
+            if (!currentInstagramGallery) return;
+            
+            const slides = document.querySelectorAll('.gallery-slide');
+            const dots = document.querySelectorAll('.gallery-dot');
+            
+            // Quitar zoom si está activo
+            const currentSlide = slides[currentInstagramSlide];
+            if (currentSlide) {
+                const img = currentSlide.querySelector('img');
+                if (img && img.classList.contains('zoomed')) {
+                    img.classList.remove('zoomed');
+                }
+            }
+            
+            // Calcular nuevo índice
+            const newIndex = (currentInstagramSlide + direction + slides.length) % slides.length;
+            
+            // Actualizar slides
+            slides[currentInstagramSlide].classList.remove('active');
+            slides[newIndex].classList.add('active');
+            
+            // Actualizar dots
+            dots[currentInstagramSlide].classList.remove('active');
+            dots[newIndex].classList.add('active');
+            
+            currentInstagramSlide = newIndex;
+            updateGalleryCounter();
+        }
+
+        function goToSlide(index) {
+            if (!currentInstagramGallery) return;
+            
+            const slides = document.querySelectorAll('.gallery-slide');
+            const dots = document.querySelectorAll('.gallery-dot');
+            
+            // Quitar zoom si está activo
+            const currentSlide = slides[currentInstagramSlide];
+            if (currentSlide) {
+                const img = currentSlide.querySelector('img');
+                if (img && img.classList.contains('zoomed')) {
+                    img.classList.remove('zoomed');
+                }
+            }
+            
+            // Actualizar slides
+            slides[currentInstagramSlide].classList.remove('active');
+            slides[index].classList.add('active');
+            
+            // Actualizar dots
+            dots[currentInstagramSlide].classList.remove('active');
+            dots[index].classList.add('active');
+            
+            currentInstagramSlide = index;
+            updateGalleryCounter();
+        }
+
+        function toggleZoom(imgElement) {
+            imgElement.classList.toggle('zoomed');
+        }
+
+        function updateGalleryCounter() {
+            if (!currentInstagramGallery) return;
+            
+            const counter = document.getElementById('galleryCounter');
+            if (counter) {
+                counter.textContent = `${currentInstagramSlide + 1} / ${currentInstagramGallery.length}`;
+            }
+        }
+
+        function closeInstagramGallery() {
+            const modal = document.getElementById('instagramGalleryModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+            document.body.style.overflow = 'auto';
+            currentInstagramGallery = null;
+            currentInstagramSlide = 0;
+        }
+
+        /**
+         * Contactar por WhatsApp
+         */
+        function contactarPorWhatsApp(titulo, precio) {
+            const mensaje = `Hola, estoy interesado en el vehículo: ${titulo} - Precio: $${formatPrecioCLP(precio)} CLP`;
+            const url = `https://wa.me/56938654827?text=${encodeURIComponent(mensaje)}`;
+            window.open(url, '_blank');
+            trackEvent('contact', 'WhatsApp', titulo);
+        }
+
+        /**
+         * Filtrar vehículos
+         */
+        function filterVehicles(filter) {
+            currentFilter = filter;
+            
+            let filteredVehicles = allVehicles;
+            
+            if (filter === 'stock') {
+                filteredVehicles = allVehicles.filter(v => 
+                    v.estado_venta === 'disponible' && 
+                    !v.en_transito
+                );
+            } else if (filter === 'transit') {
+                filteredVehicles = allVehicles.filter(v => 
+                    v.en_transito === true && 
+                    v.estado_venta === 'disponible'
+                );
+            } else if (filter === 'reserve') {
+                filteredVehicles = allVehicles.filter(v => 
+                    v.estado_venta === 'reservado'
+                );
+            }
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+                if ((filter === 'all' && btn.textContent.includes('Todos')) ||
+                    (filter === 'stock' && btn.textContent.includes('Stock')) ||
+                    (filter === 'transit' && btn.textContent.includes('Tránsito'))) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Renderizar vehículos filtrados
+            renderizarVehiculosEnGrid(filteredVehicles);
+            
+            // Scroll suave a la sección
+            document.getElementById('vehicles').scrollIntoView({ behavior: 'smooth' });
+            
+            trackEvent('filter', 'Vehicles', filter);
+        }
+
+        /**
+         * Mostrar modal de personalización
+         */
+        function showCustomizationModal() {
+            if (allVehicles.length === 0) {
+                mostrarError('Primero carga los vehículos');
+                return;
+            }
+            
+            // Usar el primer vehículo como ejemplo
+            const primerVehiculo = allVehicles[0];
+            mostrarPersonalizaciones(primerVehiculo.id);
+        }
+
+        /**
+         * Cerrar modales
+         */
+        function closeVehicleDetailsModal() {
+            document.getElementById('vehicleDetailsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeCustomizationModal() {
             document.getElementById('customizationModal').style.display = 'none';
-            // Resetear opciones seleccionadas
-            selectedOptions = {
-                wheels: customizationOptions.wheels[0],
-                audio: customizationOptions.audio[0],
-                lighting: customizationOptions.lighting[0]
-            };
+            document.body.style.overflow = 'auto';
         }
 
-        // Cerrar modal con ESC
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
+        /**
+         * Mostrar mensaje de error
+         */
+        function mostrarError(mensaje) {
+            alert(mensaje); // En una implementación real, usarías un toast o modal más elegante
+        }
 
-        // Cerrar modal al hacer click fuera
-        document.getElementById('customizationModal').addEventListener('click', (e) => {
-            if (e.target === document.getElementById('customizationModal')) {
-                closeModal();
-            }
+        /**
+         * Inicializar cuando cargue la página
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Inicializando integración con Supabase...');
+            
+            // Cargar vehículos al iniciar
+            cargarVehiculosDesdeSupabase();
+            
+            // Configurar teclado para galería
+            document.addEventListener('keydown', (e) => {
+                const galleryModal = document.getElementById('instagramGalleryModal');
+                if (galleryModal.style.display === 'block') {
+                    if (e.key === 'Escape') {
+                        closeInstagramGallery();
+                    } else if (e.key === 'ArrowRight') {
+                        changeGallerySlide(1);
+                    } else if (e.key === 'ArrowLeft') {
+                        changeGallerySlide(-1);
+                    } else if (e.key === ' ') {
+                        e.preventDefault();
+                        const currentSlide = document.querySelector('.gallery-slide.active img');
+                        if (currentSlide) toggleZoom(currentSlide);
+                    }
+                }
+            });
+            
+            // Cerrar modales al hacer click fuera
+            document.getElementById('vehicleDetailsModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('vehicleDetailsModal')) {
+                    closeVehicleDetailsModal();
+                }
+            });
+            
+            document.getElementById('customizationModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('customizationModal')) {
+                    closeCustomizationModal();
+                }
+            });
+            
+            document.getElementById('instagramGalleryModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('instagramGalleryModal')) {
+                    closeInstagramGallery();
+                }
+            });
+            
+            console.log('✅ Página lista');
         });
     </script>
 </body>
