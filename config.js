@@ -1,6 +1,6 @@
 // Configuración de la API
 // REEMPLAZA CON TU URL DE GOOGLE APPS SCRIPT
-const API_URL = 'https://script.google.com/macros/s/AKfycbwVkFTK9bbMWMv7pcKcyaoBoUJVGx-V3wJm343TYeBmNtdhF0Kg-48Aa7ZDY8OXlsiU/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbzxFjTR30yKzFEdmEtZGrDLqx21gzMu-zYuZdQ3FLdV9gI5s79C-0LLbrVF71ftUOeq/exec';
 
 // Variables globales - IMPORTANTE: usar window. para acceso global
 window.vehicles = [];
