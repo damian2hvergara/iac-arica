@@ -1,4 +1,5 @@
 // Configuración de la API
+// REEMPLAZA ESTA URL CON LA DE TU GOOGLE APPS SCRIPT
 const API_URL = 'https://script.google.com/macros/s/AKfycbwVkFTK9bbMWMv7pcKcyaoBoUJVGx-V3wJm343TYeBmNtdhF0Kg-48Aa7ZDY8OXlsiU/exec';
 
 // Variables globales
@@ -77,20 +78,38 @@ function extractYouTubeId(videoInput) {
 async function loadDataFromAPI() {
     try {
         console.log('🔄 Conectando a la base de datos...');
+        console.log('📡 URL de la API:', API_URL);
+        
         const response = await fetch(API_URL);
         
         if (!response.ok) {
+            console.error('❌ Error HTTP:', response.status, response.statusText);
             throw new Error(`Error HTTP: ${response.status}`);
         }
         
-        const data = await response.json();
+        const text = await response.text();
+        console.log('📦 Respuesta recibida (primeros 500 caracteres):', text.substring(0, 500));
+        
+        const data = JSON.parse(text);
         
         if (data.success) {
-            // Procesar los datos según la estructura de tu API
+            console.log('✅ API respondió correctamente');
+            console.log('📊 Estructura de datos recibida:', Object.keys(data.data || {}));
+            
+            // Mostrar estadísticas de cada hoja
+            if (data.data) {
+                Object.keys(data.data).forEach(key => {
+                    if (Array.isArray(data.data[key])) {
+                        console.log(`   📄 ${key}: ${data.data[key].length} registros`);
+                    }
+                });
+            }
+            
             processAPIData(data.data);
             console.log('✅ Base de datos conectada:', vehicles.length, 'vehículos cargados');
             return true;
         } else {
+            console.error('❌ Error en la respuesta de la API:', data.message);
             throw new Error(data.message || 'Error en la respuesta de la API');
         }
     } catch (error) {
@@ -104,18 +123,23 @@ async function loadDataFromAPI() {
 // Procesar datos de la API de forma segura
 function processAPIData(apiData) {
     if (!apiData) {
+        console.error('❌ No hay datos en la API');
         loadEmptyData();
         return;
     }
+    
+    console.log('🔍 Procesando datos de la API...');
     
     // 1. Configuración global
     if (Array.isArray(apiData.config)) {
         apiData.config.forEach(item => {
             if (item && item.key === 'imported_vehicles_counter') {
                 importedVehiclesCounter = safeParseInt(item.value, 142);
+                console.log('📊 Contador de vehículos importados:', importedVehiclesCounter);
             }
             if (item && item.key === 'whatsapp_number') {
                 whatsappNumber = item.value || '56938654827';
+                console.log('📱 Número de WhatsApp:', whatsappNumber);
             }
         });
     }
@@ -123,8 +147,10 @@ function processAPIData(apiData) {
     // 2. Vehículos - Filtrar solo activos
     if (Array.isArray(apiData.vehicles)) {
         const activeVehicles = apiData.vehicles.filter(v => 
-            v && v.active === 'TRUE'
+            v && (v.active === 'TRUE' || v.active === true || v.active === 1 || v.active === '1' || v.active === 'true')
         );
+        
+        console.log(`📊 Vehículos: ${apiData.vehicles.length} totales, ${activeVehicles.length} activos`);
         
         if (activeVehicles.length === 0) {
             console.log('⚠️ No hay vehículos activos en la base de datos');
@@ -138,9 +164,9 @@ function processAPIData(apiData) {
                 id: safeParseInt(vehicle.id, 0),
                 name: safeGet(vehicle, 'name', 'Vehículo'),
                 price: safeParseInt(vehicle.price_clp, 0),
-                status: safeGet(vehicle, 'status', 'stock'),
+                status: safeGet(vehicle, 'status', 'stock').toLowerCase(),
                 location: safeGet(vehicle, 'location', 'Arica'),
-                type: 'vehicle', // Valor por defecto
+                type: 'vehicle',
                 description: safeGet(vehicle, 'description', ''),
                 eta: safeGet(vehicle, 'eta', 'Disponible'),
                 transitTime: safeParseInt(vehicle.transit_days, null),
@@ -151,7 +177,7 @@ function processAPIData(apiData) {
                 kits: []
             };
             
-            // Determinar tipo del vehículo basado en el nombre
+            // Determinar tipo del vehículo
             const vehicleName = baseData.name.toLowerCase();
             if (vehicleName.includes('silverado')) baseData.type = 'silverado';
             else if (vehicleName.includes('tacoma')) baseData.type = 'tacoma';
@@ -160,8 +186,8 @@ function processAPIData(apiData) {
             else if (vehicleName.includes('ford')) baseData.type = 'ford';
             
             // 3. Especificaciones técnicas
-            if (Array.isArray(apiData.specifications)) {
-                const vehicleSpecs = apiData.specifications.filter(spec => 
+            if (Array.isArray(apiData.vehicle_specifications)) {
+                const vehicleSpecs = apiData.vehicle_specifications.filter(spec => 
                     spec && spec.vehicle_id == baseData.id
                 );
                 
@@ -173,8 +199,8 @@ function processAPIData(apiData) {
             }
             
             // 4. Galería de imágenes
-            if (Array.isArray(apiData.gallery)) {
-                const vehicleGallery = apiData.gallery
+            if (Array.isArray(apiData.vehicle_gallery)) {
+                const vehicleGallery = apiData.vehicle_gallery
                     .filter(img => img && img.vehicle_id == baseData.id)
                     .sort((a, b) => safeParseInt(a.order, 0) - safeParseInt(b.order, 0));
                 
@@ -189,17 +215,18 @@ function processAPIData(apiData) {
             }
             
             // 5. Kits de personalización
-            if (Array.isArray(apiData.kits)) {
-                const activeKits = apiData.kits.filter(kit => 
-                    kit && kit.vehicle_id == baseData.id && kit.active === 'TRUE'
+            if (Array.isArray(apiData.vehicle_kits)) {
+                const activeKits = apiData.vehicle_kits.filter(kit => 
+                    kit && kit.vehicle_id == baseData.id && 
+                    (kit.active === 'TRUE' || kit.active === true || kit.active === 1 || kit.active === '1' || kit.active === 'true')
                 );
                 
                 if (activeKits.length > 0) {
                     activeKits.forEach(kit => {
                         // Características del kit
                         let features = [];
-                        if (Array.isArray(apiData.kitFeatures)) {
-                            features = apiData.kitFeatures
+                        if (Array.isArray(apiData.kit_features)) {
+                            features = apiData.kit_features
                                 .filter(feature => feature && feature.kit_id === kit.kit_id)
                                 .map(feature => feature.feature_text)
                                 .filter(text => text && text.trim() !== '');
@@ -254,6 +281,8 @@ function processAPIData(apiData) {
     // Actualizar la interfaz con los datos cargados
     updateImportedCounter();
     updateWhatsappLinks();
+    
+    console.log('✅ Procesamiento completo. Vehículos procesados:', vehicles.length);
 }
 
 // Cargar datos vacíos como fallback seguro
@@ -286,6 +315,7 @@ function updateImportedCounter() {
     const counterElement = document.getElementById('importedVehiclesCounter');
     if (counterElement) {
         counterElement.textContent = importedVehiclesCounter;
+        console.log('🔢 Contador actualizado en interfaz:', importedVehiclesCounter);
     }
 }
 
@@ -303,6 +333,7 @@ function updateWhatsappLinks() {
             element.setAttribute('onclick', originalOnclick.replace(/wa\.me\/\d+/, `wa.me/${whatsappNumber}`));
         }
     });
+    console.log('📱 Enlaces de WhatsApp actualizados');
 }
 
 // Función para formatear precio
