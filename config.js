@@ -1,9 +1,9 @@
 // Configuración de la API
-// REEMPLAZA ESTA URL CON LA DE TU GOOGLE APPS SCRIPT
+// REEMPLAZA CON TU URL DE GOOGLE APPS SCRIPT
 const API_URL = 'https://script.google.com/macros/s/AKfycbwVkFTK9bbMWMv7pcKcyaoBoUJVGx-V3wJm343TYeBmNtdhF0Kg-48Aa7ZDY8OXlsiU/exec';
 
-// Variables globales
-let vehicles = [];
+// Variables globales - IMPORTANTE: usar window. para acceso global
+window.vehicles = [];
 let importedVehiclesCounter = 142;
 let whatsappNumber = '56938654827';
 
@@ -78,43 +78,41 @@ function extractYouTubeId(videoInput) {
 async function loadDataFromAPI() {
     try {
         console.log('🔄 Conectando a la base de datos...');
-        console.log('📡 URL de la API:', API_URL);
+        console.log('📡 URL:', API_URL);
         
-        const response = await fetch(API_URL);
+        const response = await fetch(API_URL, {
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        console.log('📊 Status:', response.status, response.statusText);
         
         if (!response.ok) {
-            console.error('❌ Error HTTP:', response.status, response.statusText);
+            console.error('❌ Error HTTP:', response.status);
             throw new Error(`Error HTTP: ${response.status}`);
         }
         
         const text = await response.text();
-        console.log('📦 Respuesta recibida (primeros 500 caracteres):', text.substring(0, 500));
+        console.log('📦 Respuesta (primeros 300 chars):', text.substring(0, 300));
         
         const data = JSON.parse(text);
         
         if (data.success) {
             console.log('✅ API respondió correctamente');
-            console.log('📊 Estructura de datos recibida:', Object.keys(data.data || {}));
-            
-            // Mostrar estadísticas de cada hoja
-            if (data.data) {
-                Object.keys(data.data).forEach(key => {
-                    if (Array.isArray(data.data[key])) {
-                        console.log(`   📄 ${key}: ${data.data[key].length} registros`);
-                    }
-                });
-            }
+            console.log('📊 Datos recibidos de:', Object.keys(data.data || {}));
             
             processAPIData(data.data);
-            console.log('✅ Base de datos conectada:', vehicles.length, 'vehículos cargados');
+            console.log('✅ Base de datos conectada:', window.vehicles.length, 'vehículos');
             return true;
         } else {
-            console.error('❌ Error en la respuesta de la API:', data.message);
-            throw new Error(data.message || 'Error en la respuesta de la API');
+            console.error('❌ Error en API:', data.message);
+            throw new Error(data.message || 'Error en API');
         }
     } catch (error) {
-        console.error('❌ No se pudo conectar a la base de datos:', error.message);
-        console.log('ℹ️ La aplicación funcionará con datos mínimos');
+        console.error('❌ Error de conexión:', error.message);
+        console.log('ℹ️ Usando datos mínimos de respaldo');
         loadEmptyData();
         return false;
     }
@@ -128,18 +126,18 @@ function processAPIData(apiData) {
         return;
     }
     
-    console.log('🔍 Procesando datos de la API...');
+    console.log('🔍 Procesando datos...');
     
     // 1. Configuración global
     if (Array.isArray(apiData.config)) {
         apiData.config.forEach(item => {
             if (item && item.key === 'imported_vehicles_counter') {
                 importedVehiclesCounter = safeParseInt(item.value, 142);
-                console.log('📊 Contador de vehículos importados:', importedVehiclesCounter);
+                console.log('📊 Contador:', importedVehiclesCounter);
             }
             if (item && item.key === 'whatsapp_number') {
                 whatsappNumber = item.value || '56938654827';
-                console.log('📱 Número de WhatsApp:', whatsappNumber);
+                console.log('📱 WhatsApp:', whatsappNumber);
             }
         });
     }
@@ -150,15 +148,15 @@ function processAPIData(apiData) {
             v && (v.active === 'TRUE' || v.active === true || v.active === 1 || v.active === '1' || v.active === 'true')
         );
         
-        console.log(`📊 Vehículos: ${apiData.vehicles.length} totales, ${activeVehicles.length} activos`);
+        console.log(`📊 Vehículos: ${apiData.vehicles.length} total, ${activeVehicles.length} activos`);
         
         if (activeVehicles.length === 0) {
-            console.log('⚠️ No hay vehículos activos en la base de datos');
+            console.log('⚠️ No hay vehículos activos');
             loadEmptyData();
             return;
         }
         
-        vehicles = activeVehicles.map(vehicle => {
+        window.vehicles = activeVehicles.map(vehicle => {
             // Datos básicos del vehículo
             const baseData = {
                 id: safeParseInt(vehicle.id, 0),
@@ -273,24 +271,23 @@ function processAPIData(apiData) {
             return baseData;
         });
     } else {
-        console.log('⚠️ No se encontraron vehículos en la base de datos');
+        console.log('⚠️ No se encontraron vehículos');
         loadEmptyData();
         return;
     }
     
-    // Actualizar la interfaz con los datos cargados
+    // Actualizar la interfaz
     updateImportedCounter();
     updateWhatsappLinks();
     
-    console.log('✅ Procesamiento completo. Vehículos procesados:', vehicles.length);
+    console.log('✅ Procesamiento completo');
 }
 
 // Cargar datos vacíos como fallback seguro
 function loadEmptyData() {
-    vehicles = [];
+    window.vehicles = [];
     console.log('ℹ️ Modo datos mínimos activado');
     
-    // Mostrar mensaje amigable en la interfaz
     setTimeout(() => {
         const container = document.getElementById('vehiclesContainer');
         if (container) {
@@ -315,25 +312,21 @@ function updateImportedCounter() {
     const counterElement = document.getElementById('importedVehiclesCounter');
     if (counterElement) {
         counterElement.textContent = importedVehiclesCounter;
-        console.log('🔢 Contador actualizado en interfaz:', importedVehiclesCounter);
     }
 }
 
 // Actualizar enlaces de WhatsApp
 function updateWhatsappLinks() {
     document.querySelectorAll('a[href*="wa.me"], button[onclick*="wa.me"]').forEach(element => {
-        // Actualizar href en enlaces
         if (element.tagName === 'A' && element.href.includes('wa.me')) {
             element.href = `https://wa.me/${whatsappNumber}`;
         }
         
-        // Actualizar onclick en botones
         if (element.onclick && element.onclick.toString().includes('wa.me')) {
             const originalOnclick = element.onclick.toString();
             element.setAttribute('onclick', originalOnclick.replace(/wa\.me\/\d+/, `wa.me/${whatsappNumber}`));
         }
     });
-    console.log('📱 Enlaces de WhatsApp actualizados');
 }
 
 // Función para formatear precio
@@ -344,12 +337,12 @@ window.formatPrice = function(price) {
 
 // Función para obtener vehículos
 window.getVehicles = function() {
-    return vehicles;
+    return window.vehicles;
 };
 
 // Función para obtener un vehículo por ID
 window.getVehicleById = function(id) {
-    return vehicles.find(v => v.id === id);
+    return window.vehicles.find(v => v.id === id);
 };
 
 // Función para contactar
@@ -358,7 +351,6 @@ window.contactVehicle = function(vehicleId) {
     let message;
     
     if (vehicleId === 0 || !vehicleId) {
-        // Contacto general
         message = `Hola, estoy interesado en importar un vehículo desde USA. ¿Podrían contactarme para asesorarme?`;
     } else {
         vehicle = getVehicleById(vehicleId);
@@ -383,12 +375,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Notificar que los datos están listos
     const event = new CustomEvent('dataLoaded', { 
         detail: { 
-            vehicles: vehicles,
-            count: vehicles.length,
+            vehicles: window.vehicles,
+            count: window.vehicles.length,
             timestamp: new Date().toISOString()
         } 
     });
     document.dispatchEvent(event);
     
-    console.log('✅ Aplicación lista. Vehículos activos:', vehicles.length);
+    console.log('✅ Aplicación lista. Vehículos:', window.vehicles.length);
 });
