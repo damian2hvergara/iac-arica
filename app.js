@@ -1,5 +1,4 @@
 // Estado
-let currentFilter = "all";
 let selectedVehicle = null;
 let selectedKit = null;
 let currentGalleryIndex = 0;
