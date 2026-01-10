@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Import American Cars</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <style>
+    body { background: var(--gray-50); }
+    .admin-header {
+        position: fixed; top: 0; width: 100%;
+        background: rgba(255,255,255,0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: var(--border);
+        z-index: 1000;
+    }
+    .header-container {
+        max-width: 1200px; margin: 0 auto;
+        padding: 12px 22px;
+        display: flex; justify-content: space-between;
+        align-items: center;
+    }
+    .admin-container {
+        max-width: 1200px;
+        margin: 80px auto 40px;
+        padding: 0 22px;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+    .stat-card {
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        text-align: center;
+    }
+    .stat-number {
+        font-size: 48px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: var(--gray-300);
+        text-transform: uppercase;
+    }
+    .content-card {
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 32px;
+        margin-bottom: 24px;
+    }
+    .card-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 24px;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+    .full-width { grid-column: 1 / -1; }
+    .vehicles-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .vehicles-table th,
+    .vehicles-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: var(--border);
+    }
+    .vehicles-table th {
+        background: var(--gray-50);
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+    .table-image {
+        width: 60px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+    .btn-icon {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .login-card {
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 48px;
+        max-width: 400px;
+        width: 100%;
+    }
+    .login-title {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+    <!-- Login -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-title">
+                <span style="color: var(--import-red);">Import</span> Cars
+            </div>
+            <h2 style="text-align: center; margin-bottom: 32px; color: var(--gray-300);">Panel Admin</h2>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" id="loginPassword" class="form-input" required>
+                </div>
+                
+                <button type="submit" class="button" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display: none;">
+        <header class="admin-header">
+            <div class="header-container">
+                <div class="logo">
+                    <span style="color: var(--import-red);">Import</span> American Cars
+                    <span style="font-size: 14px; color: var(--gray-300); margin-left: 12px;">Admin</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <span id="userEmail" style="color: var(--gray-300);"></span>
+                    <button class="button button-small button-outline" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="admin-container">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number status-stock" id="adminStockCount">0</div>
+                    <div class="stat-label">En Stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number status-transit" id="adminTransitCount">0</div>
+                    <div class="stat-label">En Tránsito</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number status-reserve" id="adminReserveCount">0</div>
+                    <div class="stat-label">Reservados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="adminTotalCount">0</div>
+                    <div class="stat-label">Total</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('vehicles')">
+                    <i class="fas fa-car"></i> Vehículos
+                </button>
+                <button class="tab" onclick="switchTab('add')">
+                    <i class="fas fa-plus"></i> Agregar
+                </button>
+            </div>
+
+            <!-- Tab: Lista -->
+            <div id="vehiclesTab" class="tab-content active">
+                <div class="content-card">
+                    <h2 class="card-title">Inventario</h2>
+                    <div id="vehiclesTableContainer">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>Cargando...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Agregar -->
+            <div id="addTab" class="tab-content">
+                <div class="content-card">
+                    <h2 class="card-title">Agregar Vehículo</h2>
+                    
+                    <form id="vehicleForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" name="name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Precio (CLP) *</label>
+                                <input type="number" name="price" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Estado *</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="stock">En Stock</option>
+                                    <option value="transit">En Tránsito</option>
+                                    <option value="reserve">Para Reservar</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Ubicación</label>
+                                <input type="text" name="location" class="form-input" placeholder="Arica">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Tipo</label>
+                                <input type="text" name="type" class="form-input" placeholder="silverado">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Video ID YouTube</label>
+                                <input type="text" name="video_id" class="form-input" placeholder="M7FIvfx5J10">
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <label class="form-label">Descripción</label>
+                                <textarea name="description" class="form-textarea" placeholder="5.3L V8 • 4x4 • Crew Cab"></textarea>
+                            </div>
+                            
+                            <div class="form-group full-width">
+                                <h3 style="margin: 24px 0 16px;">Imágenes</h3>
+                                
+                                <div class="image-upload-area" id="imageUploadArea">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--gray-300); margin-bottom: 16px;"></i>
+                                    <p style="color: var(--gray-300);">Arrastra imágenes o haz click</p>
+                                    <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                                </div>
+                                
+                                <div class="image-preview" id="imagePreview"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; margin-top: 32px;">
+                            <button type="submit" class="button" style="flex: 1;">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button type="button" class="button button-outline" onclick="resetForm()">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
+```
+
+---
+
+## ✅ ARCHIVOS DOCUMENTACIÓN
+
+Crea también estos archivos:
+
+### 📄 .gitignore
+```
+js/config.js
+.DS_Store
+node_modules/
+*.log
+.env
