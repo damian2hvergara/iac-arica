@@ -91,8 +91,12 @@ function animateCounter() {
     const counterElement = document.getElementById('importedVehiclesCounter');
     if (!counterElement) return;
     
-    const targetNumber = parseInt(counterElement.textContent) || 0;
+    // Usar el valor ya actualizado desde la API
+    const targetNumber = importedVehiclesCounter || parseInt(counterElement.textContent) || 0;
+    
     if (targetNumber === 0) return;
+    
+    console.log('🔢 Animando contador a:', targetNumber);
     
     const duration = 2000;
     const steps = 60;
