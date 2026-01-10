@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="logo"><span class="import-text">Import</span> American Cars</div>
@@ -22,325 +21,126 @@
         </div>
     </header>
 
-    <!-- Hero -->
     <section class="hero" id="home">
-        <h1>Vehículos Americanos</h1>
-        <p class="hero-subtitle">Importación directa desde USA. Personalización con accesorios originales. Entrega en Arica.</p>
-        
-        <div class="stock-indicators">
-            <div class="indicator" onclick="filterVehicles('stock')">
-                <div class="indicator-number status-stock" id="stockCount">3</div>
-                <div class="indicator-label">En Stock Arica</div>
-            </div>
-            <div class="indicator" onclick="filterVehicles('transit')">
-                <div class="indicator-number status-transit" id="transitCount">1</div>
-                <div class="indicator-label">En Tránsito</div>
-            </div>
-            <div class="indicator" onclick="filterVehicles('reserve')">
-                <div class="indicator-number status-reserve" id="reserveCount">0</div>
-                <div class="indicator-label">Para Reservar</div>
+        <div class="hero-content">
+            <h1>Vehículos Americanos</h1>
+            <p class="hero-subtitle">Importación directa desde USA a Arica. Calidad certificada y gestión completa.</p>
+            
+            <div class="stock-indicators">
+                <div class="indicator" onclick="filterVehicles('stock')">
+                    <span class="indicator-dot dot-green"></span>
+                    <span class="indicator-label">En Stock Arica</span>
+                </div>
+                <div class="indicator" onclick="filterVehicles('transit')">
+                    <span class="indicator-dot dot-orange"></span>
+                    <span class="indicator-label">En Tránsito</span>
+                </div>
+                <div class="indicator" onclick="filterVehicles('order')">
+                    <span class="indicator-dot dot-blue"></span>
+                    <span class="indicator-label">Para Reservar</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- CONTADOR DE VEHÍCULOS IMPORTADOS -->
-    <section class="success-counter">
-        <div class="counter-container">
-            <div class="counter-number" id="importedVehiclesCounter">142</div>
-            <p class="counter-text">Vehículos americanos importados exitosamente desde USA a Arica</p>
+    <section class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number" id="importedCounter">142</div>
+            <div class="stat-label">Vehículos importados exitosamente</div>
         </div>
     </section>
 
-    <!-- Vehículos -->
-    <section class="vehicles-section" id="vehicles">
-        <h2 class="section-title">Vehículos Disponibles</h2>
-        <p class="section-subtitle">Importación directa con todos los documentos en regla. Personalización disponible durante el proceso.</p>
-        
-        <div class="filters">
-            <button class="filter-button active" onclick="filterVehicles('all')">Todos</button>
-            <button class="filter-button" onclick="filterVehicles('stock')">En Stock</button>
-            <button class="filter-button" onclick="filterVehicles('transit')">En Tránsito</button>
-        </div>
-        
-        <div class="vehicles-grid" id="vehiclesContainer">
-            <!-- Cargado dinámicamente -->
-        </div>
-    </section>
-
-    <!-- Personalización -->
-    <section class="vehicles-section" id="customize" style="background: var(--gray-50);">
-        <h2 class="section-title">Personalización</h2>
-        <p class="section-subtitle">Agrega accesorios USA originales durante el proceso de importación. Instalación profesional incluida.</p>
-        
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px;">
-            <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
-                    <i class="fas fa-cog" style="font-size: 24px;"></i>
-                </div>
-                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Kits Personalizados</h3>
-                <p style="color: #86868b; font-size: 14px;">Básico, Sport, Off-Road, Premium</p>
-            </div>
-            
-            <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
-                    <i class="fas fa-tire" style="font-size: 24px;"></i>
-                </div>
-                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Llantas USA</h3>
-                <p style="color: #86868b; font-size: 14px;">Fuel, Method, BBS originales</p>
-            </div>
-            
-            <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
-                    <i class="fas fa-toolbox" style="font-size: 24px;"></i>
-                </div>
-                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Kits Off-Road</h3>
-                <p style="color: #86868b; font-size: 14px;">Suspensión, protectores, winch</p>
-            </div>
-            
-            <div style="text-align: center; padding: 32px; background: var(--white); border-radius: var(--radius); border: var(--border);">
-                <div style="width: 60px; height: 60px; background: var(--gray-100); border-radius: 30px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--import-red);">
-                    <i class="fas fa-lightbulb" style="font-size: 24px;"></i>
-                </div>
-                <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 8px;">Iluminación LED</h3>
-                <p style="color: #86868b; font-size: 14px;">Faros, niebla, interiores</p>
+    <section class="section" id="vehicles">
+        <div class="section-header">
+            <h2 class="section-title">Nuestro Inventario</h2>
+            <div class="filter-tabs">
+                <button class="filter-tab active" onclick="filterVehicles('all')">Todos</button>
+                <button class="filter-tab" onclick="filterVehicles('stock')">En Stock</button>
+                <button class="filter-tab" onclick="filterVehicles('transit')">En Tránsito</button>
+                <button class="filter-tab" onclick="filterVehicles('pickup')">Pickups</button>
+                <button class="filter-tab" onclick="filterVehicles('suv')">SUVs</button>
             </div>
         </div>
         
-        <div style="text-align: center; margin-top: 40px;">
-            <button class="button" onclick="showCustomizationModal()" style="width: auto; padding: 14px 32px;">
-                <i class="fas fa-cog"></i> Simular Personalización
-            </button>
+        <div class="vehicles-grid" id="vehiclesGrid">
+            <div class="loading-message">Cargando vehículos disponibles...</div>
         </div>
     </section>
 
-    <!-- SECCIÓN DE TESTIMONIOS -->
-    <section class="testimonials-section" id="testimonials">
-        <div class="testimonials-container">
-            <h2 class="section-title">Lo Que Dicen Nuestros Clientes</h2>
-            <p class="section-subtitle">Más de 140 clientes satisfechos con nuestro servicio de importación y personalización.</p>
-            
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-header">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
-                             alt="Carlos M." class="testimonial-avatar">
-                        <div class="testimonial-info">
-                            <h4>Carlos M.</h4>
-                            <p>Importó Silverado 2022</p>
-                        </div>
-                    </div>
-                    <p class="testimonial-text">"El proceso fue transparente desde el inicio. La personalización quedó exactamente como quería. La legalización fue más rápida de lo esperado. Totalmente recomendado."</p>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-header">
-                        <img src="https://images.unsplash.com/photo-1494790108755-2616c113a1c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
-                             alt="Ana R." class="testimonial-avatar">
-                        <div class="testimonial-info">
-                            <h4>Ana R.</h4>
-                            <p>Importó Jeep Wrangler 2021</p>
-                        </div>
-                    </div>
-                    <p class="testimonial-text">"Excelente atención. Me asesoraron en cada paso del proceso de importación. El kit off-road que instalaron es de primera calidad. Mi Jeep quedó perfecto para las dunas."</p>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-header">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
-                             alt="Miguel T." class="testimonial-avatar">
-                        <div class="testimonial-info">
-                            <h4>Miguel T.</h4>
-                            <p>Importó RAM 1500 2020</p>
-                        </div>
-                    </div>
-                    <p class="testimonial-text">"Comparé precios con varias empresas y aquí encontré el mejor valor. La personalización premium valió cada peso. El servicio post-venta ha sido impecable."</p>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                </div>
+    <section class="section bg-gray" id="customize">
+        <div class="section-header">
+            <h2 class="section-title">Personaliza tu Importación</h2>
+            <p>Configura tu vehículo ideal y nosotros lo buscamos por ti en las mejores subastas de USA.</p>
+        </div>
+        
+        <div class="custom-card">
+            <div class="custom-content">
+                <h3>Servicio de Búsqueda Personalizada</h3>
+                <p>Si no encuentras lo que buscas en nuestro stock, nuestro equipo en USA busca el vehículo exacto bajo tus especificaciones.</p>
+                <button class="btn btn-primary" onclick="openCustomizationModal()">Configurar mi vehículo</button>
             </div>
         </div>
     </section>
 
-    <!-- SECCIÓN INSTAGRAM -->
-    <section class="instagram-section">
-        <div class="instagram-container">
-            <h2 class="section-title">Entregas Reales</h2>
-            <p class="section-subtitle">Sigue nuestro Instagram para ver más entregas y proyectos de personalización.</p>
-            
-            <div class="instagram-grid">
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 1')">
-                    <img src="https://images.unsplash.com/photo-1580274455191-1c62238fa333?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                         alt="Silverado entregado" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
-                </a>
-                
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 2')">
-                    <img src="https://images.unsplash.com/photo-1553440569-bcc63803a83d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                         alt="Kit off-road instalado" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
-                </a>
-                
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 3')">
-                    <img src="https://images.unsplash.com/photo-1621461133947-f63381c2f7f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                         alt="Tacoma personalizado" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
-                </a>
-                
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 4')">
-                    <img src="https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                         alt="Detailing profesional" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
-                </a>
-                
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 5')">
-                    <img src="https://images.unsplash.com/photo-1577451550516-7d6e513d1c2b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                         alt="Proceso de importación" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
-                </a>
-                
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="instagram-post" onclick="trackEvent('click', 'Social', 'Instagram Post 6')">
-                    <img src="https://images.unsplash.com/photo-1563720223485-8d6d5c5c8b9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" 
-                         alt="Cliente satisfecho" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
-                </a>
-            </div>
-            
-            <div style="text-align: center; margin-top: 40px;">
-                <a href="https://instagram.com/tu_usuario" target="_blank" class="button button-outline" onclick="trackEvent('click', 'Social', 'Instagram Profile')">
-                    <i class="fab fa-instagram"></i> Síguenos en Instagram
-                </a>
+    <section class="section testimonials-section" id="testimonials">
+        <div class="section-header">
+            <h2 class="section-title">Clientes Satisfechos</h2>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <p>"Excelente gestión, mi camioneta llegó en el tiempo acordado y en perfectas condiciones a Arica."</p>
+                <div class="testimonial-author">- Juan P., Arica</div>
             </div>
         </div>
     </section>
 
-    <!-- SECCIÓN BLOG/ARTICLES -->
-    <section class="blog-section" id="blog">
-        <div class="blog-container">
-            <h2 class="section-title">Guías y Comparativas</h2>
-            <p class="section-subtitle">Aprende todo sobre importación de vehículos americanos y toma la mejor decisión.</p>
-            
-            <div class="articles-grid">
-                <article class="article-card">
-                    <img src="https://images.unsplash.com/photo-1493238792000-8113da705763?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                         alt="Importación vs Local" class="article-image">
-                    <div class="article-content">
-                        <span class="article-category">Guía de Importación</span>
-                        <h3 class="article-title">¿Por qué importar desde USA vs. comprar local?</h3>
-                        <p class="article-excerpt">Descubre las ventajas reales de importar tu vehículo desde Estados Unidos comparado con comprar en el mercado local chileno.</p>
-                        <a href="https://drive.google.com/file/d/1ABC123def456ghi789/view?usp=sharing" 
-                           target="_blank" 
-                           class="article-link" 
-                           onclick="trackEvent('download', 'PDF', 'Import vs Local')">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </a>
-                    </div>
-                </article>
-                
-                <article class="article-card">
-                    <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                         alt="Legalización en Chile" class="article-image">
-                    <div class="article-content">
-                        <span class="article-category">Proceso Legal</span>
-                        <h3 class="article-title">Guía completa de legalización en Chile</h3>
-                        <p class="article-excerpt">Todo lo que necesitas saber sobre el proceso de legalización de vehículos importados en Chile. Documentación, costos y tiempos.</p>
-                        <a href="https://drive.google.com/file/d/1XYZ789abc456def123/view?usp=sharing" 
-                           target="_blank" 
-                           class="article-link" 
-                           onclick="trackEvent('download', 'PDF', 'Legalization Guide')">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </a>
-                    </div>
-                </article>
-                
-                <article class="article-card">
-                    <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                         alt="Comparativa pickups" class="article-image">
-                    <div class="article-content">
-                        <span class="article-category">Comparativa</span>
-                        <h3 class="article-title">Silverado vs. RAM vs. F-150: ¿Cuál elegir?</h3>
-                        <p class="article-excerpt">Análisis detallado de las tres pickups americanas más populares. Rendimiento, costos de mantenimiento y valor de reventa.</p>
-                        <a href="https://drive.google.com/file/d/1DEF456ghi789jkl012/view?usp=sharing" 
-                           target="_blank" 
-                           class="article-link" 
-                           onclick="trackEvent('download', 'PDF', 'Pickup Comparison')">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </a>
-                    </div>
-                </article>
-            </div>
+    <section class="section blog-section" id="blog">
+        <div class="section-header">
+            <h2 class="section-title">Actualidad Automotriz</h2>
         </div>
+        <div class="articles-grid">
+            </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer" id="contact">
-        <div style="max-width: 600px; margin: 0 auto;">
-            <div class="logo" style="margin-bottom: 24px;"><span class="import-text">Import</span> American Cars</div>
-            <p style="color: #86868b; margin-bottom: 32px;">Vehículos americanos importados desde USA. Personalización con accesorios originales. Taller en Arica.</p>
-            <a href="https://wa.me/56938654827" class="button" 
-               style="width: auto; display: inline-flex; align-items: center; gap: 8px;"
-               onclick="trackEvent('click', 'Contact', 'WhatsApp Footer')">
-                <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
-            </a>
-            <div style="margin-top: 40px; font-size: 13px; color: #86868b;">
-                <p>📍 Av. Principal 1234, Arica, Chile</p>
-                <p>📞 +56 9 3865 4827</p>
-                <p>✉️ contacto@importamericancars.cl</p>
+        <div class="footer-container">
+            <div class="footer-info">
+                <div class="logo" style="margin-bottom: 20px;"><span class="import-text">Import</span> American Cars</div>
+                <p>Especialistas en importación de vehículos americanos bajo régimen de Zona Franca.</p>
+                <div class="social-links" style="margin-top: 20px; display: flex; gap: 15px;">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-whatsapp"></i></a>
+                </div>
             </div>
+            <div class="footer-links">
+                <h4>Contacto</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Arica, Chile</p>
+                <p><i class="fas fa-phone"></i> +56 9 3865 4827</p>
+                <p><i class="fas fa-envelope"></i> contacto@importamericancars.cl</p>
+            </div>
+        </div>
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #333; font-size: 12px; color: #888;">
+            © 2024 Import American Cars - Arica, Chile. Todos los derechos reservados.
         </div>
     </footer>
 
-    <!-- Modal para Detalles del Vehículo -->
     <div class="modal" id="vehicleDetailsModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeVehicleDetailsModal()">×</button>
             <div id="vehicleDetailsContent">
-                <!-- Cargado dinámicamente -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- Modal para Personalización -->
     <div class="modal" id="customizationModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeCustomizationModal()">×</button>
             <div class="customization-container" id="customizationContent">
-                <!-- Cargado dinámicamente -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- NUEVO: Galería Instagram para imágenes del vehículo -->
     <div class="instagram-gallery-modal" id="instagramGalleryModal">
         <div class="instagram-gallery-container">
             <button class="gallery-close" onclick="closeInstagramGallery()">×</button>
@@ -349,14 +149,12 @@
             <button class="gallery-nav prev" onclick="changeGallerySlide(-1)">‹</button>
             
             <div id="gallerySlidesContainer">
-                <!-- Cargado dinámicamente -->
-            </div>
+                </div>
             
             <button class="gallery-nav next" onclick="changeGallerySlide(1)">›</button>
             
             <div class="gallery-dots" id="galleryDots">
-                <!-- Cargado dinámicamente -->
-            </div>
+                </div>
         </div>
     </div>
 
