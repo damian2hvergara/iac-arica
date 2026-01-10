@@ -1,18 +1,69 @@
-// Estado
+// Estado global
+let currentFilter = "all";
 let selectedVehicle = null;
 let selectedKit = null;
 let currentGalleryIndex = 0;
 let currentInstagramGallery = null;
 let currentInstagramSlide = 0;
-let vehicles = [];
+
+// Función para obtener vehículos desde config.js
+function getAppVehicles() {
+    return window.vehicles || [];
+}
+
+// Configurar eventos de filtro después de cargar
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar a que la página cargue completamente
+    setTimeout(function() {
+        // Configurar clicks en indicadores (stock indicators)
+        document.querySelectorAll('.indicator[onclick*="filterVehicles"]').forEach(indicator => {
+            const originalOnclick = indicator.getAttribute('onclick');
+            if (originalOnclick) {
+                // Extraer el filtro del onclick
+                const match = originalOnclick.match(/filterVehicles\('([^']+)'\)/);
+                if (match && match[1]) {
+                    const filter = match[1];
+                    
+                    // Remover onclick original
+                    indicator.removeAttribute('onclick');
+                    
+                    // Agregar evento click nuevo
+                    indicator.addEventListener('click', function() {
+                        filterVehicles(filter);
+                    });
+                }
+            }
+        });
+        
+        // Configurar clicks en botones de filtro
+        document.querySelectorAll('.filter-button[onclick*="filterVehicles"]').forEach(button => {
+            const originalOnclick = button.getAttribute('onclick');
+            if (originalOnclick) {
+                // Extraer el filtro del onclick
+                const match = originalOnclick.match(/filterVehicles\('([^']+)'\)/);
+                if (match && match[1]) {
+                    const filter = match[1];
+                    
+                    // Remover onclick original
+                    button.removeAttribute('onclick');
+                    
+                    // Agregar evento click nuevo
+                    button.addEventListener('click', function() {
+                        filterVehicles(filter);
+                    });
+                }
+            }
+        });
+    }, 500); // Esperar medio segundo
+});
 
 // Inicializar
 document.addEventListener('dataLoaded', (event) => {
     if (event.detail && event.detail.vehicles) {
-        vehicles = event.detail.vehicles;
+        window.vehicles = event.detail.vehicles;
         
         // Actualizar UI solo si hay vehículos
-        if (vehicles.length > 0) {
+        if (window.vehicles.length > 0) {
             updateStockCounts();
             loadVehicles();
             setupFilters();
@@ -71,6 +122,7 @@ function setupGalleryKeyboard() {
 
 // Actualizar contadores de stock
 function updateStockCounts() {
+    const vehicles = getAppVehicles();
     if (!vehicles || vehicles.length === 0) return;
     
     const stockCount = vehicles.filter(v => v.status === "stock").length;
@@ -90,12 +142,8 @@ function animateCounter() {
     const counterElement = document.getElementById('importedVehiclesCounter');
     if (!counterElement) return;
     
-    // Usar el valor ya actualizado desde la API
-    const targetNumber = importedVehiclesCounter || parseInt(counterElement.textContent) || 0;
-    
+    const targetNumber = parseInt(counterElement.textContent) || 0;
     if (targetNumber === 0) return;
-    
-    console.log('🔢 Animando contador a:', targetNumber);
     
     const duration = 2000;
     const steps = 60;
@@ -117,6 +165,7 @@ function animateCounter() {
 
 // Cargar vehículos
 function loadVehicles(filter = "all") {
+    const vehicles = getAppVehicles();
     const container = document.getElementById('vehiclesContainer');
     if (!container) return;
     
@@ -215,6 +264,7 @@ function loadVehicles(filter = "all") {
 
 // Actualizar temporizadores de tránsito
 function updateTransitTimers() {
+    const vehicles = getAppVehicles();
     if (!vehicles) return;
     
     const transitVehicles = vehicles.filter(v => v.status === "transit");
@@ -270,6 +320,7 @@ function setupFilters() {
 
 // Abrir galería Instagram
 function openInstagramGallery(vehicleId) {
+    const vehicles = getAppVehicles();
     const vehicle = vehicles.find(v => v.id === vehicleId);
     if (!vehicle || !vehicle.gallery || vehicle.gallery.length === 0) {
         console.log('No hay galería para este vehículo');
@@ -423,6 +474,7 @@ function closeInstagramGallery() {
 
 // MOSTRAR DETALLES DEL VEHÍCULO
 function showVehicleDetails(vehicleId) {
+    const vehicles = getAppVehicles();
     const vehicle = vehicles.find(v => v.id === vehicleId);
     if (!vehicle) {
         console.error('Vehículo no encontrado');
@@ -558,6 +610,7 @@ function showVehicleDetails(vehicleId) {
 
 // Cambiar imagen de galería
 function changeGalleryImage(index, vehicleId) {
+    const vehicles = getAppVehicles();
     const vehicle = vehicles.find(v => v.id === vehicleId);
     if (!vehicle || !vehicle.gallery) return;
     
@@ -577,6 +630,7 @@ function changeGalleryImage(index, vehicleId) {
 
 // PERSONALIZAR VEHÍCULO
 function customizeVehicle(vehicleId) {
+    const vehicles = getAppVehicles();
     const vehicle = vehicles.find(v => v.id === vehicleId);
     if (!vehicle || !vehicle.kits || vehicle.kits.length === 0) {
         alert('Este vehículo no tiene opciones de personalización disponibles.');
@@ -871,6 +925,7 @@ function updateTotalPrice() {
 
 // Mostrar modal de personalización
 function showCustomizationModal() {
+    const vehicles = getAppVehicles();
     if (vehicles.length === 0) {
         alert('No hay vehículos disponibles para personalizar.');
         return;
@@ -1033,11 +1088,34 @@ window.addEventListener('beforeunload', () => {
 
 // Actualizar secciones dinámicas según datos disponibles
 function updateDynamicSections() {
-    // Verificar si hay testimonios (aquí podrías agregar lógica para cargar desde API)
+    // Verificar si hay testimonios
+    const testimonialsSection = document.querySelector('.testimonials-section');
+    const instagramSection = document.querySelector('.instagram-section');
+    const blogSection = document.querySelector('.blog-section');
+
+// Actualizar secciones dinámicas según datos disponibles
+function updateDynamicSections() {
+    // Verificar si hay testimonios
     const testimonialsSection = document.querySelector('.testimonials-section');
     const instagramSection = document.querySelector('.instagram-section');
     const blogSection = document.querySelector('.blog-section');
     
     // Por ahora, mantenemos las secciones como están
     // En el futuro, puedes agregar lógica para mostrar/ocultar basado en datos
+    
+    // Ejemplo de lógica futura:
+    // if (testimonialsSection && window.vehicles && window.vehicles.length === 0) {
+    //     testimonialsSection.style.display = 'none';
+    // }
+    
+    // if (instagramSection && (!window.vehicles || window.vehicles.length < 3)) {
+    //     instagramSection.style.display = 'none';
+    // }
+    
+    // if (blogSection) {
+    //     // Aquí podrías cargar artículos desde una API
+    // }
 }
+
+// Configurar eventos de teclado para galería
+setupGalleryKeyboard();
