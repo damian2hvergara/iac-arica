@@ -1,0 +1,1153 @@
+/* Sistema de diseño minimalista tipo Apple */
+:root {
+    --white: #ffffff;
+    --black: #000000;
+    --gray-50: #f5f5f7;
+    --gray-100: #e5e5e7;
+    --gray-200: #d2d2d7;
+    --gray-800: #1d1d1f;
+    --blue: #0066cc;
+    --green: #00a651;
+    --orange: #ff9500;
+    --import-red: rgb(99, 11, 11);
+    --import-red-light: rgba(99, 11, 11, 0.1);
+    --import-red-dark: rgb(79, 9, 9);
+    --border: 1px solid #d2d2d7;
+    --radius: 12px;
+    --shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Reset y tipografía */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    line-height: 1.47059;
+    color: var(--black);
+    background: var(--white);
+    font-weight: 400;
+    letter-spacing: -0.022em;
+}
+
+/* Header minimalista */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    z-index: 1000;
+    border-bottom: var(--border);
+}
+
+.header-container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 0 22px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--black);
+    letter-spacing: -0.5px;
+}
+
+.logo .import-text {
+    color: var(--import-red);
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--black);
+    font-size: 14px;
+    font-weight: 400;
+    transition: opacity 0.3s;
+}
+
+.nav-link:hover {
+    opacity: 0.7;
+}
+
+/* Hero con fondo de imagen */
+.hero {
+    position: relative;
+    margin-top: 44px;
+    padding: 80px 22px;
+    text-align: center;
+    background: var(--gray-50);
+    overflow: hidden;
+    z-index: 1;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    filter: brightness(0.4) contrast(1.2);
+}
+
+.hero h1,
+.hero-subtitle,
+.stock-indicators {
+    position: relative;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: -0.003em;
+    margin-bottom: 18px;
+    color: var(--white);
+}
+
+.hero-subtitle {
+    font-size: 21px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.381;
+}
+
+/* Indicadores de stock clickeables */
+.stock-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.indicator {
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+    padding: 16px;
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.indicator:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.indicator-number {
+    font-size: 40px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.indicator-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-stock { color: var(--green); }
+.status-transit { color: var(--blue); }
+.status-reserve { color: var(--orange); }
+
+/* CONTADOR DE VEHÍCULOS IMPORTADOS */
+.success-counter {
+    background: var(--import-red);
+    color: var(--white);
+    padding: 40px 22px;
+    text-align: center;
+    margin-top: -1px; /* Para unir con hero */
+}
+
+.counter-container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.counter-number {
+    font-size: 64px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1;
+}
+
+.counter-text {
+    font-size: 21px;
+    opacity: 0.9;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Grid de vehículos */
+.vehicles-section {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 80px 22px;
+}
+
+.section-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    letter-spacing: -0.003em;
+}
+
+.section-subtitle {
+    color: #86868b;
+    font-size: 17px;
+    margin-bottom: 32px;
+    max-width: 600px;
+}
+
+.vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+/* Tarjeta de vehículo */
+.vehicle-card {
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.vehicle-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.vehicle-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: var(--gray-100);
+    cursor: pointer;
+}
+
+.vehicle-info {
+    padding: 24px;
+}
+
+.vehicle-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.vehicle-price {
+    font-size: 21px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Badge de estado */
+.vehicle-status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.status-badge-stock {
+    background: rgba(0, 166, 81, 0.1);
+    color: var(--green);
+}
+
+.status-badge-transit {
+    background: rgba(0, 102, 204, 0.1);
+    color: var(--blue);
+}
+
+.status-badge-reserve {
+    background: rgba(255, 149, 0, 0.1);
+    color: var(--orange);
+}
+
+/* Botones minimalistas */
+.button {
+    display: inline-block;
+    padding: 12px 22px;
+    background: var(--import-red);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+.button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+.button-outline {
+    background: transparent;
+    color: var(--black);
+    border: var(--border);
+}
+
+/* Filtros minimalistas */
+.filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.filter-button {
+    padding: 8px 16px;
+    background: transparent;
+    border: var(--border);
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.filter-button.active {
+    background: var(--import-red);
+    color: var(--white);
+    border-color: var(--import-red);
+}
+
+/* TEMPORIZADOR PARA VEHÍCULOS EN TRÁNSITO */
+.transit-timer {
+    background: rgba(0, 102, 204, 0.1);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.timer-icon {
+    color: var(--blue);
+    font-size: 20px;
+}
+
+.timer-text {
+    font-size: 14px;
+    color: var(--blue);
+    font-weight: 500;
+}
+
+.timer-display {
+    font-weight: 700;
+    font-size: 16px;
+}
+
+/* SECCIÓN DE TESTIMONIOS */
+.testimonials-section {
+    background: var(--gray-50);
+    padding: 80px 22px;
+}
+
+.testimonials-container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+}
+
+.testimonial-card {
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    transition: transform 0.3s;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-2px);
+}
+
+.testimonial-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.testimonial-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    object-fit: cover;
+    margin-right: 16px;
+}
+
+.testimonial-info h4 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.testimonial-info p {
+    font-size: 14px;
+    color: #86868b;
+}
+
+.testimonial-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--black);
+    font-style: italic;
+}
+
+.testimonial-rating {
+    color: #ff9500;
+    margin-top: 16px;
+    font-size: 14px;
+}
+
+/* SECCIÓN INSTAGRAM */
+.instagram-section {
+    padding: 80px 22px;
+    background: var(--white);
+}
+
+.instagram-container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.instagram-post {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: var(--border);
+    transition: transform 0.3s;
+    height: 200px;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.instagram-post:hover {
+    transform: scale(1.05);
+}
+
+.instagram-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.instagram-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.instagram-post:hover .instagram-overlay {
+    opacity: 1;
+}
+
+.instagram-icon {
+    color: white;
+    font-size: 24px;
+}
+
+/* SECCIÓN BLOG/ARTICLES */
+.blog-section {
+    background: var(--gray-50);
+    padding: 80px 22px;
+}
+
+.blog-container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 32px;
+    margin-top: 40px;
+}
+
+.article-card {
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.article-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+}
+
+.article-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.article-content {
+    padding: 24px;
+}
+
+.article-category {
+    font-size: 12px;
+    color: var(--import-red);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.article-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+.article-excerpt {
+    font-size: 15px;
+    color: #86868b;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.article-link {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--import-red);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.article-link:hover {
+    text-decoration: underline;
+}
+
+/* Modal general */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: var(--white);
+    max-width: 1200px;
+    margin: 80px auto;
+    border-radius: var(--radius);
+    position: relative;
+    animation: modalAppear 0.3s ease-out;
+    width: 95%;
+}
+
+@keyframes modalAppear {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--white);
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* GALERÍA PARA DETALLES DEL VEHÍCULO */
+.vehicle-gallery {
+    margin-bottom: 32px;
+}
+
+.main-image-container {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: var(--border);
+    height: 400px;
+    margin-bottom: 16px;
+}
+
+.main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.gallery-thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 12px;
+}
+
+.thumbnail {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+}
+
+.thumbnail:hover, .thumbnail.active {
+    border-color: var(--import-red);
+    transform: scale(1.05);
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-top: 16px;
+    border: var(--border);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* NUEVO: GALERÍA TIPO INSTAGRAM - ZOOM */
+.instagram-gallery-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 3000;
+    cursor: pointer;
+}
+
+.instagram-gallery-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-slide {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    display: none;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.gallery-slide.active {
+    display: block;
+}
+
+.gallery-slide img {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 8px;
+    cursor: zoom-in;
+}
+
+.gallery-slide img.zoomed {
+    cursor: zoom-out;
+    transform: scale(1.5);
+    transition: transform 0.3s ease;
+}
+
+.gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+}
+
+.gallery-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.gallery-nav.prev {
+    left: 20px;
+}
+
+.gallery-nav.next {
+    right: 20px;
+}
+
+.gallery-counter {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+}
+
+.gallery-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+}
+
+.gallery-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.gallery-dots {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+}
+
+.gallery-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.gallery-dot.active {
+    background: var(--import-red);
+    transform: scale(1.3);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* NUEVO: DISEÑO MEJORADO PARA PERSONALIZACIÓN */
+
+/* Comparación visual mejorada */
+.visual-comparison {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 40px;
+}
+
+@media (min-width: 768px) {
+    .visual-comparison {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.comparison-image-container {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: var(--border);
+    background: var(--white);
+    height: 300px;
+}
+
+.comparison-label {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--black);
+    color: var(--white);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    z-index: 2;
+}
+
+.comparison-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+/* NUEVO: Pestañas de kits laterales compactas */
+.kit-tabs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 32px;
+}
+
+.kit-tab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.kit-tab:hover {
+    border-color: var(--black);
+    transform: translateX(4px);
+}
+
+.kit-tab.selected {
+    border-color: var(--import-red);
+    background: rgba(99, 11, 11, 0.05);
+}
+
+.kit-tab-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.kit-tab-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 70px;
+    text-align: center;
+}
+
+.kit-tab-badge.basic { background: rgba(0, 0, 0, 0.1); color: var(--black); }
+.kit-tab-badge.sport { background: rgba(255, 149, 0, 0.1); color: var(--orange); }
+.kit-tab-badge.offroad { background: rgba(0, 166, 81, 0.1); color: var(--green); }
+.kit-tab-badge.premium { background: rgba(0, 102, 204, 0.1); color: var(--blue); }
+.kit-tab-badge.extreme { background: rgba(255, 45, 85, 0.1); color: #ff2d55; }
+
+.kit-tab-name {
+    font-size: 14px;
+    font-weight: 500;
+    flex: 1;
+}
+
+.kit-tab-price {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--import-red);
+    min-width: 100px;
+    text-align: right;
+}
+
+.kit-tab-price.included {
+    color: #86868b;
+}
+
+/* NUEVO: Detalles de personalización expandidos */
+.customization-details {
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-top: 24px;
+    border: var(--border);
+}
+
+.customization-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.customization-feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--black);
+}
+
+.customization-feature i {
+    color: var(--import-red);
+    font-size: 12px;
+}
+
+/* Vista compacta para móvil */
+.mobile-compact-comparison {
+    display: none;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.compact-image-container {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: var(--border);
+    height: 180px;
+}
+
+.compact-label {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--white);
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 500;
+    z-index: 2;
+}
+
+/* Layout de modal */
+.customization-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+}
+
+@media (min-width: 992px) {
+    .customization-container {
+        grid-template-columns: 2fr 1fr;
+    }
+}
+
+.customization-options {
+    padding: 32px;
+}
+
+.customization-summary {
+    padding: 32px;
+    background: var(--gray-50);
+    border-left: var(--border);
+}
+
+/* Footer */
+.footer {
+    background: var(--gray-50);
+    padding: 60px 22px;
+    text-align: center;
+    border-top: var(--border);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero {
+        padding: 60px 22px;
+    }
+    
+    .hero h1 {
+        font-size: 36px;
+    }
+    
+    .hero-subtitle {
+        font-size: 17px;
+    }
+    
+    .stock-indicators {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .counter-number {
+        font-size: 48px;
+    }
+    
+    .counter-text {
+        font-size: 17px;
+    }
+    
+    .vehicles-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .customization-summary {
+        border-left: none;
+        border-top: var(--border);
+    }
+    
+    .modal-content {
+        margin: 10px;
+    }
+    
+    .visual-comparison {
+        grid-template-columns: 1fr;
+    }
+    
+    .main-image-container {
+        height: 250px;
+    }
+    
+    .mobile-compact-comparison {
+        display: grid;
+    }
+    
+    .comparison-image-container {
+        height: 220px;
+    }
+    
+    .customization-options, .customization-summary {
+        padding: 20px;
+    }
+    
+    .kit-tab {
+        padding: 12px;
+    }
+    
+    .kit-tab-price {
+        min-width: 80px;
+        font-size: 14px;
+    }
+    
+    .customization-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .testimonials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .instagram-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .articles-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Galería Instagram en móvil */
+    .gallery-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    .gallery-nav.prev {
+        left: 10px;
+    }
+    
+    .gallery-nav.next {
+        right: 10px;
+    }
+    
+    .gallery-counter {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
