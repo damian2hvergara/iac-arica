@@ -1,5 +1,5 @@
 /* ========================================
-   admin.js - Panel de Administración
+   admin.js - Panel Admin FUNCIONAL
    ======================================== */
 
 let currentUser = null;
@@ -8,6 +8,7 @@ let currentEditingVehicle = null;
 
 // INICIALIZACIÓN
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🔧 Inicializando admin...');
     try {
         vehicleAPI.init();
         await checkAuth();
@@ -30,7 +31,7 @@ async function checkAuth() {
             showLoginScreen();
         }
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error auth:', error);
         showLoginScreen();
     }
 }
@@ -51,37 +52,53 @@ function showAdminPanel() {
 }
 
 // LOGIN
-document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    try {
-        await vehicleAPI.signIn(email, password);
-        showNotification('Sesión iniciada', 'success');
-        await checkAuth();
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Email o contraseña incorrectos');
-    }
-});
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+            
+            await vehicleAPI.signIn(email, password);
+            showNotification('✅ Sesión iniciada correctamente', 'success');
+            await checkAuth();
+            
+        } catch (error) {
+            console.error('Error login:', error);
+            showNotification('❌ Email o contraseña incorrectos', 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    });
+}
 
 // LOGOUT
 async function logout() {
+    if (!confirm('¿Cerrar sesión?')) return;
+    
     try {
         await vehicleAPI.signOut();
         currentUser = null;
         showNotification('Sesión cerrada', 'success');
         showLoginScreen();
     } catch (error) {
-        console.error('Error:', error);
-        showError('Error al cerrar sesión');
+        console.error('Error logout:', error);
+        showNotification('Error al cerrar sesión', 'error');
     }
 }
 
 // CARGAR DATOS
 async function loadAdminData() {
+    console.log('📊 Cargando datos admin...');
     await Promise.all([
         loadAdminStats(),
         loadVehiclesTable()
@@ -97,8 +114,9 @@ async function loadAdminStats() {
         document.getElementById('adminReserveCount').textContent = stats.reserve;
         document.getElementById('adminTotalCount').textContent = stats.total;
         
+        console.log('✅ Stats cargados:', stats);
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error stats:', error);
     }
 }
 
@@ -108,83 +126,98 @@ async function loadVehiclesTable() {
     
     try {
         const vehicles = await vehicleAPI.getAllVehicles();
+        console.log('🚗 Vehículos cargados:', vehicles.length);
         
         if (vehicles.length === 0) {
             container.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-car"></i>
-                    <h3>No hay vehículos</h3>
-                    <p>Agrega tu primer vehículo</p>
+                    <i class="fas fa-car" style="font-size: 48px; color: var(--gray-200); margin-bottom: 16px;"></i>
+                    <h3 style="color: var(--gray-800); margin-bottom: 8px;">No hay vehículos</h3>
+                    <p style="color: var(--gray-300);">Agrega tu primer vehículo usando el botón "Agregar Vehículo"</p>
                 </div>
             `;
             return;
         }
         
         container.innerHTML = `
-            <table class="vehicles-table">
-                <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th>Estado</th>
-                        <th>Ubicación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${vehicles.map(vehicle => `
+            <div style="overflow-x: auto;">
+                <table class="vehicles-table">
+                    <thead>
                         <tr>
-                            <td><img src="${vehicle.baseImage}" alt="${vehicle.name}" class="table-image"></td>
-                            <td>${vehicle.name}</td>
-                            <td>$${formatPrice(vehicle.price)}</td>
-                            <td><span class="badge ${APP_CONFIG.vehicleStatuses[vehicle.status].badge}">${APP_CONFIG.vehicleStatuses[vehicle.status].label}</span></td>
-                            <td>${vehicle.location || '-'}</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="button button-small button-outline btn-icon" onclick="editVehicle('${vehicle.id}')" title="Editar">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="button button-small button-outline btn-icon" onclick="deleteVehicle('${vehicle.id}')" title="Eliminar" style="color: var(--red); border-color: var(--red);">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            <th>Imagen</th>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>Estado</th>
+                            <th>Ubicación</th>
+                            <th>Acciones</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        ${vehicles.map(vehicle => `
+                            <tr>
+                                <td><img src="${vehicle.baseImage}" alt="${vehicle.name}" class="table-image"></td>
+                                <td style="font-weight: 500;">${vehicle.name}</td>
+                                <td style="font-weight: 600;">$${formatPrice(vehicle.price)}</td>
+                                <td><span class="badge ${APP_CONFIG.vehicleStatuses[vehicle.status].badge}">${APP_CONFIG.vehicleStatuses[vehicle.status].label}</span></td>
+                                <td>${vehicle.location || '-'}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button button-small button-outline btn-icon" onclick="editVehicle('${vehicle.id}')" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="button button-small button-outline btn-icon" onclick="deleteVehicle('${vehicle.id}')" title="Eliminar" style="color: var(--red); border-color: var(--red);">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         `;
         
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error tabla:', error);
         container.innerHTML = `
             <div class="empty-state">
-                <i class="fas fa-exclamation-circle"></i>
-                <h3>Error al cargar</h3>
-                <p>Recarga la página</p>
+                <i class="fas fa-exclamation-circle" style="font-size: 48px; color: var(--red); margin-bottom: 16px;"></i>
+                <h3 style="color: var(--gray-800); margin-bottom: 8px;">Error al cargar</h3>
+                <p style="color: var(--gray-300);">Recarga la página</p>
             </div>
         `;
     }
 }
 
 // TABS
-function switchTab(tabName) {
-    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-    event.target.closest('.tab').classList.add('active');
+function switchToTab(tabName) {
+    console.log('🔄 Cambiando a tab:', tabName);
     
+    // Actualizar tabs
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    const clickedTab = document.querySelector(`.tab[data-tab="${tabName}"]`);
+    if (clickedTab) {
+        clickedTab.classList.add('active');
+    }
+    
+    // Actualizar contenido
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    document.getElementById(`${tabName}Tab`).classList.add('active');
+    const targetTab = document.getElementById(`${tabName}Tab`);
+    if (targetTab) {
+        targetTab.classList.add('active');
+    }
 }
 
-// EVENT LISTENERS
+// MANEJO DE IMÁGENES
 function setupAdminEventListeners() {
     const imageUploadArea = document.getElementById('imageUploadArea');
     const imageInput = document.getElementById('imageInput');
     
     if (imageUploadArea && imageInput) {
+        // Click
         imageUploadArea.addEventListener('click', () => imageInput.click());
         
+        // Drag & Drop
         imageUploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             imageUploadArea.classList.add('drag-over');
@@ -201,12 +234,14 @@ function setupAdminEventListeners() {
             handleImageFiles(files);
         });
         
+        // Input
         imageInput.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
             handleImageFiles(files);
         });
     }
     
+    // Formulario
     const vehicleForm = document.getElementById('vehicleForm');
     if (vehicleForm) {
         vehicleForm.addEventListener('submit', handleVehicleSubmit);
@@ -217,18 +252,18 @@ async function handleImageFiles(files) {
     const validFiles = files.filter(file => file.type.startsWith('image/'));
     
     if (validFiles.length === 0) {
-        showError('Selecciona archivos de imagen válidos');
+        showNotification('Selecciona archivos de imagen válidos', 'error');
         return;
     }
     
     if (uploadedImages.length + validFiles.length > APP_CONFIG.maxImagesPerVehicle) {
-        showError(`Máximo ${APP_CONFIG.maxImagesPerVehicle} imágenes`);
+        showNotification(`Máximo ${APP_CONFIG.maxImagesPerVehicle} imágenes`, 'error');
         return;
     }
     
     for (const file of validFiles) {
         if (file.size > APP_CONFIG.maxImageSize) {
-            showError(`${file.name} es demasiado grande (máx 10MB)`);
+            showNotification(`${file.name} es demasiado grande (máx 10MB)`, 'error');
             continue;
         }
         
@@ -246,7 +281,7 @@ async function handleImageFiles(files) {
             
         } catch (error) {
             console.error('Error:', error);
-            showError(`Error al procesar ${file.name}`);
+            showNotification(`Error al procesar ${file.name}`, 'error');
         }
     }
 }
@@ -261,7 +296,7 @@ function renderImagePreview() {
             <button type="button" class="image-preview-remove" onclick="removeImage(${index})">
                 <i class="fas fa-times"></i>
             </button>
-            ${index === 0 ? '<div style="position: absolute; bottom: 4px; left: 4px; background: var(--import-red); color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px;">Principal</div>' : ''}
+            ${index === 0 ? '<div class="main-badge">Principal</div>' : ''}
         </div>
     `).join('');
 }
@@ -269,12 +304,14 @@ function renderImagePreview() {
 function removeImage(index) {
     uploadedImages.splice(index, 1);
     renderImagePreview();
+    showNotification('Imagen eliminada', 'info');
 }
 
+// SUBMIT FORMULARIO
 async function handleVehicleSubmit(e) {
     e.preventDefault();
     
-    const submitButton = e.target.querySelector('button[type="submit"]');
+    const submitButton = document.getElementById('submitBtn');
     const originalText = submitButton.innerHTML;
     
     try {
@@ -286,72 +323,79 @@ async function handleVehicleSubmit(e) {
             name: formData.get('name'),
             price: parseInt(formData.get('price')),
             status: formData.get('status'),
-            location: formData.get('location'),
-            type: formData.get('type'),
-            description: formData.get('description'),
-            eta: formData.get('eta'),
+            location: formData.get('location') || null,
+            type: formData.get('type') || null,
+            description: formData.get('description') || null,
+            eta: formData.get('eta') || null,
             transit_time: formData.get('transit_time') ? parseInt(formData.get('transit_time')) : null,
-            video_id: formData.get('video_id'),
-            motor: formData.get('motor'),
-            potencia: formData.get('potencia'),
-            torque: formData.get('torque'),
-            transmision: formData.get('transmision'),
-            traccion: formData.get('traccion'),
-            combustible: formData.get('combustible'),
-            consumo: formData.get('consumo'),
-            capacidad: formData.get('capacidad'),
-            color: formData.get('color'),
-            kilometraje: formData.get('kilometraje')
+            video_id: formData.get('video_id') || null,
+            motor: formData.get('motor') || null,
+            potencia: formData.get('potencia') || null,
+            torque: formData.get('torque') || null,
+            transmision: formData.get('transmision') || null,
+            traccion: formData.get('traccion') || null,
+            combustible: formData.get('combustible') || null,
+            consumo: formData.get('consumo') || null,
+            capacidad: formData.get('capacidad') || null,
+            color: formData.get('color') || null,
+            kilometraje: formData.get('kilometraje') || null
         };
         
-        const vehicle = await vehicleAPI.createVehicle(vehicleData);
+        console.log('💾 Guardando vehículo:', vehicleData);
         
+        const vehicle = currentEditingVehicle 
+            ? await vehicleAPI.updateVehicle(currentEditingVehicle.id, vehicleData)
+            : await vehicleAPI.createVehicle(vehicleData);
+        
+        console.log('✅ Vehículo guardado:', vehicle);
+        
+        // Subir imágenes
         if (uploadedImages.length > 0) {
-            showNotification('Subiendo imágenes...', 'info');
+            showNotification(`Subiendo ${uploadedImages.length} imágenes...`, 'info');
             
             for (let i = 0; i < uploadedImages.length; i++) {
                 const img = uploadedImages[i];
                 
                 try {
+                    submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Subiendo imagen ${i + 1}/${uploadedImages.length}...`;
+                    
                     const imageUrl = await uploadImageToCloudinary(img.file);
                     await vehicleAPI.addImage(vehicle.id, imageUrl, i === 0, i);
                     img.uploaded = true;
+                    
+                    console.log(`✅ Imagen ${i + 1} subida`);
                 } catch (error) {
-                    console.error('Error:', error);
-                    showError(`Error al subir imagen ${i + 1}`);
+                    console.error(`Error imagen ${i + 1}:`, error);
+                    showNotification(`Error al subir imagen ${i + 1}`, 'error');
                 }
             }
         }
         
-        showNotification('Vehículo creado exitosamente', 'success');
+        showNotification('✅ Vehículo guardado exitosamente', 'success');
         
         resetForm();
         await loadAdminData();
-        switchTab('vehicles');
+        switchToTab('vehicles');
         
     } catch (error) {
-        console.error('Error:', error);
-        showError('Error al crear vehículo');
+        console.error('Error guardar:', error);
+        showNotification('❌ Error al guardar vehículo', 'error');
     } finally {
         submitButton.disabled = false;
         submitButton.innerHTML = originalText;
     }
 }
 
-function resetForm() {
-    document.getElementById('vehicleForm')?.reset();
-    uploadedImages = [];
-    renderImagePreview();
-    currentEditingVehicle = null;
-}
-
+// EDITAR VEHÍCULO
 async function editVehicle(vehicleId) {
     try {
+        console.log('✏️ Editando vehículo:', vehicleId);
         const vehicle = await vehicleAPI.getVehicle(vehicleId);
         currentEditingVehicle = vehicle;
         
-        switchTab('add');
+        switchToTab('add');
         
+        // Llenar formulario
         const form = document.getElementById('vehicleForm');
         if (!form) return;
         
@@ -361,31 +405,46 @@ async function editVehicle(vehicleId) {
             }
         });
         
-        document.querySelector('#addTab .card-title').textContent = 'Editar Vehículo';
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> Actualizar';
+        // Cambiar título
+        document.getElementById('formTitle').textContent = 'Editar Vehículo';
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Actualizar Vehículo';
         
-        showNotification('Cargado para edición', 'info');
+        showNotification('Vehículo cargado para edición', 'info');
         
     } catch (error) {
-        console.error('Error:', error);
-        showError('Error al cargar vehículo');
+        console.error('Error editar:', error);
+        showNotification('Error al cargar vehículo', 'error');
     }
 }
 
+// ELIMINAR VEHÍCULO
 async function deleteVehicle(vehicleId) {
-    if (!confirm('¿Eliminar este vehículo? No se puede deshacer.')) {
+    if (!confirm('⚠️ ¿Eliminar este vehículo? Esta acción no se puede deshacer.')) {
         return;
     }
     
     try {
+        console.log('🗑️ Eliminando:', vehicleId);
         await vehicleAPI.deleteVehicle(vehicleId);
-        showNotification('Vehículo eliminado', 'success');
+        showNotification('✅ Vehículo eliminado', 'success');
         await loadAdminData();
     } catch (error) {
-        console.error('Error:', error);
-        showError('Error al eliminar');
+        console.error('Error eliminar:', error);
+        showNotification('❌ Error al eliminar', 'error');
     }
 }
 
-console.log('✅ Admin.js cargado');
+// RESET FORMULARIO
+function resetForm() {
+    const form = document.getElementById('vehicleForm');
+    if (form) form.reset();
+    
+    uploadedImages = [];
+    renderImagePreview();
+    currentEditingVehicle = null;
+    
+    document.getElementById('formTitle').textContent = 'Agregar Vehículo';
+    document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Guardar Vehículo';
+}
+
+console.log('✅ Admin.js cargado y listo');
