@@ -256,7 +256,40 @@ async function uploadImageToCloudinary(file) {
         throw error;
     }
 }
-
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    Object.assign(notification.style, {
+        position: 'fixed',
+        top: '80px',
+        right: '20px',
+        background: type === 'success' ? '#00a651' : type === 'error' ? '#ff3b30' : '#0066cc',
+        color: 'white',
+        padding: '16px 24px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        zIndex: '9999',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        animation: 'slideIn 0.3s ease-out',
+        maxWidth: '400px',
+        fontSize: '14px',
+        fontWeight: '500'
+    });
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
 function trackEvent(eventName, eventCategory, eventLabel) {
     if (typeof gtag !== 'undefined') {
         gtag('event', eventName, {
