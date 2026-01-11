@@ -2,542 +2,427 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Admin - Import Cars</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Import American Cars</title>
     
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    
     <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* ========================================
+       ADMIN PANEL - ESTILOS ADICIONALES
+       ======================================== */
     
     body {
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        background: #f5f5f7;
-        -webkit-tap-highlight-color: transparent;
-        padding-bottom: 80px;
+        background: var(--gray-50);
+        padding-top: 60px;
     }
     
-    /* Header Móvil */
-    .mobile-header {
+    /* LOGIN SCREEN */
+    .login-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: var(--gray-50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+    
+    .login-card {
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        padding: var(--space-4xl) var(--space-2xl);
+        width: 90%;
+        max-width: 400px;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+    }
+    
+    .login-logo {
+        font-size: var(--font-4xl);
+        font-weight: var(--font-bold);
+        margin-bottom: var(--space-sm);
+        letter-spacing: var(--tracking-tight);
+    }
+    
+    .login-logo .import-text {
+        color: var(--import-red);
+    }
+    
+    .login-subtitle {
+        color: var(--gray-300);
+        margin-bottom: var(--space-2xl);
+        font-size: var(--font-lg);
+    }
+    
+    /* ADMIN PANEL */
+    .admin-header {
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
-        background: rgba(255,255,255,0.95);
+        background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
-        padding: 12px 16px;
-        border-bottom: 1px solid #e5e5e7;
-        z-index: 1000;
+        border-bottom: var(--border);
+        padding: var(--space-md) var(--space-lg);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        z-index: var(--z-header);
+        height: 60px;
     }
     
-    .logo {
-        font-size: 18px;
-        font-weight: 700;
+    .admin-logo {
+        font-size: var(--font-2xl);
+        font-weight: var(--font-bold);
     }
     
-    .logo span { color: rgb(99, 11, 11); }
+    .admin-logo .import-text {
+        color: var(--import-red);
+    }
     
-    .user-info {
-        font-size: 12px;
-        color: #86868b;
+    .admin-user {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+    }
+    
+    .user-email {
+        font-size: var(--font-sm);
+        color: var(--gray-300);
     }
     
     .logout-btn {
-        background: none;
-        border: 1px solid #e5e5e7;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        color: rgb(99, 11, 11);
+        padding: 8px 16px;
+        background: transparent;
+        border: var(--border);
+        border-radius: var(--radius-xl);
+        color: var(--import-red);
+        font-size: var(--font-sm);
+        font-weight: var(--font-medium);
         cursor: pointer;
+        transition: var(--transition-fast);
     }
     
-    /* Contenedor Principal */
-    .container {
-        margin-top: 60px;
-        padding: 16px;
+    .logout-btn:hover {
+        background: var(--import-red);
+        color: var(--white);
+        border-color: var(--import-red);
     }
     
-    /* Stats Cards Móvil */
+    /* CONTAINER */
+    .admin-container {
+        max-width: var(--max-width-xl);
+        margin: 0 auto;
+        padding: var(--space-2xl) var(--space-lg);
+    }
+    
+    /* STATS CARDS */
     .stats-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-lg);
+        margin-bottom: var(--space-2xl);
     }
     
     .stat-card {
-        background: white;
-        border-radius: 12px;
-        padding: 16px;
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-xl);
         text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        transition: var(--transition);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
     }
     
     .stat-number {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 4px;
+        font-size: var(--font-5xl);
+        font-weight: var(--font-bold);
+        margin-bottom: var(--space-sm);
     }
     
     .stat-label {
-        font-size: 11px;
-        color: #86868b;
+        font-size: var(--font-sm);
+        color: var(--gray-300);
         text-transform: uppercase;
-    }
-    
-    /* Tabs Móvil */
-    .mobile-tabs {
-        display: flex;
-        background: white;
-        border-radius: 12px;
-        padding: 4px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    
-    .tab-btn {
-        flex: 1;
-        padding: 12px;
-        border: none;
-        background: transparent;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #86868b;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .tab-btn.active {
-        background: rgb(99, 11, 11);
-        color: white;
-    }
-    
-    /* Cards */
-    .card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    
-    .card-title {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 16px;
-    }
-    
-    /* Form Móvil Optimizado */
-    .form-group {
-        margin-bottom: 16px;
-    }
-    
-    .form-label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #1d1d1f;
-        margin-bottom: 6px;
-    }
-    
-    .form-label .required {
-        color: rgb(99, 11, 11);
-    }
-    
-    .form-input,
-    .form-select,
-    .form-textarea {
-        width: 100%;
-        padding: 14px;
-        border: 1px solid #e5e5e7;
-        border-radius: 10px;
-        font-size: 16px;
-        background: #f5f5f7;
-        -webkit-appearance: none;
-    }
-    
-    .form-input:focus,
-    .form-select:focus,
-    .form-textarea:focus {
-        outline: none;
-        border-color: rgb(99, 11, 11);
-        background: white;
-    }
-    
-    .form-textarea {
-        min-height: 80px;
-        resize: vertical;
-    }
-    
-    /* Section Headers */
-    .section-header {
-        background: #f5f5f7;
-        padding: 10px 14px;
-        margin: 20px -20px 16px;
-        font-size: 13px;
-        font-weight: 700;
-        text-transform: uppercase;
-        color: #86868b;
         letter-spacing: 0.5px;
     }
     
-    /* Image Upload Móvil */
-    .image-upload-area {
-        border: 2px dashed #d2d2d7;
-        border-radius: 12px;
-        padding: 40px 20px;
-        text-align: center;
-        background: #f5f5f7;
+    /* TABS */
+    .admin-tabs {
+        display: flex;
+        gap: var(--space-sm);
+        margin-bottom: var(--space-2xl);
+        border-bottom: var(--border);
+    }
+    
+    .admin-tab {
+        padding: var(--space-md) var(--space-xl);
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        font-size: var(--font-md);
+        font-weight: var(--font-medium);
+        color: var(--gray-300);
         cursor: pointer;
-        transition: all 0.3s;
+        transition: var(--transition-fast);
     }
     
-    .image-upload-area:active {
-        border-color: rgb(99, 11, 11);
-        background: rgba(99, 11, 11, 0.05);
+    .admin-tab:hover {
+        color: var(--black);
     }
     
-    .upload-icon {
-        font-size: 48px;
-        color: #d2d2d7;
-        margin-bottom: 12px;
+    .admin-tab.active {
+        color: var(--import-red);
+        border-bottom-color: var(--import-red);
     }
     
-    .upload-text {
-        font-size: 14px;
-        color: #86868b;
+    .tab-content {
+        display: none;
     }
     
-    .upload-hint {
-        font-size: 12px;
-        color: #d2d2d7;
-        margin-top: 8px;
+    .tab-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease-out;
     }
     
-    /* Image Preview Grid */
-    .image-preview-grid {
+    /* VEHICLES TABLE */
+    .vehicles-table {
+        width: 100%;
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+    
+    .vehicles-table thead {
+        background: var(--gray-50);
+    }
+    
+    .vehicles-table th {
+        padding: var(--space-md) var(--space-lg);
+        text-align: left;
+        font-size: var(--font-sm);
+        font-weight: var(--font-semibold);
+        color: var(--gray-800);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .vehicles-table td {
+        padding: var(--space-md) var(--space-lg);
+        border-top: var(--border);
+    }
+    
+    .vehicles-table tr:hover {
+        background: var(--gray-50);
+    }
+    
+    .table-image {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: var(--radius-sm);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: var(--space-sm);
+    }
+    
+    .btn-icon {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* FORM SECTIONS */
+    .form-section {
+        background: var(--white);
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-2xl);
+        margin-bottom: var(--space-xl);
+    }
+    
+    .section-header {
+        font-size: var(--font-xl);
+        font-weight: var(--font-semibold);
+        margin-bottom: var(--space-xl);
+        padding-bottom: var(--space-md);
+        border-bottom: var(--border);
+    }
+    
+    .form-row {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-top: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-lg);
     }
     
-    .preview-item {
-        position: relative;
-        aspect-ratio: 1;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #f5f5f7;
-    }
-    
-    .preview-item img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    .preview-remove {
+    /* IMAGE PREVIEW */
+    .main-badge {
         position: absolute;
-        top: 6px;
-        right: 6px;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: rgba(255,59,48,0.95);
-        color: white;
-        border: none;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    
-    .preview-main-badge {
-        position: absolute;
-        bottom: 6px;
-        left: 6px;
-        background: rgb(99, 11, 11);
-        color: white;
-        padding: 4px 8px;
-        border-radius: 6px;
-        font-size: 10px;
-        font-weight: 700;
-    }
-    
-    /* Buttons Móvil */
-    .btn {
-        width: 100%;
-        padding: 16px;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        transition: all 0.3s;
-    }
-    
-    .btn-primary {
-        background: rgb(99, 11, 11);
-        color: white;
-    }
-    
-    .btn-primary:active {
-        transform: scale(0.98);
-        opacity: 0.8;
-    }
-    
-    .btn-secondary {
-        background: #f5f5f7;
-        color: #1d1d1f;
-        margin-top: 12px;
-    }
-    
-    .btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    
-    /* Vehicle List Móvil */
-    .vehicle-item {
-        background: white;
-        border-radius: 12px;
-        padding: 12px;
-        margin-bottom: 12px;
-        display: flex;
-        gap: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    
-    .vehicle-thumb {
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
-        object-fit: cover;
-        background: #f5f5f7;
-        flex-shrink: 0;
-    }
-    
-    .vehicle-details {
-        flex: 1;
-        min-width: 0;
-    }
-    
-    .vehicle-name {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 4px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    .vehicle-price {
-        font-size: 16px;
-        font-weight: 700;
-        color: rgb(99, 11, 11);
-        margin-bottom: 6px;
-    }
-    
-    .vehicle-status {
-        display: inline-block;
+        bottom: 8px;
+        left: 8px;
+        background: var(--import-red);
+        color: var(--white);
         padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-xs);
+        font-weight: var(--font-semibold);
     }
     
-    .status-stock { background: rgba(0,166,81,0.1); color: #00a651; }
-    .status-transit { background: rgba(0,102,204,0.1); color: #0066cc; }
-    .status-reserve { background: rgba(255,149,0,0.1); color: #ff9500; }
-    
-    .vehicle-actions {
+    /* FORM ACTIONS */
+    .form-actions {
         display: flex;
-        gap: 6px;
-        margin-top: 8px;
+        gap: var(--space-md);
+        margin-top: var(--space-2xl);
     }
     
-    .action-btn {
+    .form-actions .button {
         flex: 1;
-        padding: 8px;
-        border: 1px solid #e5e5e7;
-        background: white;
-        border-radius: 8px;
-        font-size: 12px;
-        cursor: pointer;
     }
     
-    .action-btn-edit { color: #0066cc; }
-    .action-btn-delete { color: #ff3b30; }
-    
-    /* Login Móvil */
-    .login-screen {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
+    /* HIDDEN */
+    .hidden {
+        display: none !important;
     }
     
-    .login-card {
-        background: white;
-        border-radius: 20px;
-        padding: 40px 24px;
-        width: 100%;
-        max-width: 400px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .login-title {
-        font-size: 32px;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    
-    .login-subtitle {
-        text-align: center;
-        color: #86868b;
-        margin-bottom: 32px;
-        font-size: 14px;
-    }
-    
-    /* Loading */
-    .spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #f5f5f7;
-        border-top-color: rgb(99, 11, 11);
-        border-radius: 50%;
-        animation: spin 0.8s linear infinite;
-        margin: 20px auto;
-    }
-    
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-    
-    .loading-text {
-        text-align: center;
-        color: #86868b;
-        font-size: 14px;
-        margin-top: 12px;
-    }
-    
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #86868b;
-    }
-    
-    .empty-icon {
-        font-size: 64px;
-        opacity: 0.3;
-        margin-bottom: 16px;
-    }
-    
-    /* Hidden */
-    .hidden { display: none !important; }
-    
-    /* Toast Notifications */
-    .toast {
-        position: fixed;
-        top: 70px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgb(99, 11, 11);
-        color: white;
-        padding: 14px 20px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        z-index: 9999;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        animation: slideDown 0.3s ease-out;
-        max-width: 90%;
-        text-align: center;
-    }
-    
-    .toast-success { background: #00a651; }
-    .toast-error { background: #ff3b30; }
-    
-    @keyframes slideDown {
-        from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .admin-container {
+            padding: var(--space-lg) var(--space-md);
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .admin-tabs {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .admin-tab {
+            white-space: nowrap;
+        }
+        
+        .vehicles-table {
+            font-size: var(--font-sm);
+        }
+        
+        .vehicles-table th,
+        .vehicles-table td {
+            padding: var(--space-sm) var(--space-md);
+        }
+        
+        .form-section {
+            padding: var(--space-lg);
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
     }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="loginScreen" class="login-screen">
+    <!-- ================================
+         LOGIN SCREEN
+         ================================ -->
+    <div id="loginScreen" class="login-screen hidden">
         <div class="login-card">
-            <div class="login-title">
-                <span style="color: rgb(99, 11, 11);">Import</span> Cars
+            <div class="login-logo">
+                <span class="import-text">Import</span> American Cars
             </div>
             <div class="login-subtitle">Panel de Administración</div>
             
             <form id="loginForm">
                 <div class="form-group">
-                    <label class="form-label">Email <span class="required">*</span></label>
-                    <input type="email" id="loginEmail" class="form-input" placeholder="admin@importcars.cl" required autocomplete="email">
+                    <label class="form-label">Email</label>
+                    <input 
+                        type="email" 
+                        id="loginEmail" 
+                        class="form-input" 
+                        placeholder="admin@importcars.cl" 
+                        required 
+                        autocomplete="email"
+                    >
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Contraseña <span class="required">*</span></label>
-                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+                    <label class="form-label">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="loginPassword" 
+                        class="form-input" 
+                        placeholder="••••••••" 
+                        required 
+                        autocomplete="current-password"
+                    >
                 </div>
                 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="button" style="width: 100%;">
                     <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Admin Panel -->
+    <!-- ================================
+         ADMIN PANEL
+         ================================ -->
     <div id="adminPanel" class="hidden">
         <!-- Header -->
-        <div class="mobile-header">
-            <div>
-                <div class="logo">
-                    <span>Import</span> Cars
-                </div>
-                <div class="user-info" id="userEmail"></div>
+        <header class="admin-header">
+            <div class="admin-logo">
+                <span class="import-text">Import</span> Admin
             </div>
-            <button class="logout-btn" onclick="logout()">
-                <i class="fas fa-sign-out-alt"></i> Salir
-            </button>
-        </div>
+            <div class="admin-user">
+                <div class="user-email" id="userEmail"></div>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+        </header>
 
-        <!-- Container -->
-        <div class="container">
+        <!-- Main Container -->
+        <div class="admin-container">
             <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-number" style="color: #00a651;" id="adminStockCount">0</div>
-                    <div class="stat-label">Stock</div>
+                    <div class="stat-number" style="color: var(--green);" id="adminStockCount">0</div>
+                    <div class="stat-label">En Stock</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" style="color: #0066cc;" id="adminTransitCount">0</div>
-                    <div class="stat-label">Tránsito</div>
+                    <div class="stat-number" style="color: var(--blue);" id="adminTransitCount">0</div>
+                    <div class="stat-label">En Tránsito</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" style="color: #ff9500;" id="adminReserveCount">0</div>
-                    <div class="stat-label">Reserva</div>
+                    <div class="stat-number" style="color: var(--orange);" id="adminReserveCount">0</div>
+                    <div class="stat-label">Para Reservar</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number" id="adminTotalCount">0</div>
@@ -546,301 +431,289 @@
             </div>
 
             <!-- Tabs -->
-            <div class="mobile-tabs">
-                <button class="tab-btn active" onclick="switchToTab('list')">
-                    <i class="fas fa-list"></i> Lista
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchToTab('vehicles')">
+                    <i class="fas fa-list"></i> Vehículos
                 </button>
-                <button class="tab-btn" onclick="switchToTab('add')">
-                    <i class="fas fa-plus"></i> Agregar
+                <button class="admin-tab" onclick="switchToTab('add')">
+                    <i class="fas fa-plus-circle"></i> Agregar Vehículo
                 </button>
             </div>
 
-            <!-- Tab: Lista -->
-            <div id="listTab" class="tab-content">
-                <div id="vehiclesList"></div>
+            <!-- Tab Content: Vehículos -->
+            <div id="vehiclesTab" class="tab-content active">
+                <div id="vehiclesTableContainer">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Cargando vehículos...</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Tab: Agregar/Editar -->
-            <div id="addTab" class="tab-content hidden">
-                <div class="card">
-                    <h2 class="card-title" id="formTitle">Agregar Vehículo</h2>
-                    
-                    <form id="vehicleForm">
-                        <!-- Básico -->
-                        <div class="form-group">
-                            <label class="form-label">Nombre <span class="required">*</span></label>
-                            <input type="text" name="name" class="form-input" placeholder="Chevrolet Silverado 1500 LTZ 2021" required>
+            <!-- Tab Content: Agregar/Editar -->
+            <div id="addTab" class="tab-content">
+                <form id="vehicleForm">
+                    <!-- Información Básica -->
+                    <div class="form-section">
+                        <h3 class="section-header" id="formTitle">Agregar Vehículo</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Nombre del Vehículo *</label>
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    class="form-input" 
+                                    placeholder="Chevrolet Silverado 1500 LTZ 2021" 
+                                    required
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Precio (CLP) *</label>
+                                <input 
+                                    type="number" 
+                                    name="price" 
+                                    class="form-input" 
+                                    placeholder="32900000" 
+                                    required
+                                >
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Precio (CLP) <span class="required">*</span></label>
-                            <input type="number" name="price" class="form-input" placeholder="32900000" required>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Estado *</label>
+                                <select name="status" class="form-select" required>
+                                    <option value="stock">En Stock Arica</option>
+                                    <option value="transit">En Tránsito</option>
+                                    <option value="reserve">Para Reservar</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Ubicación</label>
+                                <input 
+                                    type="text" 
+                                    name="location" 
+                                    class="form-input" 
+                                    placeholder="Arica, Chile"
+                                >
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Estado <span class="required">*</span></label>
-                            <select name="status" class="form-select" required>
-                                <option value="stock">En Stock</option>
-                                <option value="transit">En Tránsito</option>
-                                <option value="reserve">Para Reservar</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Ubicación</label>
-                            <input type="text" name="location" class="form-input" placeholder="Arica">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Tipo</label>
-                            <input type="text" name="type" class="form-input" placeholder="silverado">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Tipo</label>
+                                <input 
+                                    type="text" 
+                                    name="type" 
+                                    class="form-input" 
+                                    placeholder="silverado, ram, f150"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">ETA / Disponibilidad</label>
+                                <input 
+                                    type="text" 
+                                    name="eta" 
+                                    class="form-input" 
+                                    placeholder="Disponible inmediato"
+                                >
+                            </div>
                         </div>
                         
                         <div class="form-group">
                             <label class="form-label">Descripción</label>
-                            <textarea name="description" class="form-textarea" placeholder="5.3L V8 • 4x4 • Crew Cab • Cuero"></textarea>
+                            <textarea 
+                                name="description" 
+                                class="form-textarea" 
+                                placeholder="5.3L V8 • 4x4 • Crew Cab • Cuero • Pantalla Táctil"
+                            ></textarea>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">ETA</label>
-                            <input type="text" name="eta" class="form-input" placeholder="Disponible inmediato">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Días en Tránsito (si aplica)</label>
+                                <input 
+                                    type="number" 
+                                    name="transit_time" 
+                                    class="form-input" 
+                                    placeholder="15"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Video ID (YouTube)</label>
+                                <input 
+                                    type="text" 
+                                    name="video_id" 
+                                    class="form-input" 
+                                    placeholder="M7FIvfx5J10"
+                                >
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Especificaciones Técnicas -->
+                    <div class="form-section">
+                        <h3 class="section-header">Especificaciones Técnicas</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Motor</label>
+                                <input 
+                                    type="text" 
+                                    name="motor" 
+                                    class="form-input" 
+                                    placeholder="5.3L V8 EcoTec3"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Potencia</label>
+                                <input 
+                                    type="text" 
+                                    name="potencia" 
+                                    class="form-input" 
+                                    placeholder="355 HP @ 5600 RPM"
+                                >
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Días en tránsito</label>
-                            <input type="number" name="transit_time" class="form-input" placeholder="15">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Torque</label>
+                                <input 
+                                    type="text" 
+                                    name="torque" 
+                                    class="form-input" 
+                                    placeholder="383 lb-ft @ 4100 RPM"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Transmisión</label>
+                                <input 
+                                    type="text" 
+                                    name="transmision" 
+                                    class="form-input" 
+                                    placeholder="Automática 10 velocidades"
+                                >
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Video ID (YouTube)</label>
-                            <input type="text" name="video_id" class="form-input" placeholder="M7FIvfx5J10">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Tracción</label>
+                                <input 
+                                    type="text" 
+                                    name="traccion" 
+                                    class="form-input" 
+                                    placeholder="4x4"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Combustible</label>
+                                <input 
+                                    type="text" 
+                                    name="combustible" 
+                                    class="form-input" 
+                                    placeholder="Gasolina"
+                                >
+                            </div>
                         </div>
                         
-                        <!-- Especificaciones -->
-                        <div class="section-header">Especificaciones Técnicas</div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Motor</label>
-                            <input type="text" name="motor" class="form-input" placeholder="5.3L V8 EcoTec3">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Consumo</label>
+                                <input 
+                                    type="text" 
+                                    name="consumo" 
+                                    class="form-input" 
+                                    placeholder="12.7 L/100km"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Capacidad</label>
+                                <input 
+                                    type="text" 
+                                    name="capacidad" 
+                                    class="form-input" 
+                                    placeholder="6 pasajeros"
+                                >
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label class="form-label">Potencia</label>
-                            <input type="text" name="potencia" class="form-input" placeholder="355 HP @ 5600 RPM">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Color</label>
+                                <input 
+                                    type="text" 
+                                    name="color" 
+                                    class="form-input" 
+                                    placeholder="Gris Summit White"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Kilometraje</label>
+                                <input 
+                                    type="text" 
+                                    name="kilometraje" 
+                                    class="form-input" 
+                                    placeholder="45,000 km"
+                                >
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Torque</label>
-                            <input type="text" name="torque" class="form-input" placeholder="383 lb-ft @ 4100 RPM">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Transmisión</label>
-                            <input type="text" name="transmision" class="form-input" placeholder="Automática 10 velocidades">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Tracción</label>
-                            <input type="text" name="traccion" class="form-input" placeholder="4x4">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Combustible</label>
-                            <input type="text" name="combustible" class="form-input" placeholder="Gasolina">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Consumo</label>
-                            <input type="text" name="consumo" class="form-input" placeholder="12.7 L/100km">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Capacidad</label>
-                            <input type="text" name="capacidad" class="form-input" placeholder="6 pasajeros">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Color</label>
-                            <input type="text" name="color" class="form-input" placeholder="Gris Summit White">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Kilometraje</label>
-                            <input type="text" name="kilometraje" class="form-input" placeholder="45,000 km">
-                        </div>
-                        
-                        <!-- Imágenes -->
-                        <div class="section-header">Imágenes (Máx 10)</div>
+                    </div>
+
+                    <!-- Imágenes -->
+                    <div class="form-section">
+                        <h3 class="section-header">Imágenes (Máximo 10)</h3>
                         
                         <div class="image-upload-area" id="imageUploadArea">
                             <div class="upload-icon">
                                 <i class="fas fa-cloud-upload-alt"></i>
                             </div>
-                            <div class="upload-text">Toca para seleccionar imágenes</div>
-                            <div class="upload-hint">La primera será la principal</div>
-                            <input type="file" id="imageInput" multiple accept="image/*" style="display: none;">
+                            <div class="upload-text">
+                                Click para seleccionar imágenes o arrastra aquí
+                            </div>
+                            <div class="upload-hint">
+                                La primera imagen será la principal • Formatos: JPG, PNG, WEBP • Máx 10MB por imagen
+                            </div>
+                            <input 
+                                type="file" 
+                                id="imageInput" 
+                                multiple 
+                                accept="image/*" 
+                                style="display: none;"
+                            >
                         </div>
                         
-                        <div class="image-preview-grid" id="imagePreview"></div>
-                        
-                        <!-- Botones -->
-                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="form-actions">
+                        <button type="submit" class="button" id="submitBtn">
                             <i class="fas fa-save"></i> Guardar Vehículo
                         </button>
-                        
-                        <button type="button" class="btn btn-secondary" onclick="cancelForm()">
+                        <button type="button" class="button button-outline" onclick="cancelForm()">
                             <i class="fas fa-times"></i> Cancelar
                         </button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
-    
-    <script>
-    let currentUser = null;
-    let uploadedImages = [];
-    let currentEditingVehicle = null;
-
-    // INICIALIZACIÓN
-    document.addEventListener('DOMContentLoaded', async () => {
-        vehicleAPI.init();
-        await checkAuth();
-        setupEventListeners();
-    });
-
-    // AUTH
-    async function checkAuth() {
-        const user = await vehicleAPI.getCurrentUser();
-        if (user) {
-            currentUser = user;
-            showAdminPanel();
-            await loadData();
-        } else {
-            showLoginScreen();
-        }
-    }
-
-    function showLoginScreen() {
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('adminPanel').classList.add('hidden');
-    }
-
-    function showAdminPanel() {
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('adminPanel').classList.remove('hidden');
-        document.getElementById('userEmail').textContent = currentUser?.email || '';
-    }
-
-    // LOGIN
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const password = document.getElementById('loginPassword').value;
-        
-        try {
-            await vehicleAPI.signIn(email, password);
-            showToast('Sesión iniciada', 'success');
-            await checkAuth();
-        } catch (error) {
-            showToast('Error: ' + error.message, 'error');
-        }
-    });
-
-    async function logout() {
-        await vehicleAPI.signOut();
-        currentUser = null;
-        showLoginScreen();
-        showToast('Sesión cerrada', 'success');
-    }
-
-    // CARGAR DATOS
-    async function loadData() {
-        await loadStats();
-        await loadVehiclesList();
-    }
-
-    async function loadStats() {
-        const stats = await vehicleAPI.getStats();
-        document.getElementById('adminStockCount').textContent = stats.stock;
-        document.getElementById('adminTransitCount').textContent = stats.transit;
-        document.getElementById('adminReserveCount').textContent = stats.reserve;
-        document.getElementById('adminTotalCount').textContent = stats.total;
-    }
-
-    async function loadVehiclesList() {
-        const container = document.getElementById('vehiclesList');
-        
-        try {
-            const vehicles = await vehicleAPI.getAllVehicles();
-            
-            if (vehicles.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon"><i class="fas fa-car"></i></div>
-                        <div>No hay vehículos</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = vehicles.map(v => `
-                <div class="vehicle-item">
-                    <img src="${v.baseImage}" class="vehicle-thumb" alt="${v.name}">
-                    <div class="vehicle-details">
-                        <div class="vehicle-name">${v.name}</div>
-                        <div class="vehicle-price">$${formatPrice(v.price)}</div>
-                        <span class="vehicle-status status-${v.status}">${v.status === 'stock' ? 'Stock' : v.status === 'transit' ? 'Tránsito' : 'Reserva'}</span>
-                        <div class="vehicle-actions">
-                            <button class="action-btn action-btn-edit" onclick="editVehicle('${v.id}')">
-                                <i class="fas fa-edit"></i> Editar
-                            </button>
-                            <button class="action-btn action-btn-delete" onclick="deleteVehicle('${v.id}')">
-                                <i class="fas fa-trash"></i> Eliminar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            
-        } catch (error) {
-            container.innerHTML = `<div class="empty-state"><div>Error al cargar</div></div>`;
-        }
-    }
-
-    // TABS
-    function switchToTab(tabName) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-        
-        event.target.classList.add('active');
-        document.getElementById(tabName + 'Tab').classList.remove('hidden');
-    }
-
-    // EVENT LISTENERS
-    function setupEventListeners() {
-        const uploadArea = document.getElementById('imageUploadArea');
-        const imageInput = document.getElementById('imageInput');
-        
-        uploadArea.addEventListener('click', () => imageInput.click());
-        imageInput.addEventListener('change', (e) => handleImageFiles(Array.from(e.target.files)));
-        
-        document.getElementById('vehicleForm').addEventListener('submit', handleSubmit);
-    }
-
-    // IMÁGENES
-    async function handleImageFiles(files) {
-        const validFiles = files.filter(f => f.type.startsWith('image/'));
-        
-        if (uploadedImages.length + validFiles.length > 10) {
-            showToast('Máximo 10 imágenes', 'error');
-            return;
-        }
-        
-        for (const file of validFiles) {
-            if (file.size > 10 * 1024 * 1024) {
-                showToast('Imagen muy grande (máx 10MB)', 'error');
-                continue;
+    <script src="js/admin.js"></script>
+</body>
+</html>
