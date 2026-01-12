@@ -1,5 +1,6 @@
 /* ========================================
    api.js - Cliente API para Supabase
+   MEJORADO: Con métodos completos para kits
    ======================================== */
 
 class VehicleAPI {
@@ -15,7 +16,10 @@ class VehicleAPI {
         return this;
     }
     
+    // ====================================
     // VEHÍCULOS
+    // ====================================
+    
     async getAllVehicles(status = null) {
         try {
             let query = this.client
@@ -110,7 +114,10 @@ class VehicleAPI {
         }
     }
     
+    // ====================================
     // IMÁGENES
+    // ====================================
+    
     async addImage(vehicleId, imageUrl, isMain = false, orderIndex = 0) {
         try {
             const { data, error } = await this.client
@@ -169,7 +176,61 @@ class VehicleAPI {
         }
     }
     
-    // KITS
+    // ====================================
+    // KITS DE PERSONALIZACIÓN
+    // ====================================
+    
+    // NUEVO: Obtener todos los kits (sin filtrar por vehículo)
+    async getAllKits() {
+        try {
+            const { data, error } = await this.client
+                .from('customization_kits')
+                .select(`
+                    *,
+                    kit_features (id, feature, order_index)
+                `)
+                .order('created_at', { ascending: false });
+            
+            if (error) throw error;
+            
+            return data.map(kit => ({
+                ...kit,
+                features: (kit.kit_features || [])
+                    .sort((a, b) => a.order_index - b.order_index)
+                    .map(f => f.feature)
+            }));
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+    
+    // Obtener kits de un vehículo específico
+    async getVehicleKits(vehicleId) {
+        try {
+            const { data, error } = await this.client
+                .from('customization_kits')
+                .select(`
+                    *,
+                    kit_features (id, feature, order_index)
+                `)
+                .eq('vehicle_id', vehicleId)
+                .order('level', { ascending: true });
+            
+            if (error) throw error;
+            
+            return data.map(kit => ({
+                ...kit,
+                features: (kit.kit_features || [])
+                    .sort((a, b) => a.order_index - b.order_index)
+                    .map(f => f.feature)
+            }));
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+    
     async createKit(kitData) {
         try {
             const { data, error } = await this.client
@@ -185,6 +246,45 @@ class VehicleAPI {
             throw error;
         }
     }
+    
+    // NUEVO: Actualizar kit
+    async updateKit(kitId, kitData) {
+        try {
+            const { data, error } = await this.client
+                .from('customization_kits')
+                .update(kitData)
+                .eq('id', kitId)
+                .select()
+                .single();
+            
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+    
+    // NUEVO: Eliminar kit
+    async deleteKit(kitId) {
+        try {
+            // Las features se eliminan automáticamente por CASCADE
+            const { error } = await this.client
+                .from('customization_kits')
+                .delete()
+                .eq('id', kitId);
+            
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+    
+    // ====================================
+    // FEATURES DE KITS
+    // ====================================
     
     async addKitFeature(kitId, feature, orderIndex = 0) {
         try {
@@ -206,7 +306,59 @@ class VehicleAPI {
         }
     }
     
+    // NUEVO: Eliminar feature
+    async deleteKitFeature(featureId) {
+        try {
+            const { error } = await this.client
+                .from('kit_features')
+                .delete()
+                .eq('id', featureId);
+            
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+    
+    // NUEVO: Actualizar features de un kit (elimina todas y crea nuevas)
+    async updateKitFeatures(kitId, features) {
+        try {
+            // Eliminar features existentes
+            await this.client
+                .from('kit_features')
+                .delete()
+                .eq('kit_id', kitId);
+            
+            // Insertar nuevas features
+            if (features && features.length > 0) {
+                const featuresData = features.map((feature, index) => ({
+                    kit_id: kitId,
+                    feature: feature,
+                    order_index: index
+                }));
+                
+                const { data, error } = await this.client
+                    .from('kit_features')
+                    .insert(featuresData)
+                    .select();
+                
+                if (error) throw error;
+                return data;
+            }
+            
+            return [];
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
+    }
+    
+    // ====================================
     // ESTADÍSTICAS
+    // ====================================
+    
     async getStats() {
         try {
             const { data: vehicles, error } = await this.client
@@ -227,7 +379,10 @@ class VehicleAPI {
         }
     }
     
+    // ====================================
     // AUTENTICACIÓN
+    // ====================================
+    
     async signIn(email, password) {
         try {
             const { data, error } = await this.client.auth.signInWithPassword({
@@ -263,7 +418,10 @@ class VehicleAPI {
         }
     }
     
+    // ====================================
     // UTILIDADES
+    // ====================================
+    
     formatVehicle(vehicle) {
         if (!vehicle) return null;
         
@@ -307,4 +465,4 @@ if (typeof window !== 'undefined') {
     window.VehicleAPI = VehicleAPI;
 }
 
-console.log('✅ API Client cargado');
+console.log('✅ API Client cargado - Versión mejorada con gestión completa de kits');
