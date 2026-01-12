@@ -1,5 +1,6 @@
 /* ========================================
    vehicles.js - Lógica de Vehículos
+   MEJORADO: Con visualización de kits
    ======================================== */
 
 let currentVehicles = [];
@@ -40,6 +41,7 @@ async function loadVehicles(filter = 'all') {
         
         renderVehicles(currentVehicles);
         await updateStockCounters();
+        await updateCustomizableCount(); // NUEVO
         
     } catch (error) {
         console.error('Error:', error);
@@ -49,21 +51,32 @@ async function loadVehicles(filter = 'all') {
     }
 }
 
-// RENDERIZAR VEHÍCULOS
+// RENDERIZAR VEHÍCULOS - MEJORADO
 function renderVehicles(vehicles) {
     const container = document.getElementById('vehiclesContainer');
     if (!container) return;
     
     container.innerHTML = vehicles.map(vehicle => {
         const statusConfig = APP_CONFIG.vehicleStatuses[vehicle.status];
+        const hasKits = vehicle.kits && vehicle.kits.length > 0; // NUEVO
         
         return `
             <div class="vehicle-card">
-                <img src="${vehicle.baseImage}" 
-                     alt="${vehicle.name}" 
-                     class="vehicle-image"
-                     onclick="openGallery('${vehicle.id}')"
-                     loading="lazy">
+                <div style="position: relative;">
+                    <img src="${vehicle.baseImage}" 
+                         alt="${vehicle.name}" 
+                         class="vehicle-image"
+                         onclick="openGallery('${vehicle.id}')"
+                         loading="lazy">
+                    
+                    <!-- NUEVO: Badge de Kits Disponibles -->
+                    ${hasKits ? `
+                        <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px; z-index: 5;">
+                            <i class="fas fa-star" style="font-size: 10px;"></i>
+                            ${vehicle.kits.length} Kit${vehicle.kits.length > 1 ? 's' : ''}
+                        </div>
+                    ` : ''}
+                </div>
                 
                 <div class="vehicle-info">
                     <div class="vehicle-status ${statusConfig.badge}">
@@ -75,6 +88,28 @@ function renderVehicles(vehicles) {
                     <div class="vehicle-price">$${formatPrice(vehicle.price)} CLP</div>
                     
                     <p class="vehicle-description">${vehicle.description || ''}</p>
+                    
+                    <!-- NUEVO: Mostrar kits disponibles -->
+                    ${hasKits ? `
+                        <div style="margin: 12px 0; padding: 12px; background: var(--gray-50); border-radius: 8px; border-left: 3px solid var(--import-red);">
+                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--import-red); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                <i class="fas fa-magic" style="font-size: 10px;"></i>
+                                Personalización Disponible
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                ${vehicle.kits.slice(0, 2).map(kit => `
+                                    <span style="font-size: 11px; padding: 4px 10px; background: var(--white); border-radius: 12px; border: 1px solid var(--gray-200); font-weight: 500;">
+                                        ${kit.name}
+                                    </span>
+                                `).join('')}
+                                ${vehicle.kits.length > 2 ? `
+                                    <span style="font-size: 11px; padding: 4px 10px; color: var(--gray-300); font-weight: 500;">
+                                        +${vehicle.kits.length - 2} más
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
                     
                     ${vehicle.status === 'transit' && vehicle.transit_time ? `
                         <div class="transit-timer">
@@ -88,13 +123,20 @@ function renderVehicles(vehicles) {
                         </div>
                     ` : ''}
                     
-                    <div class="vehicle-actions">
-                        <button class="button" onclick="showVehicleDetails('${vehicle.id}')" style="flex: 1;">
-                            Ver Detalles
-                        </button>
-                        <button class="button button-outline" onclick="openCustomization('${vehicle.id}')" style="flex: 1;">
-                            Personalizar
-                        </button>
+                    <!-- MEJORADO: Botones según si tiene kits -->
+                    <div class="vehicle-actions" style="gap: 8px;">
+                        ${hasKits ? `
+                            <button class="button" onclick="openCustomization('${vehicle.id}')" style="flex: 1.2; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); box-shadow: 0 4px 12px rgba(99,11,11,0.3);">
+                                <i class="fas fa-magic"></i> Personalizar
+                            </button>
+                            <button class="button button-outline" onclick="showVehicleDetails('${vehicle.id}')" style="flex: 0.8;">
+                                Detalles
+                            </button>
+                        ` : `
+                            <button class="button" onclick="showVehicleDetails('${vehicle.id}')" style="flex: 1;">
+                                Ver Detalles
+                            </button>
+                        `}
                     </div>
                 </div>
             </div>
@@ -120,7 +162,18 @@ async function updateStockCounters() {
     }
 }
 
-// MOSTRAR DETALLES
+// NUEVO: Actualizar contador de customizables
+async function updateCustomizableCount() {
+    const customizableCount = document.getElementById('customizableCount');
+    if (customizableCount && currentVehicles) {
+        const count = currentVehicles.filter(v => 
+            v.kits && v.kits.length > 0
+        ).length;
+        customizableCount.textContent = count;
+    }
+}
+
+// MOSTRAR DETALLES - MEJORADO
 async function showVehicleDetails(vehicleId) {
     try {
         const vehicle = await vehicleAPI.getVehicle(vehicleId);
@@ -132,6 +185,8 @@ async function showVehicleDetails(vehicleId) {
         if (!modal || !content) return;
         
         trackEvent('view', 'Vehicle Details', vehicle.name);
+        
+        const hasKits = vehicle.kits && vehicle.kits.length > 0; // NUEVO
         
         content.innerHTML = `
             <div style="padding: 32px;">
@@ -164,6 +219,59 @@ async function showVehicleDetails(vehicleId) {
                     ` : ''}
                 </div>
                 
+                <!-- NUEVO: Sección de Kits si están disponibles -->
+                ${hasKits ? `
+                    <div style="background: var(--import-red-light); padding: 32px; border-radius: 12px; margin-bottom: 32px; border: 1px solid rgba(99,11,11,0.2);">
+                        <h3 style="font-size: 21px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+                            <i class="fas fa-magic" style="color: var(--import-red);"></i> 
+                            Kits de Personalización Disponibles
+                        </h3>
+                        <p style="color: var(--gray-300); margin-bottom: 24px; font-size: 15px;">
+                            Este vehículo cuenta con ${vehicle.kits.length} kit${vehicle.kits.length > 1 ? 's' : ''} configurado${vehicle.kits.length > 1 ? 's' : ''}
+                        </p>
+                        
+                        <div style="display: grid; gap: 16px;">
+                            ${vehicle.kits.map(kit => `
+                                <div style="background: var(--white); padding: 20px; border-radius: 8px; border: 1px solid var(--gray-200);">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                        <div>
+                                            <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">
+                                                ${kit.name}
+                                            </div>
+                                            <div style="font-size: 13px; color: var(--gray-300);">
+                                                ${kit.description || ''}
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 18px; font-weight: 700; color: ${kit.price > 0 ? 'var(--import-red)' : 'var(--gray-300)'}; white-space: nowrap; margin-left: 16px;">
+                                            ${kit.price > 0 ? `+$${formatPrice(kit.price)}` : 'Incluido'}
+                                        </div>
+                                    </div>
+                                    
+                                    ${kit.features && kit.features.length > 0 ? `
+                                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px;">
+                                            ${kit.features.map(feature => `
+                                                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-800);">
+                                                    <i class="fas fa-check" style="color: var(--import-red); font-size: 11px;"></i>
+                                                    <span>${feature}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="margin-top: 20px; padding: 16px; background: var(--white); border-radius: 8px; border-left: 3px solid var(--import-red);">
+                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--import-red);">
+                                <i class="fas fa-info-circle"></i> Importante
+                            </div>
+                            <div style="font-size: 13px; color: var(--gray-300); line-height: 1.5;">
+                                La personalización se realiza antes de la entrega, manteniendo la versión original del vehículo.
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+                
                 <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 20px;">Especificaciones Técnicas</h3>
                 <div style="background: var(--gray-50); padding: 24px; border-radius: var(--radius); margin-bottom: 32px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
@@ -188,9 +296,11 @@ async function showVehicleDetails(vehicleId) {
                     <button class="button" onclick="contactVehicle('${vehicle.id}')" style="flex: 1; min-width: 200px;">
                         <i class="fab fa-whatsapp"></i> Consultar
                     </button>
-                    <button class="button button-outline" onclick="closeVehicleDetails(); openCustomization('${vehicle.id}')" style="flex: 1; min-width: 200px;">
-                        <i class="fas fa-cog"></i> Personalizar
-                    </button>
+                    ${hasKits ? `
+                        <button class="button button-outline" onclick="closeVehicleDetails(); openCustomization('${vehicle.id}')" style="flex: 1; min-width: 200px;">
+                            <i class="fas fa-magic"></i> Personalizar
+                        </button>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -258,7 +368,7 @@ function animateCounter() {
     }, duration / steps);
 }
 
-// EVENT LISTENERS
+// EVENT LISTENERS - MEJORADO
 function setupEventListeners() {
     const filters = document.querySelectorAll('#vehicleFilters .filter-button');
     filters.forEach(filter => {
@@ -268,7 +378,16 @@ function setupEventListeners() {
             filters.forEach(f => f.classList.remove('active'));
             this.classList.add('active');
             
-            loadVehicles(filterValue);
+            // NUEVO: Manejar filtro customizable
+            if (filterValue === 'customizable') {
+                const customizableVehicles = currentVehicles.filter(v => 
+                    v.kits && v.kits.length > 0
+                );
+                renderVehicles(customizableVehicles);
+            } else {
+                loadVehicles(filterValue);
+            }
+            
             trackEvent('filter', 'Vehicles', filterValue);
         });
     });
@@ -333,4 +452,4 @@ function setupEventListeners() {
     window.addEventListener('scroll', trackScroll);
 }
 
-console.log('✅ Vehicles.js cargado');
+console.log('✅ Vehicles.js cargado - Versión mejorada con kits');
