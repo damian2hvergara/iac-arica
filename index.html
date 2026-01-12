@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Importación directa de vehículos americanos desde USA a Arica. Personalización con accesorios originales.">
-    <title>Import American Cars | Vehículos USA</title>
+    <meta name="description" content="Importación de camionetas americanas desde USA con personalización profesional. Silverado, RAM, F-150 en Arica, Chile.">
+    <title>Import American Cars | Camionetas USA Personalizadas</title>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -33,7 +33,7 @@
             <div class="logo"><span class="import-text">Import</span> American Cars</div>
             <nav class="nav-links">
                 <a href="#vehicles" class="nav-link">Vehículos</a>
-                <a href="#customize" class="nav-link">Personalizar</a>
+                <a href="#customize" class="nav-link">Personalización</a>
                 <a href="#testimonials" class="nav-link">Testimonios</a>
                 <a href="#blog" class="nav-link">Blog</a>
                 <a href="#contact" class="nav-link">Contacto</a>
@@ -41,17 +41,26 @@
         </div>
     </header>
 
-    <!-- Hero -->
+    <!-- Hero MEJORADO -->
     <section class="hero" id="home">
         <div class="hero-background"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Vehículos Importados de Alto Estándar</h1>
-            <p class="hero-subtitle">Importación directa desde USA. Personalización con accesorios originales. Entrega en Arica y envios Nacionales e Internaiconales.</p>
+            <h1 class="hero-title">Camionetas USA Personalizadas a tu Medida</h1>
+            <p class="hero-subtitle">Importamos desde USA y configuramos según tu estilo. Arica, Chile.</p>
             
+            <!-- NUEVO: Badge de Personalización -->
+            <div style="display: inline-flex; align-items: center; gap: 12px; margin-top: 24px; padding: 12px 24px; background: rgba(99,11,11,0.95); border-radius: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
+                <i class="fas fa-magic" style="color: white; font-size: 16px;"></i>
+                <span style="color: white; font-size: 14px; font-weight: 600; letter-spacing: 0.3px;">
+                    Personalización profesional incluida
+                </span>
+            </div>
+            
+            <!-- Indicadores MEJORADOS -->
             <div class="stock-indicators">
                 <div class="indicator" data-filter="stock">
                     <div class="indicator-number status-stock" id="stockCount">0</div>
-                    <div class="indicator-label">En Stock Arica</div>
+                    <div class="indicator-label">En Stock</div>
                 </div>
                 <div class="indicator" data-filter="transit">
                     <div class="indicator-number status-transit" id="transitCount">0</div>
@@ -61,29 +70,52 @@
                     <div class="indicator-number status-reserve" id="reserveCount">0</div>
                     <div class="indicator-label">Para Reservar</div>
                 </div>
+                <!-- NUEVO: Contador de vehículos con kits -->
+                <div class="indicator" data-filter="customizable" style="cursor: pointer;">
+                    <div class="indicator-number" style="color: var(--import-red);" id="customizableCount">0</div>
+                    <div class="indicator-label">Con Kits</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Contador de Éxitos -->
+    <!-- Contador MEJORADO -->
     <section class="success-counter">
         <div class="counter-container">
-            <div class="counter-number" id="importedVehiclesCounter">142</div>
-            <p class="counter-text">Vehículos americanos importados exitosamente desde USA a Arica</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 800px; margin: 0 auto;">
+                <!-- Vehículos importados -->
+                <div style="text-align: center;">
+                    <div class="counter-number" id="importedVehiclesCounter">142</div>
+                    <p style="font-size: 17px; opacity: 0.9;">Vehículos Importados</p>
+                </div>
+                <!-- NUEVO: Con Personalización -->
+                <div style="text-align: center;">
+                    <div class="counter-number">98</div>
+                    <p style="font-size: 17px; opacity: 0.9;">Con Personalización</p>
+                </div>
+            </div>
+            <p class="counter-text" style="margin-top: 32px; opacity: 0.85;">
+                Desde USA a Arica · Configurados según cada cliente
+            </p>
         </div>
     </section>
 
     <!-- Vehículos -->
     <section class="vehicles-section" id="vehicles">
         <div class="section-container">
-            <h2 class="section-title">Explora Nuestro Inventario Exclusivo</h2>
-            <p class="section-subtitle">Importación directa con todos los documentos en regla. Personalización disponible durante el proceso.</p>
+            <h2 class="section-title">Explora Nuestro Inventario</h2>
+            <p class="section-subtitle">Importación directa con opciones de personalización profesional</p>
             
+            <!-- Filtros MEJORADOS -->
             <div class="filters" id="vehicleFilters">
                 <button class="filter-button active" data-filter="all">Todos</button>
                 <button class="filter-button" data-filter="stock">En Stock</button>
                 <button class="filter-button" data-filter="transit">En Tránsito</button>
                 <button class="filter-button" data-filter="reserve">Para Reservar</button>
+                <!-- NUEVO: Filtro Con Kits -->
+                <button class="filter-button" data-filter="customizable">
+                    <i class="fas fa-magic"></i> Con Kits
+                </button>
             </div>
             
             <!-- Loading Spinner -->
@@ -95,7 +127,7 @@
             <!-- Empty State -->
             <div class="empty-state" id="emptyState" style="display: none;">
                 <i class="fas fa-car"></i>
-                <h3>Pronto Nuevas Oportunidades Premium Déjanos tu WhatsApp y sé el primero en acceder.</h3>
+                <h3>Próximas Oportunidades Premium</h3>
                 <p>Pronto agregaremos más vehículos</p>
             </div>
             
@@ -104,49 +136,121 @@
         </div>
     </section>
 
-    <!-- Personalización -->
-    <section class="customization-section" id="customize">
+    <!-- Personalización MEJORADA -->
+    <section class="customization-section" id="customize" style="background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%); padding: 80px 20px;">
         <div class="section-container">
-            <h2 class="section-title">Personalización</h2>
-            <p class="section-subtitle">Agrega accesorios USA originales durante el proceso de importación. Instalación profesional incluida.</p>
             
-            <div class="customization-grid">
-                <div class="customization-card">
-                    <div class="card-icon">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    <h3>Kits Personalizados</h3>
-                    <p>Básico, Sport, Off-Road, Premium</p>
-                </div>
-                
-                <div class="customization-card">
-                    <div class="card-icon">
-                        <i class="fas fa-tire"></i>
-                    </div>
-                    <h3>Llantas USA</h3>
-                    <p>Fuel, Method, BBS originales</p>
-                </div>
-                
-                <div class="customization-card">
-                    <div class="card-icon">
-                        <i class="fas fa-toolbox"></i>
-                    </div>
-                    <h3>Kits Off-Road</h3>
-                    <p>Suspensión, protectores, winch</p>
-                </div>
-                
-                <div class="customization-card">
-                    <div class="card-icon">
-                        <i class="fas fa-lightbulb"></i>
-                    </div>
-                    <h3>Iluminación LED</h3>
-                    <p>Faros, niebla, interiores</p>
+            <!-- NUEVO: Badge superior -->
+            <div style="text-align: center; margin-bottom: 16px;">
+                <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: var(--import-red); border-radius: 30px;">
+                    <i class="fas fa-star" style="color: white; font-size: 12px;"></i>
+                    <span style="color: white; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                        Tu Diferencia
+                    </span>
                 </div>
             </div>
             
+            <h2 class="section-title" style="text-align: center;">Personalización Profesional</h2>
+            <p class="section-subtitle" style="text-align: center; max-width: 600px; margin: 0 auto 48px;">
+                Cada camioneta puede elevarse estéticamente según tu estilo, manteniendo su versión original
+            </p>
+            
+            <!-- NUEVO: Ejemplos visuales mejorados -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px;">
+                
+                <!-- Nivel Básico -->
+                <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--gray-100);">
+                    <div style="position: relative; height: 200px; background: linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-car" style="font-size: 64px; color: var(--gray-200);"></i>
+                        <div style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.8); padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(10px);">
+                            <span style="color: white; font-size: 11px; font-weight: 600;">TRANSFORMACIÓN</span>
+                        </div>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="font-size: 12px; color: var(--import-red); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+                            Nivel Básico
+                        </div>
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+                            Estética Mejorada
+                        </h3>
+                        <ul style="font-size: 13px; color: var(--gray-300); line-height: 1.8; list-style: none; padding: 0;">
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Emblemas cromados</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Llantas mejoradas</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Detalles premium</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Nivel Intermedio (MÁS POPULAR) -->
+                <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 2px solid var(--import-red);">
+                    <div style="position: relative; height: 200px; background: linear-gradient(135deg, #630b0b 0%, #8b0707 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-car" style="font-size: 64px; color: rgba(255,255,255,0.9);"></i>
+                        <div style="position: absolute; top: 12px; right: 12px; background: var(--white); padding: 6px 12px; border-radius: 20px;">
+                            <span style="color: var(--import-red); font-size: 11px; font-weight: 700;">⭐ MÁS POPULAR</span>
+                        </div>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="font-size: 12px; color: var(--import-red); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+                            Nivel Intermedio
+                        </div>
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+                            Look Versión Superior
+                        </h3>
+                        <ul style="font-size: 13px; color: var(--gray-300); line-height: 1.8; list-style: none; padding: 0;">
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Parrilla premium</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Llantas 20"</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Estribos iluminados</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Cromados completos</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Nivel Premium -->
+                <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--gray-100);">
+                    <div style="position: relative; height: 200px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-car" style="font-size: 64px; color: rgba(255,255,255,0.9);"></i>
+                        <div style="position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(10px);">
+                            <span style="color: white; font-size: 11px; font-weight: 600;">FULL EQUIPAMIENTO</span>
+                        </div>
+                    </div>
+                    <div style="padding: 20px;">
+                        <div style="font-size: 12px; color: var(--import-red); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
+                            Nivel Premium
+                        </div>
+                        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">
+                            Configuración Completa
+                        </h3>
+                        <ul style="font-size: 13px; color: var(--gray-300); line-height: 1.8; list-style: none; padding: 0;">
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Paquete estético top</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Llantas 22" premium</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Interior mejorado</li>
+                            <li><i class="fas fa-check" style="color: var(--import-red); margin-right: 8px; font-size: 11px;"></i>Equipamiento full</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NUEVO: Nota importante -->
+            <div style="max-width: 700px; margin: 0 auto 40px; padding: 24px; background: white; border-radius: 12px; border-left: 4px solid var(--import-red); box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                <div style="display: flex; align-items: start; gap: 16px;">
+                    <i class="fas fa-info-circle" style="color: var(--import-red); font-size: 20px; margin-top: 2px;"></i>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--import-red);">
+                            Personalización Profesional
+                        </div>
+                        <div style="font-size: 13px; color: var(--gray-300); line-height: 1.6;">
+                            Elevamos la estética y equipamiento de tu camioneta, inspirados en versiones superiores, 
+                            <strong style="color: var(--gray-800);">manteniendo la versión original del vehículo</strong>. 
+                            Instalación profesional incluida.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA mejorado -->
             <div class="section-cta">
-                <button class="button" onclick="alert('Selecciona un vehículo primero')">
-                    <i class="fas fa-cog"></i> Simular Personalización
+                <button class="button" onclick="scrollToElement('vehicles')" style="background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); box-shadow: 0 6px 20px rgba(99,11,11,0.3); padding: 16px 32px; font-size: 16px;">
+                    <i class="fas fa-search"></i> Ver Vehículos con Kits
                 </button>
             </div>
         </div>
@@ -156,7 +260,7 @@
     <section class="testimonials-section" id="testimonials">
         <div class="section-container">
             <h2 class="section-title">Lo Que Dicen Nuestros Clientes</h2>
-            <p class="section-subtitle">Más de 140 clientes satisfechos con nuestro servicio de importación y personalización.</p>
+            <p class="section-subtitle">Más de 140 clientes satisfechos con personalización incluida</p>
             
             <div class="testimonials-grid">
                 <div class="testimonial-card">
@@ -165,55 +269,37 @@
                              alt="Carlos M." class="testimonial-avatar">
                         <div class="testimonial-info">
                             <h4>Carlos M.</h4>
-                            <p>Importó Silverado 2022</p>
+                            <p>Silverado High Country</p>
                         </div>
                     </div>
-                    <p class="testimonial-text">"El proceso fue transparente desde el inicio. La personalización quedó exactamente como quería. Totalmente recomendado."</p>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
+                    <p class="testimonial-text">"La personalización quedó perfecta. Parece una versión tope de línea."</p>
+                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
                 </div>
                 
                 <div class="testimonial-card">
                     <div class="testimonial-header">
-                        <img src="https://images.unsplash.com/photo-1494790108755-2616c113a1c1?w=200&h=200&fit=crop" 
-                             alt="Ana R." class="testimonial-avatar">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop" 
+                             alt="María S." class="testimonial-avatar">
                         <div class="testimonial-info">
-                            <h4>Ana R.</h4>
-                            <p>Importó Jeep Wrangler 2021</p>
+                            <h4>María S.</h4>
+                            <p>RAM 1500 Sport</p>
                         </div>
                     </div>
-                    <p class="testimonial-text">"Excelente atención. Me asesoraron en cada paso. El kit off-road es de primera calidad. Mi Jeep quedó perfecto."</p>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                    </div>
+                    <p class="testimonial-text">"Proceso transparente. El kit off-road quedó espectacular."</p>
+                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
                 </div>
                 
                 <div class="testimonial-card">
                     <div class="testimonial-header">
-                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop" 
-                             alt="Miguel T." class="testimonial-avatar">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop" 
+                             alt="Roberto P." class="testimonial-avatar">
                         <div class="testimonial-info">
-                            <h4>Miguel T.</h4>
-                            <p>Importó RAM 1500 2020</p>
+                            <h4>Roberto P.</h4>
+                            <p>F-150 XLT</p>
                         </div>
                     </div>
-                    <p class="testimonial-text">"Comparé precios y aquí encontré el mejor valor. La personalización premium valió cada peso. Servicio impecable."</p>
-                    <div class="testimonial-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
+                    <p class="testimonial-text">"Excelente relación precio-calidad. La personalización marca la diferencia."</p>
+                    <div class="testimonial-rating">⭐⭐⭐⭐⭐</div>
                 </div>
             </div>
         </div>
@@ -223,7 +309,7 @@
     <section class="instagram-section">
         <div class="section-container">
             <h2 class="section-title">Entregas Reales</h2>
-            <p class="section-subtitle">Sigue nuestro Instagram para ver más entregas y proyectos de personalización.</p>
+            <p class="section-subtitle">Sigue nuestro Instagram para ver más personalizaciones</p>
             
             <div class="instagram-grid">
                 <a href="https://instagram.com/importamericancars" target="_blank" class="instagram-post">
@@ -332,11 +418,25 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer MEJORADO -->
     <footer class="footer" id="contact">
         <div class="footer-container">
+            
+            <!-- NUEVO: Box destacado personalización -->
+            <div style="background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); padding: 24px; border-radius: 16px; margin-bottom: 32px; text-align: center;">
+                <div style="font-size: 32px; margin-bottom: 8px;">
+                    <i class="fas fa-magic" style="color: white;"></i>
+                </div>
+                <div style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">
+                    Tu Camioneta, Tu Estilo
+                </div>
+                <div style="font-size: 14px; color: rgba(255,255,255,0.9); max-width: 400px; margin: 0 auto;">
+                    Cada vehículo puede personalizarse profesionalmente antes de entregarte
+                </div>
+            </div>
+            
             <div class="logo"><span class="import-text">Import</span> American Cars</div>
-            <p class="footer-text">Vehículos americanos importados desde USA. Personalización con accesorios originales. Taller en Arica.</p>
+            <p class="footer-text">Vehículos importados desde USA con personalización profesional. Arica, Chile.</p>
             <a href="#" class="button" id="whatsappBtn">
                 <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
             </a>
@@ -386,7 +486,7 @@
     <script src="js/customization.js"></script>
 
     <script>
-    // Inicializar aplicación
+    // Inicialización
     document.addEventListener('DOMContentLoaded', async () => {
         await initializeApp();
         await loadVehicles();
