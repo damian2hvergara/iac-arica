@@ -1,7 +1,5 @@
 /* ========================================
    vehicles.js - Lógica de Vehículos
-   VERSIÓN SUPER ROBUSTA - Enero 2025
-   Con logs detallados y múltiples estrategias
    ======================================== */
 
 let currentVehicles = [];
@@ -40,28 +38,8 @@ async function loadVehicles(filter = 'all') {
             return;
         }
         
-        let vehiclesToRender = currentVehicles;
-        if (filter === 'customizable') {
-            vehiclesToRender = currentVehicles.filter(v => 
-                v.kits && v.kits.length > 0
-            );
-            
-            if (vehiclesToRender.length === 0) {
-                if (emptyState) {
-                    emptyState.innerHTML = `
-                        <i class="fas fa-magic"></i>
-                        <h3>No hay vehículos con kits configurados</h3>
-                        <p>Estamos agregando más opciones de personalización</p>
-                    `;
-                    emptyState.style.display = 'block';
-                }
-                return;
-            }
-        }
-        
-        renderVehicles(vehiclesToRender);
+        renderVehicles(currentVehicles);
         await updateStockCounters();
-        await updateCustomizableCount();
         
     } catch (error) {
         console.error('Error:', error);
@@ -78,31 +56,18 @@ function renderVehicles(vehicles) {
     
     container.innerHTML = vehicles.map(vehicle => {
         const statusConfig = APP_CONFIG.vehicleStatuses[vehicle.status];
-        const hasKits = vehicle.kits && vehicle.kits.length > 0;
         
         return `
             <div class="vehicle-card">
-                <div style="position: relative;">
-                    <img src="${vehicle.baseImage}" 
-                         alt="${vehicle.name}" 
-                         class="vehicle-image"
-                         onclick="openGallery('${vehicle.id}')"
-                         loading="lazy">
-                    
-                    <!-- Badge de Kits Disponibles -->
-                    ${hasKits ? `
-                        <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px;">
-                            <i class="fas fa-star" style="font-size: 10px;"></i>
-                            ${vehicle.kits.length} Kit${vehicle.kits.length > 1 ? 's' : ''}
-                        </div>
-                    ` : ''}
-                </div>
+                <img src="${vehicle.baseImage}" 
+                     alt="${vehicle.name}" 
+                     class="vehicle-image"
+                     onclick="openGallery('${vehicle.id}')"
+                     loading="lazy">
                 
                 <div class="vehicle-info">
-                    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
-                        <div class="vehicle-status ${statusConfig.badge}">
-                            ${statusConfig.label}
-                        </div>
+                    <div class="vehicle-status ${statusConfig.badge}">
+                        ${statusConfig.label}
                     </div>
                     
                     <h3 class="vehicle-title">${vehicle.name}</h3>
@@ -110,28 +75,6 @@ function renderVehicles(vehicles) {
                     <div class="vehicle-price">$${formatPrice(vehicle.price)} CLP</div>
                     
                     <p class="vehicle-description">${vehicle.description || ''}</p>
-                    
-                    <!-- Kits disponibles -->
-                    ${hasKits ? `
-                        <div style="margin: 12px 0; padding: 12px; background: var(--gray-50); border-radius: 8px; border-left: 3px solid var(--import-red);">
-                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--import-red); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                                <i class="fas fa-magic" style="font-size: 10px;"></i>
-                                Personalización Disponible
-                            </div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                ${vehicle.kits.slice(0, 2).map(kit => `
-                                    <span style="font-size: 11px; padding: 4px 10px; background: var(--white); border-radius: 12px; border: 1px solid var(--gray-200); font-weight: 500;">
-                                        ${kit.name}
-                                    </span>
-                                `).join('')}
-                                ${vehicle.kits.length > 2 ? `
-                                    <span style="font-size: 11px; padding: 4px 10px; color: var(--gray-300); font-weight: 500;">
-                                        +${vehicle.kits.length - 2} más
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                    ` : ''}
                     
                     ${vehicle.status === 'transit' && vehicle.transit_time ? `
                         <div class="transit-timer">
@@ -145,19 +88,13 @@ function renderVehicles(vehicles) {
                         </div>
                     ` : ''}
                     
-                    <div class="vehicle-actions" style="gap: 8px;">
-                        ${hasKits ? `
-                            <button class="button" onclick="openCustomization('${vehicle.id}')" style="flex: 1.2; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); box-shadow: 0 4px 12px rgba(99,11,11,0.3);">
-                                <i class="fas fa-magic"></i> Personalizar
-                            </button>
-                            <button class="button button-outline" onclick="showVehicleDetails('${vehicle.id}')" style="flex: 0.8;">
-                                Detalles
-                            </button>
-                        ` : `
-                            <button class="button" onclick="showVehicleDetails('${vehicle.id}')" style="flex: 1;">
-                                Ver Detalles
-                            </button>
-                        `}
+                    <div class="vehicle-actions">
+                        <button class="button" onclick="showVehicleDetails('${vehicle.id}')" style="flex: 1;">
+                            Ver Detalles
+                        </button>
+                        <button class="button button-outline" onclick="openCustomization('${vehicle.id}')" style="flex: 1;">
+                            Personalizar
+                        </button>
                     </div>
                 </div>
             </div>
@@ -182,63 +119,8 @@ async function updateStockCounters() {
         console.error('Error:', error);
     }
 }
-async function updateCustomizableCount() {
-    const customizableCount = document.getElementById('customizableCount');
-    if (customizableCount && currentVehicles) {
-        const count = currentVehicles.filter(v => 
-            v.kits && v.kits.length > 0
-        ).length;
-        customizableCount.textContent = count;
-    }
-}
 
-// ACTUALIZAR CONTADOR DE CUSTOMIZABLES - SUPER ROBUSTO
-async function updateCustomizableCount() {
-    console.log('🔄 [updateCustomizableCount] Iniciando...');
-    
-    // 1. Verificar elemento existe
-    const customizableCount = document.getElementById('customizableCount');
-    if (!customizableCount) {
-        console.error('❌ [updateCustomizableCount] Elemento #customizableCount NO ENCONTRADO');
-        console.log('🔍 Elementos con ID disponibles:', 
-            Array.from(document.querySelectorAll('[id]')).map(e => e.id).join(', ')
-        );
-        return 0;
-    }
-    
-    console.log('✅ [updateCustomizableCount] Elemento encontrado');
-    
-    // 2. Obtener vehículos (siempre desde API para estar seguros)
-    let vehicles;
-    try {
-        console.log('📡 [updateCustomizableCount] Cargando desde API...');
-        vehicles = await vehicleAPI.getAllVehicles();
-        currentVehicles = vehicles;
-        console.log(`📦 [updateCustomizableCount] ${vehicles.length} vehículos cargados`);
-    } catch (error) {
-        console.error('❌ [updateCustomizableCount] Error en API:', error);
-        return 0;
-    }
-    
-    // 3. Contar vehículos con kits
-    const withKits = vehicles.filter(v => {
-        const hasKits = v.kits && Array.isArray(v.kits) && v.kits.length > 0;
-        if (hasKits) {
-            console.log(`  ✓ ${v.name}: ${v.kits.length} kit(s)`);
-        }
-        return hasKits;
-    });
-    
-    const count = withKits.length;
-    
-    // 4. Actualizar DOM
-    customizableCount.textContent = count;
-    console.log(`✅ [updateCustomizableCount] CONTADOR ACTUALIZADO: ${count}/${vehicles.length}`);
-    
-    return count;
-}
-
-// MOSTRAR DETALLES (función completa con kits)
+// MOSTRAR DETALLES
 async function showVehicleDetails(vehicleId) {
     try {
         const vehicle = await vehicleAPI.getVehicle(vehicleId);
@@ -250,8 +132,6 @@ async function showVehicleDetails(vehicleId) {
         if (!modal || !content) return;
         
         trackEvent('view', 'Vehicle Details', vehicle.name);
-        
-        const hasKits = vehicle.kits && vehicle.kits.length > 0;
         
         content.innerHTML = `
             <div style="padding: 32px;">
@@ -284,58 +164,6 @@ async function showVehicleDetails(vehicleId) {
                     ` : ''}
                 </div>
                 
-                ${hasKits ? `
-                    <div style="background: var(--import-red-light); padding: 32px; border-radius: 12px; margin-bottom: 32px; border: 1px solid rgba(99,11,11,0.2);">
-                        <h3 style="font-size: 21px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
-                            <i class="fas fa-magic" style="color: var(--import-red);"></i> 
-                            Kits de Personalización Disponibles
-                        </h3>
-                        <p style="color: var(--gray-300); margin-bottom: 24px; font-size: 15px;">
-                            Este vehículo cuenta con ${vehicle.kits.length} kit${vehicle.kits.length > 1 ? 's' : ''} configurado${vehicle.kits.length > 1 ? 's' : ''}
-                        </p>
-                        
-                        <div style="display: grid; gap: 16px;">
-                            ${vehicle.kits.map(kit => `
-                                <div style="background: var(--white); padding: 20px; border-radius: 8px; border: 1px solid var(--gray-200);">
-                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                                        <div>
-                                            <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">
-                                                ${kit.name}
-                                            </div>
-                                            <div style="font-size: 13px; color: var(--gray-300);">
-                                                ${kit.description || ''}
-                                            </div>
-                                        </div>
-                                        <div style="font-size: 18px; font-weight: 700; color: ${kit.price > 0 ? 'var(--import-red)' : 'var(--gray-300)'}; white-space: nowrap; margin-left: 16px;">
-                                            ${kit.price > 0 ? `+$${formatPrice(kit.price)}` : 'Incluido'}
-                                        </div>
-                                    </div>
-                                    
-                                    ${kit.features && kit.features.length > 0 ? `
-                                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px;">
-                                            ${kit.features.map(feature => `
-                                                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-800);">
-                                                    <i class="fas fa-check" style="color: var(--import-red); font-size: 11px;"></i>
-                                                    <span>${feature}</span>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        
-                        <div style="margin-top: 20px; padding: 16px; background: var(--white); border-radius: 8px; border-left: 3px solid var(--import-red);">
-                            <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px; color: var(--import-red);">
-                                <i class="fas fa-info-circle"></i> Importante
-                            </div>
-                            <div style="font-size: 13px; color: var(--gray-300); line-height: 1.5;">
-                                La personalización se realiza antes de la entrega, manteniendo la versión original del vehículo.
-                            </div>
-                        </div>
-                    </div>
-                ` : ''}
-                
                 <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 20px;">Especificaciones Técnicas</h3>
                 <div style="background: var(--gray-50); padding: 24px; border-radius: var(--radius); margin-bottom: 32px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
@@ -360,11 +188,9 @@ async function showVehicleDetails(vehicleId) {
                     <button class="button" onclick="contactVehicle('${vehicle.id}')" style="flex: 1; min-width: 200px;">
                         <i class="fab fa-whatsapp"></i> Consultar
                     </button>
-                    ${hasKits ? `
-                        <button class="button button-outline" onclick="closeVehicleDetails(); openCustomization('${vehicle.id}')" style="flex: 1; min-width: 200px;">
-                            <i class="fas fa-magic"></i> Personalizar
-                        </button>
-                    ` : ''}
+                    <button class="button button-outline" onclick="closeVehicleDetails(); openCustomization('${vehicle.id}')" style="flex: 1; min-width: 200px;">
+                        <i class="fas fa-cog"></i> Personalizar
+                    </button>
                 </div>
             </div>
         `;
@@ -442,55 +268,11 @@ function setupEventListeners() {
             filters.forEach(f => f.classList.remove('active'));
             this.classList.add('active');
             
-            if (filterValue === 'customizable') {
-                const customizableVehicles = currentVehicles.filter(v => 
-                    v.kits && v.kits.length > 0
-                );
-                
-                console.log('🔍 Filtro customizable activado');
-                console.log('📊 Total vehículos:', currentVehicles.length);
-                console.log('✨ Con kits:', customizableVehicles.length);
-                
-                if (customizableVehicles.length === 0) {
-                    const emptyState = document.getElementById('emptyState');
-                    const container = document.getElementById('vehiclesContainer');
-                    if (container) container.innerHTML = '';
-                    if (emptyState) {
-                        emptyState.innerHTML = `
-                            <i class="fas fa-magic"></i>
-                            <h3>No hay vehículos con kits configurados</h3>
-                            <p>Estamos agregando más opciones de personalización</p>
-                        `;
-                        emptyState.style.display = 'block';
-                    }
-                } else {
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) emptyState.style.display = 'none';
-                    renderVehicles(customizableVehicles);
-                }
-            } else {
-                loadVehicles(filterValue);
-            }
-            
+            loadVehicles(filterValue);
             trackEvent('filter', 'Vehicles', filterValue);
         });
     });
-    // Filtro de customizables
-   const customizableFilter = document.querySelector('[data-filter="customizable"]');
-   if (customizableFilter) {
-       customizableFilter.addEventListener('click', function() {
-           const filters = document.querySelectorAll('.filter-button');
-           filters.forEach(f => f.classList.remove('active'));
-           this.classList.add('active');
-           
-           const customizableVehicles = currentVehicles.filter(v => 
-               v.kits && v.kits.length > 0
-           );
-           renderVehicles(customizableVehicles);
-           
-           trackEvent('filter', 'Vehicles', 'customizable');
-       });
-   }
+    
     const indicators = document.querySelectorAll('.stock-indicators .indicator');
     indicators.forEach(indicator => {
         indicator.addEventListener('click', function() {
@@ -551,33 +333,4 @@ function setupEventListeners() {
     window.addEventListener('scroll', trackScroll);
 }
 
-// ========================================
-// ACTUALIZACIÓN AUTOMÁTICA - MULTI-ESTRATEGIA
-// ========================================
-
-console.log('🎯 Configurando actualización automática del contador...');
-
-// Estrategia 1: DOMContentLoaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('📍 [Estrategia 1] DOMContentLoaded disparado');
-        setTimeout(updateCustomizableCount, 1000);
-    });
-} else {
-    console.log('📍 [Estrategia 1] DOM ya está listo, ejecutando inmediatamente');
-    setTimeout(updateCustomizableCount, 1000);
-}
-
-// Estrategia 2: window.load
-window.addEventListener('load', () => {
-    console.log('📍 [Estrategia 2] Window load disparado');
-    setTimeout(updateCustomizableCount, 1500);
-});
-
-// Estrategia 3: Timeout de respaldo
-setTimeout(() => {
-    console.log('📍 [Estrategia 3] Timeout 3s - intento final');
-    updateCustomizableCount();
-}, 3000);
-
-console.log('✅ Vehicles.js cargado - VERSIÓN SUPER ROBUSTA con logs detallados');
+console.log('✅ Vehicles.js cargado');
