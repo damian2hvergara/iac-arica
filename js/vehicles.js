@@ -182,6 +182,15 @@ async function updateStockCounters() {
         console.error('Error:', error);
     }
 }
+async function updateCustomizableCount() {
+    const customizableCount = document.getElementById('customizableCount');
+    if (customizableCount && currentVehicles) {
+        const count = currentVehicles.filter(v => 
+            v.kits && v.kits.length > 0
+        ).length;
+        customizableCount.textContent = count;
+    }
+}
 
 // ACTUALIZAR CONTADOR DE CUSTOMIZABLES - SUPER ROBUSTO
 async function updateCustomizableCount() {
