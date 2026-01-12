@@ -89,8 +89,9 @@ function renderVehicles(vehicles) {
                          onclick="openGallery('${vehicle.id}')"
                          loading="lazy">
                     
+                    <!-- Badge de Kits Disponibles -->
                     ${hasKits ? `
-                        <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px; z-index: 5;">
+                        <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px;">
                             <i class="fas fa-star" style="font-size: 10px;"></i>
                             ${vehicle.kits.length} Kit${vehicle.kits.length > 1 ? 's' : ''}
                         </div>
@@ -98,8 +99,10 @@ function renderVehicles(vehicles) {
                 </div>
                 
                 <div class="vehicle-info">
-                    <div class="vehicle-status ${statusConfig.badge}">
-                        ${statusConfig.label}
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <div class="vehicle-status ${statusConfig.badge}">
+                            ${statusConfig.label}
+                        </div>
                     </div>
                     
                     <h3 class="vehicle-title">${vehicle.name}</h3>
@@ -108,6 +111,7 @@ function renderVehicles(vehicles) {
                     
                     <p class="vehicle-description">${vehicle.description || ''}</p>
                     
+                    <!-- Kits disponibles -->
                     ${hasKits ? `
                         <div style="margin: 12px 0; padding: 12px; background: var(--gray-50); border-radius: 8px; border-left: 3px solid var(--import-red);">
                             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--import-red); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
