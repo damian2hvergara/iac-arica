@@ -1,6 +1,6 @@
 /* ========================================
    vehicles.js - Lógica de Vehículos
-   VERSIÓN FINAL CORREGIDA
+   VERSIÓN FINAL DEFINITIVA - Enero 2025
    ======================================== */
 
 let currentVehicles = [];
@@ -64,7 +64,7 @@ async function loadVehicles(filter = 'all') {
         
         renderVehicles(vehiclesToRender);
         await updateStockCounters();
-        await updateCustomizableCount();
+        await updateCustomizableCount(); // Actualizar contador
         
     } catch (error) {
         console.error('Error:', error);
@@ -184,18 +184,24 @@ async function updateStockCounters() {
     }
 }
 
-// ACTUALIZAR CONTADOR DE CUSTOMIZABLES
+// ACTUALIZAR CONTADOR DE CUSTOMIZABLES - CORREGIDO
 async function updateCustomizableCount() {
+    console.log('🔄 Ejecutando updateCustomizableCount...');
+    
     const customizableCount = document.getElementById('customizableCount');
-    if (!customizableCount) return;
+    if (!customizableCount) {
+        console.warn('⚠️ Elemento customizableCount no encontrado');
+        return;
+    }
     
     let vehicles = currentVehicles;
     if (!vehicles || vehicles.length === 0) {
+        console.log('📦 currentVehicles vacío, cargando desde API...');
         try {
             vehicles = await vehicleAPI.getAllVehicles();
             currentVehicles = vehicles;
         } catch (error) {
-            console.error('Error al obtener vehículos:', error);
+            console.error('❌ Error al obtener vehículos:', error);
             return;
         }
     }
@@ -207,6 +213,8 @@ async function updateCustomizableCount() {
     customizableCount.textContent = count;
     
     console.log(`✅ Vehículos con kits: ${count}/${vehicles.length}`);
+    
+    return count;
 }
 
 // MOSTRAR DETALLES
@@ -507,4 +515,12 @@ function setupEventListeners() {
     window.addEventListener('scroll', trackScroll);
 }
 
-console.log('✅ Vehicles.js cargado - Versión FINAL CORREGIDA con filtro de kits');
+// ACTUALIZACIÓN AUTOMÁTICA AL CARGAR - CORREGIDO
+window.addEventListener('load', () => {
+    console.log('🚀 Window load event - Forzando actualización de contador');
+    setTimeout(async () => {
+        await updateCustomizableCount();
+    }, 500);
+});
+
+console.log('✅ Vehicles.js cargado - VERSIÓN FINAL DEFINITIVA con actualización automática');
