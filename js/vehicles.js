@@ -1,6 +1,6 @@
 /* ========================================
    vehicles.js - Lógica de Vehículos
-   MEJORADO Y CORREGIDO: Con visualización de kits
+   VERSIÓN FINAL CORREGIDA
    ======================================== */
 
 let currentVehicles = [];
@@ -18,7 +18,7 @@ async function initializeApp() {
     }
 }
 
-// CARGAR VEHÍCULOS - CORREGIDO
+// CARGAR VEHÍCULOS
 async function loadVehicles(filter = 'all') {
     const container = document.getElementById('vehiclesContainer');
     const loadingSpinner = document.getElementById('loadingSpinner');
@@ -29,7 +29,7 @@ async function loadVehicles(filter = 'all') {
         if (container) container.innerHTML = '';
         if (emptyState) emptyState.style.display = 'none';
         
-        // CORREGIDO: Solo cargar de BD si no es filtro customizable
+        // Solo cargar de BD si no es filtro customizable
         if (filter !== 'customizable') {
             const status = filter === 'all' ? null : filter;
             currentVehicles = await vehicleAPI.getAllVehicles(status);
@@ -42,7 +42,7 @@ async function loadVehicles(filter = 'all') {
             return;
         }
         
-        // CORREGIDO: Filtrar customizable DESPUÉS de tener datos
+        // Filtrar customizable DESPUÉS de tener datos
         let vehiclesToRender = currentVehicles;
         if (filter === 'customizable') {
             vehiclesToRender = currentVehicles.filter(v => 
@@ -64,7 +64,7 @@ async function loadVehicles(filter = 'all') {
         
         renderVehicles(vehiclesToRender);
         await updateStockCounters();
-        await updateCustomizableCount(); // Actualiza siempre
+        await updateCustomizableCount();
         
     } catch (error) {
         console.error('Error:', error);
@@ -74,7 +74,7 @@ async function loadVehicles(filter = 'all') {
     }
 }
 
-// RENDERIZAR VEHÍCULOS - MEJORADO
+// RENDERIZAR VEHÍCULOS
 function renderVehicles(vehicles) {
     const container = document.getElementById('vehiclesContainer');
     if (!container) return;
@@ -94,7 +94,6 @@ function renderVehicles(vehicles) {
                          onclick="openGallery('${vehicle.id}')"
                          loading="lazy">
                     
-                    <!-- Badge de Kits Disponibles -->
                     ${hasKits ? `
                         <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px; z-index: 5;">
                             <i class="fas fa-star" style="font-size: 10px;"></i>
@@ -114,7 +113,6 @@ function renderVehicles(vehicles) {
                     
                     <p class="vehicle-description">${vehicle.description || ''}</p>
                     
-                    <!-- Mostrar kits disponibles -->
                     ${hasKits ? `
                         <div style="margin: 12px 0; padding: 12px; background: var(--gray-50); border-radius: 8px; border-left: 3px solid var(--import-red);">
                             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--import-red); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
@@ -148,7 +146,6 @@ function renderVehicles(vehicles) {
                         </div>
                     ` : ''}
                     
-                    <!-- Botones según si tiene kits -->
                     <div class="vehicle-actions" style="gap: 8px;">
                         ${hasKits ? `
                             <button class="button" onclick="openCustomization('${vehicle.id}')" style="flex: 1.2; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); box-shadow: 0 4px 12px rgba(99,11,11,0.3);">
@@ -187,17 +184,16 @@ async function updateStockCounters() {
     }
 }
 
-// ACTUALIZAR CONTADOR DE CUSTOMIZABLES - CORREGIDO
+// ACTUALIZAR CONTADOR DE CUSTOMIZABLES
 async function updateCustomizableCount() {
     const customizableCount = document.getElementById('customizableCount');
     if (!customizableCount) return;
     
-    // CORREGIDO: Cargar todos los vehículos si currentVehicles está vacío
     let vehicles = currentVehicles;
     if (!vehicles || vehicles.length === 0) {
         try {
             vehicles = await vehicleAPI.getAllVehicles();
-            currentVehicles = vehicles; // Guardar para uso futuro
+            currentVehicles = vehicles;
         } catch (error) {
             console.error('Error al obtener vehículos:', error);
             return;
@@ -213,7 +209,7 @@ async function updateCustomizableCount() {
     console.log(`✅ Vehículos con kits: ${count}/${vehicles.length}`);
 }
 
-// MOSTRAR DETALLES - MEJORADO
+// MOSTRAR DETALLES
 async function showVehicleDetails(vehicleId) {
     try {
         const vehicle = await vehicleAPI.getVehicle(vehicleId);
@@ -259,7 +255,6 @@ async function showVehicleDetails(vehicleId) {
                     ` : ''}
                 </div>
                 
-                <!-- Sección de Kits si están disponibles -->
                 ${hasKits ? `
                     <div style="background: var(--import-red-light); padding: 32px; border-radius: 12px; margin-bottom: 32px; border: 1px solid rgba(99,11,11,0.2);">
                         <h3 style="font-size: 21px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
@@ -408,7 +403,7 @@ function animateCounter() {
     }, duration / steps);
 }
 
-// EVENT LISTENERS - CORREGIDO
+// EVENT LISTENERS
 function setupEventListeners() {
     const filters = document.querySelectorAll('#vehicleFilters .filter-button');
     filters.forEach(filter => {
@@ -418,9 +413,7 @@ function setupEventListeners() {
             filters.forEach(f => f.classList.remove('active'));
             this.classList.add('active');
             
-            // CORREGIDO: Manejar filtro customizable
             if (filterValue === 'customizable') {
-                // Filtrar de los vehículos ya cargados
                 const customizableVehicles = currentVehicles.filter(v => 
                     v.kits && v.kits.length > 0
                 );
@@ -514,4 +507,4 @@ function setupEventListeners() {
     window.addEventListener('scroll', trackScroll);
 }
 
-console.log('✅ Vehicles.js cargado - Versión CORREGIDA con filtro de kits');
+console.log('✅ Vehicles.js cargado - Versión FINAL CORREGIDA con filtro de kits');
