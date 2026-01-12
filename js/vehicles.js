@@ -1,6 +1,7 @@
 /* ========================================
    vehicles.js - Lógica de Vehículos
-   VERSIÓN FINAL DEFINITIVA - Enero 2025
+   VERSIÓN SUPER ROBUSTA - Enero 2025
+   Con logs detallados y múltiples estrategias
    ======================================== */
 
 let currentVehicles = [];
@@ -29,11 +30,8 @@ async function loadVehicles(filter = 'all') {
         if (container) container.innerHTML = '';
         if (emptyState) emptyState.style.display = 'none';
         
-        // Solo cargar de BD si no es filtro customizable
-        if (filter !== 'customizable') {
-            const status = filter === 'all' ? null : filter;
-            currentVehicles = await vehicleAPI.getAllVehicles(status);
-        }
+        const status = filter === 'all' ? null : filter;
+        currentVehicles = await vehicleAPI.getAllVehicles(status);
         
         if (loadingSpinner) loadingSpinner.style.display = 'none';
         
@@ -42,7 +40,6 @@ async function loadVehicles(filter = 'all') {
             return;
         }
         
-        // Filtrar customizable DESPUÉS de tener datos
         let vehiclesToRender = currentVehicles;
         if (filter === 'customizable') {
             vehiclesToRender = currentVehicles.filter(v => 
@@ -64,7 +61,7 @@ async function loadVehicles(filter = 'all') {
         
         renderVehicles(vehiclesToRender);
         await updateStockCounters();
-        await updateCustomizableCount(); // Actualizar contador
+        await updateCustomizableCount();
         
     } catch (error) {
         console.error('Error:', error);
@@ -82,8 +79,6 @@ function renderVehicles(vehicles) {
     container.innerHTML = vehicles.map(vehicle => {
         const statusConfig = APP_CONFIG.vehicleStatuses[vehicle.status];
         const hasKits = vehicle.kits && vehicle.kits.length > 0;
-        
-        console.log(`Vehículo ${vehicle.name}: ${hasKits ? vehicle.kits.length : 0} kits`);
         
         return `
             <div class="vehicle-card">
@@ -184,40 +179,53 @@ async function updateStockCounters() {
     }
 }
 
-// ACTUALIZAR CONTADOR DE CUSTOMIZABLES - CORREGIDO
+// ACTUALIZAR CONTADOR DE CUSTOMIZABLES - SUPER ROBUSTO
 async function updateCustomizableCount() {
-    console.log('🔄 Ejecutando updateCustomizableCount...');
+    console.log('🔄 [updateCustomizableCount] Iniciando...');
     
+    // 1. Verificar elemento existe
     const customizableCount = document.getElementById('customizableCount');
     if (!customizableCount) {
-        console.warn('⚠️ Elemento customizableCount no encontrado');
-        return;
+        console.error('❌ [updateCustomizableCount] Elemento #customizableCount NO ENCONTRADO');
+        console.log('🔍 Elementos con ID disponibles:', 
+            Array.from(document.querySelectorAll('[id]')).map(e => e.id).join(', ')
+        );
+        return 0;
     }
     
-    let vehicles = currentVehicles;
-    if (!vehicles || vehicles.length === 0) {
-        console.log('📦 currentVehicles vacío, cargando desde API...');
-        try {
-            vehicles = await vehicleAPI.getAllVehicles();
-            currentVehicles = vehicles;
-        } catch (error) {
-            console.error('❌ Error al obtener vehículos:', error);
-            return;
+    console.log('✅ [updateCustomizableCount] Elemento encontrado');
+    
+    // 2. Obtener vehículos (siempre desde API para estar seguros)
+    let vehicles;
+    try {
+        console.log('📡 [updateCustomizableCount] Cargando desde API...');
+        vehicles = await vehicleAPI.getAllVehicles();
+        currentVehicles = vehicles;
+        console.log(`📦 [updateCustomizableCount] ${vehicles.length} vehículos cargados`);
+    } catch (error) {
+        console.error('❌ [updateCustomizableCount] Error en API:', error);
+        return 0;
+    }
+    
+    // 3. Contar vehículos con kits
+    const withKits = vehicles.filter(v => {
+        const hasKits = v.kits && Array.isArray(v.kits) && v.kits.length > 0;
+        if (hasKits) {
+            console.log(`  ✓ ${v.name}: ${v.kits.length} kit(s)`);
         }
-    }
+        return hasKits;
+    });
     
-    const count = vehicles.filter(v => 
-        v.kits && v.kits.length > 0
-    ).length;
+    const count = withKits.length;
     
+    // 4. Actualizar DOM
     customizableCount.textContent = count;
-    
-    console.log(`✅ Vehículos con kits: ${count}/${vehicles.length}`);
+    console.log(`✅ [updateCustomizableCount] CONTADOR ACTUALIZADO: ${count}/${vehicles.length}`);
     
     return count;
 }
 
-// MOSTRAR DETALLES
+// MOSTRAR DETALLES (función completa con kits)
 async function showVehicleDetails(vehicleId) {
     try {
         const vehicle = await vehicleAPI.getVehicle(vehicleId);
@@ -515,12 +523,33 @@ function setupEventListeners() {
     window.addEventListener('scroll', trackScroll);
 }
 
-// ACTUALIZACIÓN AUTOMÁTICA AL CARGAR - CORREGIDO
+// ========================================
+// ACTUALIZACIÓN AUTOMÁTICA - MULTI-ESTRATEGIA
+// ========================================
+
+console.log('🎯 Configurando actualización automática del contador...');
+
+// Estrategia 1: DOMContentLoaded
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('📍 [Estrategia 1] DOMContentLoaded disparado');
+        setTimeout(updateCustomizableCount, 1000);
+    });
+} else {
+    console.log('📍 [Estrategia 1] DOM ya está listo, ejecutando inmediatamente');
+    setTimeout(updateCustomizableCount, 1000);
+}
+
+// Estrategia 2: window.load
 window.addEventListener('load', () => {
-    console.log('🚀 Window load event - Forzando actualización de contador');
-    setTimeout(async () => {
-        await updateCustomizableCount();
-    }, 500);
+    console.log('📍 [Estrategia 2] Window load disparado');
+    setTimeout(updateCustomizableCount, 1500);
 });
 
-console.log('✅ Vehicles.js cargado - VERSIÓN FINAL DEFINITIVA con actualización automática');
+// Estrategia 3: Timeout de respaldo
+setTimeout(() => {
+    console.log('📍 [Estrategia 3] Timeout 3s - intento final');
+    updateCustomizableCount();
+}, 3000);
+
+console.log('✅ Vehicles.js cargado - VERSIÓN SUPER ROBUSTA con logs detallados');
