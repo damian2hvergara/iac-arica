@@ -466,7 +466,22 @@ function setupEventListeners() {
             trackEvent('filter', 'Vehicles', filterValue);
         });
     });
-    
+    // Filtro de customizables
+   const customizableFilter = document.querySelector('[data-filter="customizable"]');
+   if (customizableFilter) {
+       customizableFilter.addEventListener('click', function() {
+           const filters = document.querySelectorAll('.filter-button');
+           filters.forEach(f => f.classList.remove('active'));
+           this.classList.add('active');
+           
+           const customizableVehicles = currentVehicles.filter(v => 
+               v.kits && v.kits.length > 0
+           );
+           renderVehicles(customizableVehicles);
+           
+           trackEvent('filter', 'Vehicles', 'customizable');
+       });
+   }
     const indicators = document.querySelectorAll('.stock-indicators .indicator');
     indicators.forEach(indicator => {
         indicator.addEventListener('click', function() {
