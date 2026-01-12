@@ -490,6 +490,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
         await initializeApp();
         await loadVehicles();
+        await updateCustomizableCount(); // ← NUEVA LÍNEA
         animateCounter();
         setupEventListeners();
     });
