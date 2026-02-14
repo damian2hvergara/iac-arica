@@ -19,8 +19,8 @@ const FAQS = [
         category: '💰 Sobre Precios y Pagos',
         questions: [
             {
-                q: '¿El precio incluye la nacionalización?',
-                a: 'No, el precio publicado es del vehículo en USA. La nacionalización tiene un costo adicional que varía según el modelo y año. Te cotizamos todo de forma transparente.'
+                q: '¿El precio incluye fuera de zona franca?',
+                a: 'No, el precio publicado es del vehículo para zona franca Iquique, Arica y Magallanes. La liberación tiene un costo adicional que varía según el modelo y año, siempre que cumplas los requisitos legales. Te cotizamos todo de forma transparente.'
             },
             {
                 q: '¿Aceptan vehículo en parte de pago?',
@@ -28,11 +28,11 @@ const FAQS = [
             },
             {
                 q: '¿Tienen financiamiento?',
-                a: 'Trabajamos con instituciones financieras que pueden ayudarte. El financiamiento se gestiona una vez confirmada la reserva del vehículo.'
+                a: 'Trabajamos con financiamiento directo. El financiamiento se gestiona una vez confirmada la reserva del vehículo.'
             },
             {
                 q: '¿Cuánto es el pie mínimo?',
-                a: 'Generalmente trabajamos con un pie del 20-30% del valor total (vehículo + nacionalización). Esto puede variar según el caso.'
+                a: 'Generalmente trabajamos con un pie del 20-30% del valor total (vehículo + liberación). Esto puede variar según el caso.'
             }
         ]
     },
@@ -42,7 +42,7 @@ const FAQS = [
         questions: [
             {
                 q: '¿Cuánto demora el proceso completo?',
-                a: 'El proceso completo toma entre 45 a 60 días desde la compra en USA hasta la entrega en Chile. Esto incluye transporte marítimo, trámites aduaneros y nacionalización.'
+                a: 'El proceso completo de un proyecto, salvos los vehiculos en stock, toma entre 45 a 60 días desde el arribo de USA a Chile. Esto incluye liberación.'
             },
             {
                 q: '¿Viene con garantía?',
@@ -50,11 +50,11 @@ const FAQS = [
             },
             {
                 q: '¿Qué documentos necesito?',
-                a: 'Necesitas RUT, Cédula de Identidad y certificado de domicilio. Nosotros nos encargamos de todos los trámites de importación y nacionalización.'
+                a: 'Necesitas RUT, Cédula de Identidad y certificado de domicilio. Nosotros nos encargamos de todos los trámites de importación y liberación.'
             },
             {
                 q: '¿Ustedes hacen todo el trámite?',
-                a: 'Sí, nos encargamos de TODO: compra en USA, transporte, trámites aduaneros, nacionalización y entrega. Tú solo recibes tu vehículo listo para usar.'
+                a: 'Sí, nos encargamos de TODO: compra en USA, transporte, trámites aduaneros, liberación y entrega. Tú solo recibes tu vehículo listo para usar.'
             }
         ]
     },
@@ -71,7 +71,7 @@ const FAQS = [
                 a: 'Todos nuestros vehículos son inspeccionados antes de comprarlos. Te enviamos reporte de inspección completo con fotos y cualquier detalle se informa de forma transparente.'
             },
             {
-                q: '¿Viene con manual y llaves originales?',
+                q: '¿Viene con instrucciones y llaves originales?',
                 a: 'Sí, todos incluyen manuales, llaves originales y documentación completa del vehículo.'
             },
             {
