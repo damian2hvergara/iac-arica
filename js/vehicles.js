@@ -1,6 +1,6 @@
 /* ========================================
    vehicles.js - Lógica de Vehículos
-   MEJORADO Y CORREGIDO: Con visualización de kits
+   MEJORADO Y CORREGIDO: Con visualización de kits, deep link y share premium
    ======================================== */
 
 let currentVehicles = [];
@@ -63,6 +63,7 @@ async function loadVehicles(filter = 'all') {
         }
         
         renderVehicles(vehiclesToRender);
+        handleDeepLink(); // 👈 NUEVO: deep link automático
         await updateStockCounters();
         await updateCustomizableCount(); // Actualiza siempre
         
@@ -95,12 +96,19 @@ function renderVehicles(vehicles) {
                          loading="lazy">
                     
                     <!-- Badge de Kits Disponibles -->
-                    ${hasKits ? `
-                        <div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px; z-index: 5;">
+                    ${hasKits ? 
+                        `<div style="position: absolute; top: 12px; right: 12px; background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); color: white; padding: 8px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; backdrop-filter: blur(10px); box-shadow: 0 4px 12px rgba(99,11,11,0.4); display: flex; align-items: center; gap: 6px; z-index: 5;">
                             <i class="fas fa-star" style="font-size: 10px;"></i>
                             ${vehicle.kits.length} Kit${vehicle.kits.length > 1 ? 's' : ''}
-                        </div>
-                    ` : ''}
+                        </div>`
+                     : ''}
+                    
+                    <!-- BOTÓN SHARE PREMIUM (NUEVO) -->
+                    <button onclick="shareVehicle('${vehicle.id}', this)" 
+                            class="share-btn-premium">
+                        <i class="fas fa-share-alt"></i>
+                        <span class="share-count">${vehicle.shareCount || 0}</span>
+                    </button>
                 </div>
                 
                 <div class="vehicle-info">
@@ -115,29 +123,29 @@ function renderVehicles(vehicles) {
                     <p class="vehicle-description">${vehicle.description || ''}</p>
                     
                     <!-- Mostrar kits disponibles -->
-                    ${hasKits ? `
-                        <div style="margin: 12px 0; padding: 12px; background: var(--gray-50); border-radius: 8px; border-left: 3px solid var(--import-red);">
+                    ${hasKits ? 
+                        `<div style="margin: 12px 0; padding: 12px; background: var(--gray-50); border-radius: 8px; border-left: 3px solid var(--import-red);">
                             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--import-red); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
                                 <i class="fas fa-magic" style="font-size: 10px;"></i>
                                 Personalización Disponible
                             </div>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                ${vehicle.kits.slice(0, 2).map(kit => `
-                                    <span style="font-size: 11px; padding: 4px 10px; background: var(--white); border-radius: 12px; border: 1px solid var(--gray-200); font-weight: 500;">
+                                ${vehicle.kits.slice(0, 2).map(kit => 
+                                    `<span style="font-size: 11px; padding: 4px 10px; background: var(--white); border-radius: 12px; border: 1px solid var(--gray-200); font-weight: 500;">
                                         ${kit.name}
-                                    </span>
-                                `).join('')}
-                                ${vehicle.kits.length > 2 ? `
-                                    <span style="font-size: 11px; padding: 4px 10px; color: var(--gray-300); font-weight: 500;">
+                                    </span>`
+                                ).join('')}
+                                ${vehicle.kits.length > 2 ? 
+                                    `<span style="font-size: 11px; padding: 4px 10px; color: var(--gray-300); font-weight: 500;">
                                         +${vehicle.kits.length - 2} más
-                                    </span>
-                                ` : ''}
+                                    </span>`
+                                 : ''}
                             </div>
-                        </div>
-                    ` : ''}
+                        </div>`
+                     : ''}
                     
-                    ${vehicle.status === 'transit' && vehicle.transit_time ? `
-                        <div class="transit-timer">
+                    ${vehicle.status === 'transit' && vehicle.transit_time ? 
+                        `<div class="transit-timer">
                             <div class="timer-icon">
                                 <i class="fas fa-shipping-fast"></i>
                             </div>
@@ -145,18 +153,18 @@ function renderVehicles(vehicles) {
                                 <div class="timer-text">Llega en</div>
                                 <div class="timer-display">${vehicle.transit_time} días</div>
                             </div>
-                        </div>
-                    ` : ''}
+                        </div>`
+                     : ''}
                     
-                    <!-- Botones: Personalizar (si tiene kits), Detalles, Consultas -->
+                    <!-- Botones: Personalizar (si tiene kits), Comprar (antes "Detalles"), Consultas -->
                     <div class="vehicle-actions" style="gap: 8px; display: grid; grid-template-columns: ${hasKits ? '1fr 1fr 1fr' : '1fr 1fr'};">
-                        ${hasKits ? `
-                            <button class="button" onclick="openCustomization('${vehicle.id}')" style="background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); box-shadow: 0 4px 12px rgba(99,11,11,0.3); font-size: 13px; padding: 10px 12px;">
+                        ${hasKits ? 
+                            `<button class="button" onclick="openCustomization('${vehicle.id}')" style="background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); box-shadow: 0 4px 12px rgba(99,11,11,0.3); font-size: 13px; padding: 10px 12px;">
                                 <i class="fas fa-magic"></i> Personalizar
-                            </button>
-                        ` : ''}
+                            </button>`
+                         : ''}
                         <button class="button ${hasKits ? 'button-outline' : ''}" onclick="showVehicleDetails('${vehicle.id}')" style="font-size: 13px; padding: 10px 12px;">
-                            <i class="fas fa-info-circle"></i> Detalles
+                            <i class="fas fa-shopping-cart"></i> Comprar   <!-- 👈 Cambiado de "Detalles" a "Comprar" -->
                         </button>
                         <button class="button button-outline" onclick="openConsultation('${vehicle.id}')" style="font-size: 13px; padding: 10px 12px;">
                             <i class="fas fa-question-circle"></i> Consultas
@@ -237,30 +245,30 @@ async function showVehicleDetails(vehicleId) {
                         <img src="${vehicle.gallery[0] || vehicle.baseImage}" alt="${vehicle.name}" style="width: 100%; height: 100%; object-fit: cover;" id="mainDetailImage">
                     </div>
                     
-                    ${vehicle.gallery.length > 1 ? `
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px;">
-                            ${vehicle.gallery.map((img, index) => `
-                                <img src="${img}" 
+                    ${vehicle.gallery.length > 1 ? 
+                        `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px;">
+                            ${vehicle.gallery.map((img, index) => 
+                                `<img src="${img}" 
                                      alt="Vista ${index + 1}" 
                                      style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid ${index === 0 ? 'var(--import-red)' : 'transparent'};"
-                                     onclick="changeDetailImage('${img}', this)">
-                            `).join('')}
-                        </div>
-                    ` : ''}
+                                     onclick="changeDetailImage('${img}', this)">`
+                            ).join('')}
+                        </div>`
+                     : ''}
                     
-                    ${vehicle.video_id ? `
-                        <div style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: var(--radius); overflow: hidden; margin-top: 16px; border: var(--border);">
+                    ${vehicle.video_id ? 
+                        `<div style="position: relative; padding-bottom: 56.25%; height: 0; border-radius: var(--radius); overflow: hidden; margin-top: 16px; border: var(--border);">
                             <iframe src="https://www.youtube.com/embed/${vehicle.video_id}" 
                                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
                                     frameborder="0" allowfullscreen>
                             </iframe>
-                        </div>
-                    ` : ''}
+                        </div>`
+                     : ''}
                 </div>
                 
                 <!-- Sección de Kits si están disponibles -->
-                ${hasKits ? `
-                    <div style="background: var(--import-red-light); padding: 32px; border-radius: 12px; margin-bottom: 32px; border: 1px solid rgba(99,11,11,0.2);">
+                ${hasKits ? 
+                    `<div style="background: var(--import-red-light); padding: 32px; border-radius: 12px; margin-bottom: 32px; border: 1px solid rgba(99,11,11,0.2);">
                         <h3 style="font-size: 21px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
                             <i class="fas fa-magic" style="color: var(--import-red);"></i> 
                             Kits de Personalización Disponibles
@@ -270,8 +278,8 @@ async function showVehicleDetails(vehicleId) {
                         </p>
                         
                         <div style="display: grid; gap: 16px;">
-                            ${vehicle.kits.map(kit => `
-                                <div style="background: var(--white); padding: 20px; border-radius: 8px; border: 1px solid var(--gray-200);">
+                            ${vehicle.kits.map(kit => 
+                                `<div style="background: var(--white); padding: 20px; border-radius: 8px; border: 1px solid var(--gray-200);">
                                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                                         <div>
                                             <div style="font-size: 17px; font-weight: 600; margin-bottom: 4px;">
@@ -282,22 +290,22 @@ async function showVehicleDetails(vehicleId) {
                                             </div>
                                         </div>
                                         <div style="font-size: 18px; font-weight: 700; color: ${kit.price > 0 ? 'var(--import-red)' : 'var(--gray-300)'}; white-space: nowrap; margin-left: 16px;">
-                                            ${kit.price > 0 ? `+$${formatPrice(kit.price)}` : 'Incluido'}
+                                            ${kit.price > 0 ? '+$' + formatPrice(kit.price) : 'Incluido'}
                                         </div>
                                     </div>
                                     
-                                    ${kit.features && kit.features.length > 0 ? `
-                                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px;">
-                                            ${kit.features.map(feature => `
-                                                <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-800);">
+                                    ${kit.features && kit.features.length > 0 ? 
+                                        `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 12px;">
+                                            ${kit.features.map(feature => 
+                                                `<div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray-800);">
                                                     <i class="fas fa-check" style="color: var(--import-red); font-size: 11px;"></i>
                                                     <span>${feature}</span>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            `).join('')}
+                                                </div>`
+                                            ).join('')}
+                                        </div>`
+                                     : ''}
+                                </div>`
+                            ).join('')}
                         </div>
                         
                         <div style="margin-top: 20px; padding: 16px; background: var(--white); border-radius: 8px; border-left: 3px solid var(--import-red);">
@@ -308,20 +316,20 @@ async function showVehicleDetails(vehicleId) {
                                 La personalización se realiza antes de la entrega, manteniendo la versión original del vehículo.
                             </div>
                         </div>
-                    </div>
-                ` : ''}
+                    </div>`
+                 : ''}
                 
                 <h3 style="font-size: 17px; font-weight: 600; margin-bottom: 20px;">Especificaciones Técnicas</h3>
                 <div style="background: var(--gray-50); padding: 24px; border-radius: var(--radius); margin-bottom: 32px;">
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                        ${Object.entries(vehicle.specifications).filter(([_, value]) => value).map(([key, value]) => `
-                            <div>
+                        ${Object.entries(vehicle.specifications).filter(([_, value]) => value).map(([key, value]) => 
+                            `<div>
                                 <div style="font-size: 12px; color: var(--gray-300); text-transform: uppercase; margin-bottom: 4px;">
                                     ${key}
                                 </div>
                                 <div style="font-weight: 500;">${value}</div>
-                            </div>
-                        `).join('')}
+                            </div>`
+                        ).join('')}
                     </div>
                 </div>
                 
@@ -335,11 +343,11 @@ async function showVehicleDetails(vehicleId) {
                     <button class="button" onclick="contactVehicle('${vehicle.id}')" style="flex: 1; min-width: 200px;">
                         <i class="fab fa-whatsapp"></i> Consultar
                     </button>
-                    ${hasKits ? `
-                        <button class="button button-outline" onclick="closeVehicleDetails(); openCustomization('${vehicle.id}')" style="flex: 1; min-width: 200px;">
+                    ${hasKits ? 
+                        `<button class="button button-outline" onclick="closeVehicleDetails(); openCustomization('${vehicle.id}')" style="flex: 1; min-width: 200px;">
                             <i class="fas fa-magic"></i> Personalizar
-                        </button>
-                    ` : ''}
+                        </button>`
+                     : ''}
                 </div>
             </div>
         `;
@@ -381,6 +389,78 @@ function contactVehicle(vehicleId) {
     
     trackEvent('contact', 'WhatsApp', vehicle.name);
     window.open(`https://wa.me/${CONTACT_CONFIG.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+}
+
+/* ========================================
+   SHARE PREMIUM + CONTADOR (NUEVO)
+   ======================================== */
+
+function shareVehicle(vehicleId, buttonElement = null) {
+    const vehicle = currentVehicles.find(v => v.id === vehicleId) || selectedVehicle;
+    if (!vehicle) return;
+
+    if (!vehicle.shareCount) vehicle.shareCount = 0;
+    vehicle.shareCount++;
+
+    if (buttonElement) {
+        const counter = buttonElement.querySelector(".share-count");
+        if (counter) counter.textContent = vehicle.shareCount;
+
+        buttonElement.classList.add("share-animate");
+        setTimeout(() => {
+            buttonElement.classList.remove("share-animate");
+        }, 400);
+    }
+
+    const vehicleUrl = `${window.location.origin}?v=${vehicle.id}`;
+    const message = `Mira esta ${vehicle.name} disponible en Arica por $${formatPrice(vehicle.price)} CLP:\n${vehicleUrl}`;
+
+    trackEvent('share', 'Vehicle', vehicle.name);
+
+    if (navigator.share) {
+        navigator.share({
+            title: vehicle.name,
+            text: message,
+            url: vehicleUrl
+        }).catch(() => {});
+    } else {
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(message)}`,
+            '_blank'
+        );
+    }
+}
+
+/* ========================================
+   DEEP LINK ?v= (NUEVO)
+   ======================================== */
+
+function handleDeepLink() {
+    const params = new URLSearchParams(window.location.search);
+    const vehicleId = params.get("v");
+    if (!vehicleId) return;
+
+    setTimeout(() => {
+        const vehicleCard = document.querySelector(
+            `[onclick="openGallery('${vehicleId}')"]`
+        )?.closest('.vehicle-card');
+
+        if (vehicleCard) {
+            vehicleCard.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            vehicleCard.style.transition = "0.4s";
+            vehicleCard.style.boxShadow = "0 0 0 3px var(--import-red)";
+            setTimeout(() => {
+                vehicleCard.style.boxShadow = "";
+            }, 2000);
+        }
+
+        showVehicleDetails(vehicleId);
+
+    }, 800);
 }
 
 // ANIMACIÓN CONTADOR
@@ -513,4 +593,4 @@ function setupEventListeners() {
     window.addEventListener('scroll', trackScroll);
 }
 
-console.log('✅ Vehicles.js cargado - Versión CORREGIDA con filtro de kits');
+console.log('✅ Vehicles.js cargado - Versión CORREGIDA con filtro de kits, deep link y share premium');
