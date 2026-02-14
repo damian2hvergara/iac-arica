@@ -19,40 +19,6 @@
     transition: var(--transition);
     cursor: pointer;
     white-space: nowrap;
-
-.share-btn-premium {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
-    z-index: 6;
-}
-
-.share-btn-premium:hover {
-    background: var(--import-red);
-    color: white;
-    transform: scale(1.1);
-}
-
-.share-count {
-    font-size: 11px;
-}
-
-.share-animate {
-    transform: scale(1.25);
-}
-
 }
 
 .button:hover {
@@ -85,6 +51,40 @@
     opacity: 0.5;
     cursor: not-allowed;
     transform: none;
+}
+
+/* NUEVO: Botón de compartir premium (para tarjetas de vehículos) */
+.share-btn-premium {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    backdrop-filter: blur(8px);
+    transition: all 0.3s ease;
+    z-index: 6;
+}
+
+.share-btn-premium:hover {
+    background: var(--import-red);
+    color: white;
+    transform: scale(1.1);
+}
+
+.share-count {
+    font-size: 11px;
+}
+
+.share-animate {
+    transform: scale(1.25);
 }
 
 /* CARDS */
