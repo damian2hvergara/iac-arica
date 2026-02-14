@@ -20,7 +20,6 @@
     cursor: pointer;
     white-space: nowrap;
 
-/* ===== NUEVO: BOTÓN DE COMPARTIR PREMIUM ===== */
 .share-btn-premium {
     position: absolute;
     top: 12px;
