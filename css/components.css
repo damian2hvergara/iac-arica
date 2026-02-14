@@ -53,38 +53,106 @@
     transform: none;
 }
 
-/* NUEVO: Botón de compartir premium (para tarjetas de vehículos) */
+/* ========================================
+   Botón de compartir premium (para tarjetas de vehículos)
+   ======================================== */
+
+/* Reset para botones (opcional pero recomendado para evitar estilos por defecto) */
+button.share-btn-premium {
+  all: unset; /* Resetea todos los estilos por defecto del botón */
+  display: flex; /* Restauramos el display flex */
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Estilos base del botón */
 .share-btn-premium {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    backdrop-filter: blur(8px);
-    transition: all 0.3s ease;
-    z-index: 6;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 40px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #1a1a1a;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 10;
+  text-decoration: none;
+  letter-spacing: 0.3px;
 }
 
+/* Estilo al pasar el mouse */
 .share-btn-premium:hover {
-    background: var(--import-red);
-    color: white;
-    transform: scale(1.1);
+  background: var(--import-red, #c62828);
+  color: white;
+  border-color: var(--import-red, #c62828);
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(198, 40, 40, 0.3);
 }
 
+.share-btn-premium:hover .share-count {
+  color: white;
+}
+
+/* Estilo al hacer clic (active) */
+.share-btn-premium:active {
+  transform: scale(0.98);
+}
+
+/* Estilo para el contador de veces compartido */
 .share-count {
-    font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.08);
+  padding: 2px 6px;
+  border-radius: 30px;
+  min-width: 24px;
+  text-align: center;
+  transition: background 0.2s;
 }
 
+.share-btn-premium:hover .share-count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Animación cuando se comparte (se activa con JS) */
 .share-animate {
-    transform: scale(1.25);
+  animation: sharePop 0.4s ease;
+}
+
+@keyframes sharePop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.2); }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Para asegurar visibilidad en imágenes claras, añadimos un borde sutil */
+.share-btn-premium {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* En modo oscuro (si lo hubiera) podríamos ajustar */
+@media (prefers-color-scheme: dark) {
+  .share-btn-premium {
+    background: rgba(30, 30, 30, 0.9);
+    color: #f0f0f0;
+    border-color: rgba(255,255,255,0.2);
+  }
+  .share-btn-premium:hover {
+    background: var(--import-red, #c62828);
+    color: white;
+  }
 }
 
 /* CARDS */
