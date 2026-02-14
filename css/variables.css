@@ -1,0 +1,213 @@
+/* ========================================
+   variables.css - Sistema de Diseño Apple
+   Import American Cars
+   ======================================== */
+
+:root {
+    /* Colores principales */
+    --white: #ffffff;
+    --black: #000000;
+    --gray-50: #f5f5f7;
+    --gray-100: #e5e5e7;
+    --gray-200: #d2d2d7;
+    --gray-300: #86868b;
+    --gray-800: #1d1d1f;
+    
+    /* Colores de marca */
+    --import-red: rgb(99, 11, 11);
+    --import-red-light: rgba(99, 11, 11, 0.1);
+    --import-red-dark: rgb(79, 9, 9);
+    
+    /* Colores de acento */
+    --blue: #0066cc;
+    --green: #00a651;
+    --orange: #ff9500;
+    --red: #ff3b30;
+    
+    /* Bordes y sombras */
+    --border: 1px solid #d2d2d7;
+    --border-light: 1px solid #e5e5e7;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --shadow: 0 2px 20px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 30px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
+    
+    /* Espaciado */
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+    --space-4xl: 80px;
+    
+    /* Tipografía */
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    --font-xs: 11px;
+    --font-sm: 12px;
+    --font-base: 13px;
+    --font-md: 14px;
+    --font-lg: 15px;
+    --font-xl: 17px;
+    --font-2xl: 21px;
+    --font-3xl: 24px;
+    --font-4xl: 28px;
+    --font-5xl: 36px;
+    --font-6xl: 48px;
+    --font-7xl: 64px;
+    
+    /* Pesos */
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    
+    /* Line heights */
+    --leading-tight: 1.2;
+    --leading-snug: 1.375;
+    --leading-normal: 1.47059;
+    --leading-relaxed: 1.625;
+    
+    /* Letter spacing */
+    --tracking-tight: -0.5px;
+    --tracking-normal: -0.022em;
+    
+    /* Transiciones */
+    --transition: all 0.3s ease;
+    --transition-fast: all 0.15s ease;
+    --transition-slow: all 0.5s ease;
+    
+    /* Z-index */
+    --z-base: 1;
+    --z-header: 1000;
+    --z-modal: 2000;
+    --z-gallery: 3000;
+    --z-tooltip: 4000;
+    --z-max: 9999;
+    
+    /* Anchos máximos */
+    --max-width-sm: 640px;
+    --max-width-md: 768px;
+    --max-width-lg: 980px;
+    --max-width-xl: 1200px;
+    --max-width-2xl: 1400px;
+}
+
+/* Reset Básico */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-lg);
+    line-height: var(--leading-normal);
+    color: var(--black);
+    background: var(--white);
+    font-weight: var(--font-normal);
+    letter-spacing: var(--tracking-normal);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--font-bold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Clases Utilitarias */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
