@@ -17,14 +17,12 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/main.css">
 
-    <!-- Google Analytics 4 - OPTIMIZADO -->
+    <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-83095XZ965"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        
-        // Configuración mejorada con eventos personalizados
         gtag('config', 'G-83095XZ965', {
             'send_page_view': true,
             'custom_map': {
@@ -375,7 +373,7 @@
                 <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
             </a>
             <div class="footer-info">
-                <p>📍 Av. Principal 1234, Arica, Chile</p>
+                <p>📍 Alejandro Azolas 3048, 1000000 Arica, Arica y Parinacota</p>
                 <p>📞 +56 9 3865 4827</p>
                 <p>✉️ contacto@importamericancars.cl</p>
             </div>
@@ -434,32 +432,20 @@
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 console.log('🚀 Iniciando aplicación...');
-                
-                // Inicializar API
                 await initializeApp();
-                
-                // Cargar vehículos
                 await loadVehicles();
-                
-                // Animar contador
                 animateCounter();
-                
-                // Event listeners
                 setupEventListeners();
-                
                 console.log('✅ Aplicación inicializada correctamente');
                 
-                // Google Analytics: Página cargada
                 if (typeof gtag !== 'undefined') {
                     gtag('event', 'page_loaded', {
                         'event_category': 'engagement',
                         'event_label': 'Site Ready'
                     });
                 }
-                
             } catch (error) {
                 console.error('❌ Error al inicializar:', error);
-                showError('Error al cargar la aplicación. Por favor, recarga la página.');
             }
         });
     </script>
