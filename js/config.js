@@ -8,8 +8,8 @@ const APP_CONFIG = {
     // SUPABASE
     // ====================================
     supabase: {
-        url: 'https://nvroeevlxsrfqxkamxdn.supabase.co',
-        anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cm9lZXZseHNyZnF4a2FteGRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTY5ODYsImV4cCI6MjA2NDg5Mjk4Nn0.cP1KYLij4sMDK8SfrJWfpK3dJHccRkLopP0dQHSP8Yk'
+        url:'https://nvroeevlxsrfqxkamxdn.supabase.co',
+        anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im52cm9lZXZseHNyZnF4a2FteGRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkzMTY5ODYsImV4cCI6MjA2NDg5Mjk4Nn0.cP1KYLij4sMDK8SfrJWfpK3dJHccRkLopP0dQHSP8Yk'
     },
 
     // ====================================
@@ -17,8 +17,8 @@ const APP_CONFIG = {
     // ====================================
     whatsapp: {
         number: '56938654827',
-        defaultMessage: 'Hola, estoy interesado en importar un vehículo desde USA. ¿Podrían asesorarme?',
-        vehicleMessage: (vehicle) => `Hola, me interesa el ${vehicle.name} (${vehicle.year}) que vi en su sitio web. ¿Podrían darme más información?`
+        defaultMessage:'Hola, estoy interesado en importar un vehículo desde USA. ¿Podrían asesorarme?',
+        vehicleMessage:(vehicle) => `Hola, me interesa el ${vehicle.name} (${vehicle.year}) que vi en su sitio web. ¿Podrían darme más información?`
     },
 
     // ====================================
