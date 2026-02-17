@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Importación de vehículos americanos premium. Traemos tu auto soñado desde USA con garantía de 12 meses.">
+    <meta name="keywords" content="importar autos USA, vehículos americanos, importación Chile, autos americanos Arica">
+    <meta name="author" content="Import American Cars">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Import American Cars - Tu Auto Soñado desde USA">
+    <meta property="og:description" content="Importamos vehículos americanos con garantía. Ahorra hasta 40% comparado con concesionarios locales.">
+    <meta property="og:image" content="https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg">
+    <meta property="og:url" content="https://importamericancars.cl">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Import American Cars">
+    <meta name="twitter:description" content="Importamos tu auto soñado desde USA">
+    
+    <title>Import American Cars - Vehículos Americanos Premium</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Google Fonts - SF Pro fallback -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/main.css">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+    </script>
+</head>
+<body>
+    <!-- ========================================
+         HEADER
+         ======================================== -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <span>Import</span> American Cars
+            </a>
+            <button class="header-cta">
+                <i class="fab fa-whatsapp"></i>
+                Contactar
+            </button>
+        </div>
+    </header>
+
+    <!-- ========================================
+         HERO
+         ======================================== -->
+    <section class="hero">
+        <div class="hero-background"></div>
+        
+        <div class="hero-content">
+            <div class="hero-eyebrow">
+                <span>Garantía 12 meses incluida</span>
+            </div>
+            
+            <h1 class="hero-title">
+                El auto que siempre quisiste,<br>
+                por el precio que mereces
+            </h1>
+            
+            <p class="hero-subtitle">
+                Importamos desde Estados Unidos y entregamos en Arica. 
+                Sin trámites, sin complicaciones.
+            </p>
+            
+            <a href="#vehicles" class="hero-cta">
+                Ver vehículos disponibles
+                <span class="badge">0</span>
+            </a>
+        </div>
+        
+        <!-- Trust Bar -->
+        <div class="trust-bar" id="trustBar">
+            <!-- Contenido dinámico desde JS -->
+            <div class="trust-bar-inner">
+                <div class="trust-item">
+                    <div class="trust-value">---</div>
+                    <div class="trust-label">Cargando...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         FILTROS
+         ======================================== -->
+    <section class="filters-section" id="vehicles">
+        <div class="filters-container">
+            <div class="filters-header">
+                <h2 class="filters-title">Explora nuestro inventario</h2>
+                <p class="filters-subtitle">Selecciona el tipo de vehículo que te interesa</p>
+            </div>
+            
+            <!-- Filtros por tipo -->
+            <div class="type-filters" id="typeFilters">
+                <!-- Contenido dinámico desde JS -->
+            </div>
+            
+            <!-- Filtros por estado -->
+            <div class="status-filters" id="statusFilters">
+                <!-- Contenido dinámico desde JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         VEHÍCULOS
+         ======================================== -->
+    <section class="vehicles-section">
+        <div class="vehicles-container">
+            <div class="vehicles-grid" id="vehiclesGrid">
+                <!-- Contenido dinámico desde JS -->
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Cargando vehículos...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         ENTREGAS RECIENTES
+         ======================================== -->
+    <section class="deliveries-section">
+        <div class="deliveries-container">
+            <div class="deliveries-header">
+                <p class="deliveries-label">Entregas recientes</p>
+                <h2 class="deliveries-title">Clientes que ya manejan su sueño</h2>
+                <p class="deliveries-subtitle">
+                    Historias reales de importaciones exitosas en los últimos meses
+                </p>
+            </div>
+            
+            <div class="deliveries-grid" id="deliveriesGrid">
+                <!-- Contenido dinámico desde JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================
+         CONTADOR DE IMPACTO
+         ======================================== -->
+    <section class="trust-counter-section">
+        <div class="trust-counter-container" id="trustCounterGrid">
+            <!-- Contenido dinámico desde JS -->
+        </div>
+    </section>
+
+    <!-- ========================================
+         CTA FINAL
+         ======================================== -->
+    <section class="final-cta-section">
+        <div class="final-cta-container">
+            <h2 class="final-cta-title">¿Listo para importar tu próximo auto?</h2>
+            <p class="final-cta-text">
+                Conversemos sobre el vehículo que buscas. Sin compromiso, sin presión. 
+                Solo información clara para que tomes la mejor decisión.
+            </p>
+            <a href="#" class="final-cta-btn">
+                <i class="fab fa-whatsapp"></i>
+                Hablar con un asesor
+            </a>
+            <p class="final-cta-note">Respuesta promedio: menos de 5 minutos</p>
+        </div>
+    </section>
+
+    <!-- ========================================
+         FOOTER
+         ======================================== -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <span>Import</span> American Cars
+            </div>
+            <p class="footer-text">
+                Importación profesional de vehículos americanos. 
+                Servicio personalizado desde Estados Unidos hasta tu puerta en Chile.
+            </p>
+            <div class="footer-links">
+                <a href="https://instagram.com/importamericancars" target="_blank" rel="noopener">Instagram</a>
+                <a href="#" onclick="openWhatsApp(); return false;">WhatsApp</a>
+                <a href="/admin.html">Admin</a>
+            </div>
+            <p class="footer-copy">© 2025 Import American Cars. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- ========================================
+         MODALES (se crean dinámicamente en JS)
+         ======================================== -->
+
+    <!-- ========================================
+         SCRIPTS
+         ======================================== -->
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/vehicles.js"></script>
+    <script src="js/testimonials.js"></script>
+    <script src="js/consultation.js"></script>
+    <script src="js/activity.js"></script>
+    <script src="js/share.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/customization.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
