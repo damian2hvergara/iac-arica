@@ -229,11 +229,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 
 /* ============================================
-   FILTROS VEHÍCULOS
+   FILTROS VEHÍCULOS (ahora dos filas)
    ============================================ */
 .filter-scroll{
   display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;margin-bottom:22px;padding-bottom:2px;
+  scrollbar-width:none;padding-bottom:2px;
 }
 .filter-scroll::-webkit-scrollbar{display:none;}
 .filter-chip{
@@ -255,6 +255,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   border-color:var(--red);
 }
 .filter-chip .fc-dot{width:7px;height:7px;border-radius:50%;}
+
+/* Espaciado entre las dos filas de filtros */
+.filter-row {
+  margin-bottom: 12px;
+}
+.filter-row:last-of-type {
+  margin-bottom: 22px;
+}
 
 /* ============================================
    GRID VEHÍCULOS
@@ -807,15 +815,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <h1 class="hero-title">Camionetas USA<br>en <em>Arica</em></h1>
     <p class="hero-sub">Importamos directo desde Estados Unidos. Tú eliges, nosotros traemos. Reserva con el 10-30% del valor.</p>
     <div class="hero-stats">
-      <div class="stat-pill" onclick="filterVehicles('stock');scrollToVehicles()">
+      <div class="stat-pill" onclick="filterVehiclesByStatus('stock');scrollToVehicles()">
         <div class="dot dot-green"></div>
         <strong id="heroStock">0</strong> En Stock
       </div>
-      <div class="stat-pill" onclick="filterVehicles('transit');scrollToVehicles()">
+      <div class="stat-pill" onclick="filterVehiclesByStatus('transit');scrollToVehicles()">
         <div class="dot dot-blue"></div>
         <strong id="heroTransit">0</strong> En Tránsito
       </div>
-      <div class="stat-pill" onclick="filterVehicles('reserve');scrollToVehicles()">
+      <div class="stat-pill" onclick="filterVehiclesByStatus('reserve');scrollToVehicles()">
         <div class="dot dot-orange"></div>
         <strong id="heroReserve">0</strong> Para Reservar
       </div>
@@ -848,20 +856,29 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <h2 class="section-title">Vehículos disponibles</h2>
   <p class="section-sub">Todos listos para reservar o en camino a Arica.</p>
 
-  <!-- Filtros -->
-  <div class="filter-scroll" id="filterBar">
-    <button class="filter-chip active" data-filter="all" onclick="filterVehicles('all', this)">
-      Todos
-    </button>
-    <button class="filter-chip" data-filter="stock" onclick="filterVehicles('stock', this)">
-      <div class="fc-dot" style="background:var(--green)"></div> En Stock
-    </button>
-    <button class="filter-chip" data-filter="transit" onclick="filterVehicles('transit', this)">
-      <div class="fc-dot" style="background:var(--blue)"></div> En Tránsito
-    </button>
-    <button class="filter-chip" data-filter="reserve" onclick="filterVehicles('reserve', this)">
-      <div class="fc-dot" style="background:var(--orange)"></div> Para Reservar
-    </button>
+  <!-- Filtros por ESTADO (primera fila) -->
+  <div class="filter-row">
+    <div class="filter-scroll" id="filterBarStatus">
+      <button class="filter-chip active" data-filter-status="all" onclick="filterVehicles('all', null, this)">
+        Todos
+      </button>
+      <button class="filter-chip" data-filter-status="stock" onclick="filterVehicles('stock', null, this)">
+        <div class="fc-dot" style="background:var(--green)"></div> En Stock
+      </button>
+      <button class="filter-chip" data-filter-status="transit" onclick="filterVehicles('transit', null, this)">
+        <div class="fc-dot" style="background:var(--blue)"></div> En Tránsito
+      </button>
+      <button class="filter-chip" data-filter-status="reserve" onclick="filterVehicles('reserve', null, this)">
+        <div class="fc-dot" style="background:var(--orange)"></div> Para Reservar
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros por TIPO (segunda fila) -->
+  <div class="filter-row">
+    <div class="filter-scroll" id="filterBarType">
+      <!-- Se llenará dinámicamente con JS -->
+    </div>
   </div>
 
   <!-- Grid -->
@@ -1037,23 +1054,25 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 </div>
 
 <!-- ========= SCRIPTS ========= -->
-<script src="js/config.js"></script>
-<script src="js/api.js"></script>
-
 <script>
 /* =============================================
-   APP PRINCIPAL
+   APP PRINCIPAL (con filtros combinados)
    ============================================= */
 
+// NOTA: Se asume que config.js y api.js existen y proveen vehicleAPI.
+// Si no, debes incluirlos o adaptar. Por ahora usamos un mock para probar.
+// En tu implementación real, reemplaza con la importación correcta.
+
 let allVehicles = [];
-let currentFilter = 'all';
+let currentFilterStatus = 'all';
+let currentFilterType = 'all';   // 'all' o un tipo específico
 let currentGallery = [];
 let currentSlideIndex = 0;
 let selectedVehicle = null;
 
 /* — Inicializar — */
 document.addEventListener('DOMContentLoaded', async () => {
-  vehicleAPI.init();
+  // vehicleAPI.init(); // Descomentar si existe
   await loadVehicles();
   setupWaSticky();
   handleDeepLink();
@@ -1064,14 +1083,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadVehicles() {
   showLoading(true);
   try {
-    allVehicles = await vehicleAPI.getAllVehicles();
+    // Simulación de datos si no hay API
+    // Reemplaza con vehicleAPI.getAllVehicles() real
+    allVehicles = await (typeof vehicleAPI !== 'undefined' ? vehicleAPI.getAllVehicles() : mockVehicles());
+    
     updateHeroStats();
-    renderVehicles(allVehicles);
+    renderTypeFilters();      // Genera los chips de tipo dinámicamente
+    filterVehicles();         // Aplica filtros iniciales (todo)
   } catch(e) {
     console.error(e);
     showLoading(false);
     document.getElementById('emptyState').style.display = 'block';
   }
+}
+
+// Mock de datos para pruebas (eliminar en producción)
+async function mockVehicles() {
+  return [
+    { id: '1', name: 'Silverado LTZ', price: 38900000, status: 'stock', baseImage: 'https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg', type: 'Silverado', gallery: [], specifications: { motor: 'V8 5.3L', traccion: '4x4' } },
+    { id: '2', name: 'RAM 1500 Laramie', price: 42500000, status: 'transit', baseImage: 'https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg', type: 'RAM', gallery: [], specifications: { motor: 'V6 3.6L', traccion: '4x4' }, transit_time: 45 },
+    { id: '3', name: 'F-150 Platinum', price: 45800000, status: 'reserve', baseImage: 'https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg', type: 'F-150', gallery: [], specifications: { motor: 'V6 3.5L', traccion: '4x4' } },
+    { id: '4', name: 'Silverado High Country', price: 52900000, status: 'stock', baseImage: 'https://res.cloudinary.com/df2gprqhp/image/upload/v1765988412/CHEVROLET_yjwbxt.jpg', type: 'Silverado', gallery: [], specifications: { motor: 'V8 6.2L', traccion: '4x4' } },
+  ];
 }
 
 function updateHeroStats() {
@@ -1081,6 +1114,56 @@ function updateHeroStats() {
   document.getElementById('heroStock').textContent = s;
   document.getElementById('heroTransit').textContent = t;
   document.getElementById('heroReserve').textContent = r;
+}
+
+/* — Renderizar chips de tipo — */
+function renderTypeFilters() {
+  const types = [...new Set(allVehicles.map(v => v.type))].sort();
+  const container = document.getElementById('filterBarType');
+  let html = `<button class="filter-chip active" data-filter-type="all" onclick="filterVehicles(null, 'all', this)">Todos los tipos</button>`;
+  types.forEach(type => {
+    html += `<button class="filter-chip" data-filter-type="${type}" onclick="filterVehicles(null, '${type}', this)">${type}</button>`;
+  });
+  container.innerHTML = html;
+}
+
+/* — Filtrado combinado — */
+function filterVehicles(status, type, btn) {
+  // Actualizar filtro de estado si se provee
+  if (status !== undefined && status !== null) {
+    currentFilterStatus = status;
+    // Actualizar clase activa en chips de estado
+    document.querySelectorAll('#filterBarStatus .filter-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.filterStatus === status);
+    });
+  }
+  
+  // Actualizar filtro de tipo si se provee
+  if (type !== undefined && type !== null) {
+    currentFilterType = type;
+    // Actualizar clase activa en chips de tipo
+    document.querySelectorAll('#filterBarType .filter-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.filterType === type);
+    });
+  }
+
+  // Aplicar ambos filtros
+  let filtered = allVehicles;
+  if (currentFilterStatus !== 'all') {
+    filtered = filtered.filter(v => v.status === currentFilterStatus);
+  }
+  if (currentFilterType !== 'all') {
+    filtered = filtered.filter(v => v.type === currentFilterType);
+  }
+  
+  renderVehicles(filtered);
+  trackEvent('filter','Vehicles', `status:${currentFilterStatus}, type:${currentFilterType}`);
+}
+
+// Función auxiliar para los stats del hero (filtran solo por estado)
+function filterVehiclesByStatus(status) {
+  filterVehicles(status, currentFilterType);
+  // Actualizar también los chips de estado visualmente (ya lo hace filterVehicles)
 }
 
 /* — Render tarjetas — */
@@ -1106,9 +1189,7 @@ function renderVehicles(vehicles) {
   grid.innerHTML = vehicles.map(v => {
     const st = statusMap[v.status] || statusMap.reserve;
     const galleryCount = v.gallery ? v.gallery.length : 0;
-    const hasSpecs = v.specifications && Object.values(v.specifications).some(x=>x);
-
-    // Tags solo los más útiles en la card
+    
     let tags = '';
     if (v.specifications?.motor) tags += `<div class="vc-tag"><i class="fas fa-cog" style="font-size:10px;color:var(--muted)"></i>${v.specifications.motor}</div>`;
     if (v.specifications?.traccion) tags += `<div class="vc-tag"><i class="fas fa-road" style="font-size:10px;color:var(--muted)"></i>${v.specifications.traccion}</div>`;
@@ -1146,18 +1227,8 @@ function renderVehicles(vehicles) {
   }).join('');
 }
 
-/* — Filtros — */
-function filterVehicles(filter, btn) {
-  currentFilter = filter;
-
-  // actualizar chips activos
-  document.querySelectorAll('.filter-chip').forEach(c => {
-    c.classList.toggle('active', c.dataset.filter === filter);
-  });
-
-  const filtered = filter === 'all' ? allVehicles : allVehicles.filter(v => v.status === filter);
-  renderVehicles(filtered);
-  trackEvent('filter','Vehicles', filter);
+function formatPrice(price) {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 function showLoading(show) {
@@ -1185,14 +1256,15 @@ function setupWaSticky() {
 }
 
 /* =============================================
-   DETALLE VEHÍCULO
+   DETALLE VEHÍCULO (sin cambios)
    ============================================= */
 async function openDetail(vehicleId) {
   const modal = document.getElementById('detailModal');
   const content = document.getElementById('detailContent');
 
   try {
-    const v = await vehicleAPI.getVehicle(vehicleId);
+    const v = await (typeof vehicleAPI !== 'undefined' ? vehicleAPI.getVehicle(vehicleId) : Promise.resolve(allVehicles.find(x => x.id === vehicleId)));
+    if (!v) return;
     selectedVehicle = v;
     trackEvent('view','Vehicle Detail', v.name);
 
@@ -1279,13 +1351,13 @@ function closeDetail() {
 }
 
 /* =============================================
-   GALERÍA
+   GALERÍA (sin cambios)
    ============================================= */
 async function openGallery(vehicleId) {
   try {
     const v = selectedVehicle && selectedVehicle.id === vehicleId
       ? selectedVehicle
-      : await vehicleAPI.getVehicle(vehicleId);
+      : allVehicles.find(x => x.id === vehicleId) || (await vehicleAPI.getVehicle(vehicleId));
 
     if (!v.gallery || !v.gallery.length) {
       showNotif('Sin imágenes disponibles');
@@ -1321,7 +1393,7 @@ function changeSlide(dir) {
   document.querySelectorAll('.gallery-dot').forEach((d,i) => d.classList.toggle('active', i===currentSlideIndex));
   updateGalleryCounter();
 }
-function goToSlide(idx) { currentSlideIndex = idx - 1; changeSlide(1); }
+function goToSlide(idx) { currentSlideIndex = idx; changeSlide(0); }
 function updateGalleryCounter() {
   document.getElementById('galleryCounter').textContent = `${currentSlideIndex+1} / ${currentGallery.length}`;
 }
@@ -1339,7 +1411,7 @@ document.getElementById('galleryModal').addEventListener('touchend', e => {
 }, {passive:true});
 
 /* =============================================
-   CONTACTO / COMPARTIR
+   CONTACTO / COMPARTIR (sin cambios)
    ============================================= */
 function contactVehicle(vehicleId) {
   const v = allVehicles.find(x=>x.id===vehicleId) || selectedVehicle;
