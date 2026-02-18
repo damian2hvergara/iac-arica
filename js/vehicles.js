@@ -86,8 +86,11 @@ function renderVehicles(vehicles) {
                     ${vehicle.kits.length} Kit${vehicle.kits.length > 1 ? 's' : ''}
                 </div>` : ''}
 
-                <button onclick="shareVehicle('${vehicle.id}', this)" class="share-btn-premium">
-                    <i class="fas fa-share-alt"></i>
+                <button onclick="shareVehicle('${vehicle.id}', this)"
+                        class="share-btn-premium"
+                        data-count="${vehicle.shareCount || 0}"
+                        title="Compartir">
+                    <i class="fas fa-arrow-up-from-bracket"></i>
                     <span class="share-count">${vehicle.shareCount || 0}</span>
                 </button>
             </div>
@@ -290,6 +293,7 @@ function shareVehicle(vehicleId, buttonEl = null) {
     if (buttonEl) {
         const counter = buttonEl.querySelector('.share-count');
         if (counter) counter.textContent = vehicle.shareCount;
+        buttonEl.setAttribute('data-count', vehicle.shareCount);
         buttonEl.classList.add('share-animate');
         setTimeout(() => buttonEl.classList.remove('share-animate'), 400);
     }
