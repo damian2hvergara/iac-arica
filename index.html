@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Importación de camionetas americanas desde USA con personalización profesional. Silverado, RAM, F-150 en Arica, Chile.">
     <title>Import American Cars | Camionetas USA Personalizadas</title>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <!-- CSS Modular -->
     <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/components.css">
@@ -32,36 +32,272 @@
             }
         });
     </script>
+
+    <style>
+        /* ── Estilos nuevos solo para este index ── */
+
+        /* Barra de confianza debajo del hero-subtitle */
+        .trust-strip {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px 24px;
+            margin-top: 28px;
+        }
+        .trust-strip-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: rgba(255,255,255,0.92);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .trust-strip-item i {
+            color: #4ade80;
+            font-size: 14px;
+        }
+
+        /* ── Sección "Cómo funciona" ── */
+        .process-section {
+            background: var(--white);
+            padding: 80px 20px;
+            border-bottom: var(--border);
+        }
+        .process-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0;
+            max-width: 860px;
+            margin: 48px auto 0;
+            position: relative;
+        }
+        /* Línea conectora entre pasos (solo desktop) */
+        .process-steps::before {
+            content: '';
+            position: absolute;
+            top: 36px;
+            left: calc(100% / 6);
+            right: calc(100% / 6);
+            height: 2px;
+            background: linear-gradient(90deg, var(--import-red) 0%, #ff9500 100%);
+            z-index: 0;
+        }
+        .process-step {
+            text-align: center;
+            padding: 0 24px 32px;
+            position: relative;
+            z-index: 1;
+        }
+        .process-step-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            font-weight: 800;
+            color: white;
+            background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%);
+            box-shadow: 0 4px 16px rgba(99,11,11,0.35);
+            position: relative;
+        }
+        .process-step-number {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            color: var(--import-red);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .process-step-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--black);
+        }
+        .process-step-desc {
+            font-size: 14px;
+            color: var(--gray-300);
+            line-height: 1.6;
+        }
+        .process-cta-row {
+            text-align: center;
+            margin-top: 48px;
+        }
+        .process-time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99,11,11,0.07);
+            color: var(--import-red);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* ── FAQ compacto ── */
+        .faq-compact-section {
+            background: var(--gray-50);
+            padding: 72px 20px;
+        }
+        .faq-compact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            max-width: 860px;
+            margin: 40px auto 0;
+        }
+        .faq-compact-item {
+            background: white;
+            border: var(--border);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .faq-compact-item:hover {
+            border-color: var(--import-red);
+            box-shadow: 0 4px 16px rgba(99,11,11,0.08);
+        }
+        .faq-compact-q {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--black);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .faq-compact-q i {
+            color: var(--import-red);
+            font-size: 13px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            transition: transform 0.25s ease;
+        }
+        .faq-compact-a {
+            display: none;
+            font-size: 14px;
+            color: var(--gray-300);
+            line-height: 1.65;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--gray-100);
+        }
+        .faq-compact-item.open .faq-compact-a { display: block; }
+        .faq-compact-item.open .faq-compact-q i { transform: rotate(180deg); }
+
+        /* ── CTA final antes del footer ── */
+        .final-cta-section {
+            background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%);
+            padding: 72px 20px;
+            text-align: center;
+        }
+        .final-cta-section h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 12px;
+        }
+        .final-cta-section p {
+            color: rgba(255,255,255,0.85);
+            font-size: 17px;
+            max-width: 480px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+        }
+        .final-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            color: var(--import-red);
+            padding: 16px 36px;
+            border-radius: var(--radius);
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .final-cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+        }
+        .final-cta-reassure {
+            margin-top: 16px;
+            color: rgba(255,255,255,0.65);
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .process-steps::before { display: none; }
+            .process-steps { gap: 8px; }
+            .process-step { padding: 0 12px 24px; }
+            .final-cta-section h2 { font-size: 24px; }
+            .trust-strip { gap: 6px 16px; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
+
+    <!-- ═══════════════════════════════════════
+         HEADER
+    ═══════════════════════════════════════ -->
     <header class="header">
         <div class="header-container">
             <div class="logo"><span class="import-text">Import</span> American Cars - Arica</div>
             <nav class="nav-links">
-                <a href="#vehicles" class="nav-link">Vehículos</a>
-                <a href="#customize" class="nav-link">Personalización</a>
-                <a href="#testimonials" class="nav-link">Testimonios</a>
-                <a href="#blog" class="nav-link">Blog</a>
-                <a href="#contact" class="nav-link">Contacto</a>
+                <a href="#vehicles"    class="nav-link">Vehículos</a>
+                <a href="#process"     class="nav-link">Cómo funciona</a>
+                <a href="#customize"   class="nav-link">Personalización</a>
+                <a href="#testimonials"class="nav-link">Clientes</a>
+                <a href="#contact"     class="nav-link">Contacto</a>
             </nav>
         </div>
     </header>
 
-    <!-- Hero -->
+
+    <!-- ═══════════════════════════════════════
+         1. HERO
+         Objetivo: impacto + credibilidad en 5 seg
+    ═══════════════════════════════════════ -->
     <section class="hero" id="home">
         <div class="hero-background"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Camionetas USA Personalizadas a tu Medida</h1>
-            <p class="hero-subtitle">Importamos desde USA y configuramos según tu estilo. Arica, Chile.</p>
-            
-            <div style="display: inline-flex; align-items: center; gap: 12px; margin-top: 24px; padding: 12px 24px; background: rgba(99,11,11,0.95); border-radius: 30px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);">
-                <i class="fas fa-magic" style="color: white; font-size: 16px;"></i>
-                <span style="color: white; font-size: 14px; font-weight: 600; letter-spacing: 0.3px;">
-                    Personalización profesional incluida
+
+            <h1 class="hero-title">Tu Camioneta Americana,<br>Lista en Arica</h1>
+            <p class="hero-subtitle">
+                Importamos desde USA, gestionamos todo el trámite<br>
+                y te entregamos personalizada según tu estilo.
+            </p>
+
+            <!-- Confianza instantánea — 3 pruebas en una línea -->
+            <div class="trust-strip">
+                <span class="trust-strip-item">
+                    <i class="fas fa-check-circle"></i> +142 vehículos entregados
+                </span>
+                <span class="trust-strip-item">
+                    <i class="fas fa-check-circle"></i> Nosotros hacemos todo el trámite
+                </span>
+                <span class="trust-strip-item">
+                    <i class="fas fa-check-circle"></i> Garantía mecánica incluida
                 </span>
             </div>
-            
+
+            <!-- Contadores de stock en tiempo real -->
             <div class="stock-indicators">
                 <div class="indicator" data-filter="stock">
                     <div class="indicator-number status-stock" id="stockCount">0</div>
@@ -76,61 +312,132 @@
                     <div class="indicator-label">Para Reservar</div>
                 </div>
             </div>
+
         </div>
     </section>
 
-    <!-- Contador -->
-    <section class="success-counter">
-        <div class="counter-container">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; max-width: 800px; margin: 0 auto;">
-                <div style="text-align: center;">
-                    <div class="counter-number" id="importedVehiclesCounter">142</div>
-                    <p style="font-size: 17px; opacity: 0.9;">Vehículos Importados</p>
-                </div>
-            </div>
-            <p class="counter-text" style="margin-top: 32px; opacity: 0.85;">
-                Desde USA a Arica · Configurados según cada cliente
-            </p>
-        </div>
-    </section>
 
-    <!-- Vehículos -->
+    <!-- ═══════════════════════════════════════
+         2. VEHÍCULOS
+         Objetivo: mostrar el producto con confianza ya establecida
+    ═══════════════════════════════════════ -->
     <section class="vehicles-section" id="vehicles">
         <div class="section-container">
-            <h2 class="section-title">Explora Nuestro Inventario</h2>
-            <p class="section-subtitle">Importación directa con opciones de personalización profesional</p>
+
+            <h2 class="section-title">Elige tu Vehículo</h2>
+            <p class="section-subtitle">Nosotros nos encargamos de todo lo demás</p>
 
             <!-- Filtro por tipo -->
             <div class="filter-row" id="typeFilters">
                 <!-- Generado por filters.js -->
             </div>
-
-            <!-- Separador visual -->
             <div class="filter-divider"></div>
-
             <!-- Filtro por estado -->
             <div class="filter-row filter-row-status" id="statusFilters">
                 <!-- Generado por filters.js -->
             </div>
-            
+
             <div class="loading-spinner" id="loadingSpinner">
                 <div class="spinner"></div>
                 <p>Cargando vehículos...</p>
             </div>
-            
+
             <div class="empty-state" id="emptyState" style="display: none;">
                 <i class="fas fa-car"></i>
                 <h3>Próximas Oportunidades Premium</h3>
                 <p>Pronto agregaremos más vehículos</p>
             </div>
-            
+
             <div class="vehicles-grid" id="vehiclesContainer"></div>
+
         </div>
     </section>
 
-    <!-- Personalización -->
+
+    <!-- ═══════════════════════════════════════
+         3. CÓMO FUNCIONA
+         Objetivo: eliminar la objeción "¿cómo es el proceso?"
+         antes de que el usuario la tenga
+    ═══════════════════════════════════════ -->
+    <section class="process-section" id="process">
+        <div class="section-container">
+
+            <div style="text-align:center;">
+                <div class="process-time-badge">
+                    <i class="fas fa-clock"></i> 45 a 60 días desde USA hasta Arica
+                </div>
+                <h2 class="section-title">Así de Simple es el Proceso</h2>
+                <p class="section-subtitle" style="max-width:520px;margin:0 auto;">
+                    Tú eliges, nosotros hacemos todo. Sin burocracia, sin sorpresas.
+                </p>
+            </div>
+
+            <div class="process-steps">
+
+                <div class="process-step">
+                    <div class="process-step-icon">
+                        <i class="fas fa-search"></i>
+                        <span class="process-step-number">1</span>
+                    </div>
+                    <div class="process-step-title">Eliges tu vehículo</div>
+                    <div class="process-step-desc">
+                        Seleccionas del inventario o nos dices qué quieres y lo buscamos en USA para ti.
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="process-step-icon">
+                        <i class="fas fa-file-signature"></i>
+                        <span class="process-step-number">2</span>
+                    </div>
+                    <div class="process-step-title">Nosotros gestionamos todo</div>
+                    <div class="process-step-desc">
+                        Compra, transporte, aduana, liberación en zona franca. Tú no haces ningún trámite.
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="process-step-icon">
+                        <i class="fas fa-magic"></i>
+                        <span class="process-step-number">3</span>
+                    </div>
+                    <div class="process-step-title">Lo personalizamos</div>
+                    <div class="process-step-desc">
+                        Antes de entregarte, instalamos tu kit de personalización elegido.
+                    </div>
+                </div>
+
+                <div class="process-step">
+                    <div class="process-step-icon">
+                        <i class="fas fa-key"></i>
+                        <span class="process-step-number">4</span>
+                    </div>
+                    <div class="process-step-title">Recibes en Arica</div>
+                    <div class="process-step-desc">
+                        Te entregamos revisado, con garantía mecánica y listo para circular.
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="process-cta-row">
+                <a href="https://wa.me/56938654827?text=Hola,%20quiero%20saber%20m%C3%A1s%20sobre%20el%20proceso%20de%20importaci%C3%B3n"
+                   target="_blank" class="button" onclick="trackEvent('click','Process','WhatsApp CTA')">
+                    <i class="fab fa-whatsapp"></i> Pregúntame cómo funciona
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         4. PERSONALIZACIÓN
+         Objetivo: mostrar el diferenciador competitivo
+    ═══════════════════════════════════════ -->
     <section class="customization-section" id="customize" style="background: linear-gradient(180deg, var(--white) 0%, var(--gray-50) 100%); padding: 80px 20px;">
         <div class="section-container">
+
             <div style="text-align: center; margin-bottom: 16px;">
                 <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: var(--import-red); border-radius: 30px;">
                     <i class="fas fa-star" style="color: white; font-size: 12px;"></i>
@@ -139,13 +446,14 @@
                     </span>
                 </div>
             </div>
-            
+
             <h2 class="section-title" style="text-align: center;">Personalización Profesional</h2>
             <p class="section-subtitle" style="text-align: center; max-width: 600px; margin: 0 auto 48px;">
                 Cada camioneta puede elevarse estéticamente según tu estilo, manteniendo su versión original
             </p>
-            
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 48px;">
+
                 <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--gray-100);">
                     <div style="position: relative; height: 200px; background: linear-gradient(135deg, #f5f5f7 0%, #e5e5e7 100%); display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-car" style="font-size: 64px; color: var(--gray-200);"></i>
@@ -157,15 +465,13 @@
                         <div style="font-size: 12px; color: var(--import-red); font-weight: 700; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">
                             Antes → Después
                         </div>
-                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">
-                            Personalización Premium
-                        </h3>
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Personalización Premium</h3>
                         <p style="color: var(--gray-300); font-size: 14px; line-height: 1.6;">
                             Transformamos tu camioneta con kits profesionales: llantas, suspensión, estética exterior e interior.
                         </p>
                     </div>
                 </div>
-                
+
                 <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--gray-100);">
                     <div style="position: relative; height: 200px; background: linear-gradient(135deg, #ff9500 0%, #ff6b00 100%); display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-bolt" style="font-size: 64px; color: rgba(255,255,255,0.9);"></i>
@@ -174,15 +480,13 @@
                         <div style="display: inline-block; padding: 4px 12px; background: rgba(255,149,0,0.1); color: #ff9500; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
                             Kit Sport
                         </div>
-                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">
-                            Apariencia Deportiva
-                        </h3>
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Apariencia Deportiva</h3>
                         <p style="color: var(--gray-300); font-size: 14px; line-height: 1.6;">
                             Llantas deportivas, suspensión rebajada, detalles cromados y viniles personalizados.
                         </p>
                     </div>
                 </div>
-                
+
                 <div style="background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid var(--gray-100);">
                     <div style="position: relative; height: 200px; background: linear-gradient(135deg, #00a651 0%, #008842 100%); display: flex; align-items: center; justify-content: center;">
                         <i class="fas fa-mountain" style="font-size: 64px; color: rgba(255,255,255,0.9);"></i>
@@ -191,33 +495,36 @@
                         <div style="display: inline-block; padding: 4px 12px; background: rgba(0,166,81,0.1); color: #00a651; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
                             Kit Off-Road
                         </div>
-                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">
-                            Preparación Extrema
-                        </h3>
+                        <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Preparación Extrema</h3>
                         <p style="color: var(--gray-300); font-size: 14px; line-height: 1.6;">
                             Suspensión levantada, neumáticos all-terrain, parrillas LED y protecciones reforzadas.
                         </p>
                     </div>
                 </div>
+
             </div>
-            
+
             <div class="section-cta">
                 <a href="#vehicles" class="button">
                     <i class="fas fa-magic"></i> Ver Vehículos Personalizables
                 </a>
             </div>
+
         </div>
     </section>
 
-    <!-- Testimonios / Entregas -->
+
+    <!-- ═══════════════════════════════════════
+         5. TESTIMONIOS / ENTREGAS
+         Objetivo: prueba social antes del cierre
+    ═══════════════════════════════════════ -->
     <section class="testimonials-section" id="testimonials">
         <div class="section-container">
-            <h2 class="section-title">Nuestros Clientes</h2>
-            <p class="section-subtitle">Entregas reales, procesos reales</p>
 
-            <!-- Tarjetas estáticas: se muestran siempre.
-                 Si existe la tabla 'deliveries' en Supabase con visible=true,
-                 testimonials.js las reemplaza automáticamente con las entregas reales. -->
+            <h2 class="section-title">Clientes Reales, Entregas Reales</h2>
+            <p class="section-subtitle">Lo que dicen quienes ya tienen su camioneta americana</p>
+
+            <!-- Si existe tabla 'deliveries' en Supabase, testimonials.js reemplaza este grid -->
             <div class="deliveries-grid" id="deliveriesGrid">
 
                 <article class="delivery-card">
@@ -291,46 +598,38 @@
     </section>
 
 
-    <!-- Instagram -->
+    <!-- ═══════════════════════════════════════
+         6. INSTAGRAM
+         Objetivo: refuerzo visual social
+    ═══════════════════════════════════════ -->
     <section class="instagram-section">
         <div class="section-container">
             <h2 class="section-title">Síguenos en Instagram</h2>
             <p class="section-subtitle">@importamericancars</p>
-            
+
             <div class="instagram-grid">
                 <a href="https://www.instagram.com/import_american_cars" target="_blank" class="instagram-post">
-                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676424/qbgz8hbqqjwdozqzf0f0.jpg" 
+                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676424/qbgz8hbqqjwdozqzf0f0.jpg"
                          alt="Vehículo" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
+                    <div class="instagram-overlay"><i class="fab fa-instagram instagram-icon"></i></div>
                 </a>
-                
                 <a href="https://www.instagram.com/import_american_cars" target="_blank" class="instagram-post">
-                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676522/iap8wm33cblfg6ofyc9r.jpg" 
+                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676522/iap8wm33cblfg6ofyc9r.jpg"
                          alt="Kit off-road" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
+                    <div class="instagram-overlay"><i class="fab fa-instagram instagram-icon"></i></div>
                 </a>
-               
                 <a href="https://www.instagram.com/import_american_cars" target="_blank" class="instagram-post">
-                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676857/wgjdhwryqz6ji049mff3.jpg" 
+                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676857/wgjdhwryqz6ji049mff3.jpg"
                          alt="Importación" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
+                    <div class="instagram-overlay"><i class="fab fa-instagram instagram-icon"></i></div>
                 </a>
-                
                 <a href="https://www.instagram.com/import_american_cars" target="_blank" class="instagram-post">
-                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676766/c3gtahfwy3sibrpz93fg.jpg" 
+                    <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676766/c3gtahfwy3sibrpz93fg.jpg"
                          alt="Cliente" class="instagram-image">
-                    <div class="instagram-overlay">
-                        <i class="fab fa-instagram instagram-icon"></i>
-                    </div>
+                    <div class="instagram-overlay"><i class="fab fa-instagram instagram-icon"></i></div>
                 </a>
             </div>
-            
+
             <div class="section-cta">
                 <a href="https://instagram.com/importamericancars" target="_blank" class="button button-outline">
                     <i class="fab fa-instagram"></i> Síguenos en Instagram
@@ -339,70 +638,110 @@
         </div>
     </section>
 
-    <!-- Blog -->
-    <section class="blog-section" id="blog">
+
+    <!-- ═══════════════════════════════════════
+         7. PREGUNTAS FRECUENTES
+         Objetivo: resolver las 5 dudas que frenan la compra
+         (reemplaza al blog con PDFs vacíos)
+    ═══════════════════════════════════════ -->
+    <section class="faq-compact-section" id="blog">
         <div class="section-container">
-            <h2 class="section-title">Guías y Comparativas</h2>
-            <p class="section-subtitle">Aprende todo sobre importación de vehículos americanos.</p>
-            
-            <div class="articles-grid">
-                <article class="article-card">
-                    <img src="https://images.unsplash.com/photo-1493238792000-8113da705763?w=800&h=600&fit=crop" 
-                         alt="Importación" class="article-image">
-                    <div class="article-content">
-                        <span class="article-category">Guía de Importación</span>
-                        <h3 class="article-title">¿Por qué importar desde USA vs. comprar local?</h3>
-                        <p class="article-excerpt">Descubre las ventajas reales de importar tu vehículo desde Estados Unidos.</p>
-                        <a href="#" class="article-link">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </a>
+
+            <div style="text-align:center;">
+                <h2 class="section-title">Preguntas Frecuentes</h2>
+                <p class="section-subtitle">Las dudas más comunes, respondidas directo</p>
+            </div>
+
+            <div class="faq-compact-grid">
+
+                <div class="faq-compact-item" onclick="toggleFaqCompact(this)">
+                    <div class="faq-compact-q">
+                        ¿Cuánto demora el proceso completo?
+                        <i class="fas fa-chevron-down"></i>
                     </div>
-                </article>
-                
-                <article class="article-card">
-                    <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=600&fit=crop" 
-                         alt="Legalización" class="article-image">
-                    <div class="article-content">
-                        <span class="article-category">Proceso Legal</span>
-                        <h3 class="article-title">Guía completa de legalización en Chile</h3>
-                        <p class="article-excerpt">Todo sobre el proceso de legalización. Documentación, costos y tiempos.</p>
-                        <a href="#" class="article-link">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </a>
+                    <div class="faq-compact-a">
+                        Entre 45 y 60 días desde que el vehículo arriba a Chile hasta que lo tienes en mano en Arica. Vehículos en stock se entregan antes.
                     </div>
-                </article>
-                
-                <article class="article-card">
-                    <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&h=600&fit=crop" 
-                         alt="Comparativa" class="article-image">
-                    <div class="article-content">
-                        <span class="article-category">Comparativa</span>
-                        <h3 class="article-title">Silverado vs. RAM vs. F-150: ¿Cuál elegir?</h3>
-                        <p class="article-excerpt">Análisis detallado de las tres pickups americanas más populares.</p>
-                        <a href="#" class="article-link">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </a>
+                </div>
+
+                <div class="faq-compact-item" onclick="toggleFaqCompact(this)">
+                    <div class="faq-compact-q">
+                        ¿El precio incluye todo?
+                        <i class="fas fa-chevron-down"></i>
                     </div>
-                </article>
+                    <div class="faq-compact-a">
+                        El precio publicado es el valor del vehículo en zona franca (Arica, Iquique, Magallanes). La liberación fuera de zona franca tiene un costo adicional que cotizamos de forma transparente.
+                    </div>
+                </div>
+
+                <div class="faq-compact-item" onclick="toggleFaqCompact(this)">
+                    <div class="faq-compact-q">
+                        ¿Tienen financiamiento?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-compact-a">
+                        Sí. Trabajamos con financiamiento directo. Se gestiona tras confirmar la reserva. El pie mínimo habitual es 20–30% del valor total.
+                    </div>
+                </div>
+
+                <div class="faq-compact-item" onclick="toggleFaqCompact(this)">
+                    <div class="faq-compact-q">
+                        ¿Aceptan vehículo en parte de pago?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-compact-a">
+                        Sí. Evaluamos tu vehículo actual y lo consideramos como parte del pago inicial.
+                    </div>
+                </div>
+
+                <div class="faq-compact-item" onclick="toggleFaqCompact(this)">
+                    <div class="faq-compact-q">
+                        ¿Qué garantía tiene el vehículo?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-compact-a">
+                        Garantía mecánica de 3 meses o 5.000 km en motor y transmisión. Todos los vehículos pasan revisión técnica completa antes de la entrega.
+                    </div>
+                </div>
+
+                <div class="faq-compact-item" onclick="toggleFaqCompact(this)">
+                    <div class="faq-compact-q">
+                        ¿Ustedes hacen todos los trámites?
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="faq-compact-a">
+                        Sí. Compra en USA, transporte, trámites aduaneros, liberación y entrega. Tú solo eliges y recibes.
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+
+    <!-- ═══════════════════════════════════════
+         8. CTA FINAL
+         Objetivo: último empuje antes del footer
+    ═══════════════════════════════════════ -->
+    <section class="final-cta-section">
+        <h2>¿Listo para tu Camioneta Americana?</h2>
+        <p>Escríbenos hoy y te asesoramos sin compromiso. Respondemos en minutos.</p>
+        <a href="https://wa.me/56938654827?text=Hola,%20quiero%20asesor%C3%ADa%20para%20importar%20un%20veh%C3%ADculo%20desde%20USA"
+           target="_blank"
+           class="final-cta-btn"
+           onclick="trackEvent('click','Final CTA','WhatsApp')">
+            <i class="fab fa-whatsapp" style="font-size:20px;"></i>
+            Quiero mi vehículo
+        </a>
+        <div class="final-cta-reassure">Sin compromiso · Respondemos en minutos · +56 9 3865 4827</div>
+    </section>
+
+
+    <!-- ═══════════════════════════════════════
+         FOOTER
+    ═══════════════════════════════════════ -->
     <footer class="footer" id="contact">
         <div class="footer-container">
-            <div style="background: linear-gradient(135deg, var(--import-red) 0%, #8b0707 100%); padding: 24px; border-radius: 16px; margin-bottom: 32px; text-align: center;">
-                <div style="font-size: 32px; margin-bottom: 8px;">
-                    <i class="fas fa-magic" style="color: white;"></i>
-                </div>
-                <div style="font-size: 18px; font-weight: 700; color: white; margin-bottom: 8px;">
-                    Tu Camioneta, Tu Estilo
-                </div>
-                <div style="font-size: 14px; color: rgba(255,255,255,0.9); max-width: 400px; margin: 0 auto;">
-                    Cada vehículo puede personalizarse profesionalmente antes de entregarte
-                </div>
-            </div>
-            
             <div class="logo"><span class="import-text">Import</span> American Cars</div>
             <p class="footer-text">Vehículos importados desde USA con personalización profesional. Arica, Chile.</p>
             <a href="#" class="button" id="whatsappBtn">
@@ -415,6 +754,11 @@
             </div>
         </div>
     </footer>
+
+
+    <!-- ═══════════════════════════════════════
+         MODALES (sin cambios)
+    ═══════════════════════════════════════ -->
 
     <!-- Modal: Detalles del Vehículo -->
     <div class="modal" id="vehicleDetailsModal">
@@ -438,11 +782,9 @@
     <div class="gallery-modal" id="galleryModal">
         <button class="gallery-close" onclick="closeGallery()">×</button>
         <div class="gallery-counter" id="galleryCounter">1 / 1</div>
-        
         <button class="gallery-nav prev" onclick="changeSlide(-1)">‹</button>
         <div class="gallery-slides" id="gallerySlides"></div>
         <button class="gallery-nav next" onclick="changeSlide(1)">›</button>
-        
         <div class="gallery-dots" id="galleryDots"></div>
     </div>
 
@@ -455,7 +797,10 @@
         </div>
     </div>
 
-    <!-- Scripts -->
+
+    <!-- ═══════════════════════════════════════
+         SCRIPTS
+    ═══════════════════════════════════════ -->
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="js/filters.js"></script>
@@ -466,21 +811,35 @@
     <script src="js/consultation.js"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        // ── Inicializar app ──────────────────────────────
+        document.addEventListener('DOMContentLoaded', async function () {
             try {
-                console.log('🚀 Iniciando aplicación...');
+                console.log('🚀 Iniciando...');
                 await initializeApp();
                 await loadVehicles();
                 animateCounter();
                 setupEventListeners();
-                // Testimonios: carga desde Supabase si existe tabla 'deliveries',
-                // si no, los estáticos del HTML quedan visibles
                 await testimonialsSystem.init();
-                console.log('✅ Aplicación lista');
+                console.log('✅ Listo');
             } catch (error) {
                 console.error('❌ Error al iniciar:', error);
             }
         });
+
+        // ── FAQ compacto ─────────────────────────────────
+        function toggleFaqCompact(el) {
+            const isOpen = el.classList.contains('open');
+            // Cerrar todos
+            document.querySelectorAll('.faq-compact-item.open').forEach(item => {
+                item.classList.remove('open');
+            });
+            // Abrir el clickeado si estaba cerrado
+            if (!isOpen) {
+                el.classList.add('open');
+                trackEvent('open', 'FAQ Compact', el.querySelector('.faq-compact-q').textContent.trim().substring(0, 40));
+            }
+        }
     </script>
+
 </body>
 </html>
