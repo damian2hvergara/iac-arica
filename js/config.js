@@ -26,7 +26,7 @@ const CLOUDINARY_CONFIG = {
 // CONTACTO
 // ====================================
 const CONTACT_CONFIG = {
-    whatsapp: '56938654827',
+    whatsapp: '56981458545',
     email: 'contacto@importamericancars.cl',
     instagram: 'importamericancars'
 };
