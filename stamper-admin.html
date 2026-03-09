@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Sorteo — IAC Arica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --red:#9B0000;--red-deep:#6B0000;
+  --bg:#0C0C0C;--surface:#161616;--surface-2:#202020;--surface-3:#2A2A2A;
+  --border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);
+  --text:#F2F2F2;--muted:#6E6E6E;--muted-2:#3E3E3E;
+  --green:#00C566;--blue:#3B82F6;--orange:#F59E0B;--gold:#C9A84C;
+  --white:#FFF;--font-h:'Barlow Condensed',sans-serif;--font-b:'DM Sans',sans-serif;
+  --r-sm:10px;--r-md:16px;--r-lg:22px;--r-full:999px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+img{display:block;max-width:100%;}
+
+/* LOGIN */
+.login-wrap{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);z-index:999;
+}
+.login-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:40px 28px;width:90%;max-width:380px;text-align:center;
+}
+.login-title{font-family:var(--font-h);font-size:28px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.login-title span{color:var(--red);}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+.login-input{
+  width:100%;padding:13px 14px;background:var(--surface-2);
+  border:1px solid var(--border-hi);border-radius:var(--r-sm);
+  color:var(--text);font-family:var(--font-b);font-size:14px;
+  margin-bottom:10px;-webkit-appearance:none;
+}
+.login-input::placeholder{color:var(--muted-2);}
+.login-input:focus{outline:none;border-color:var(--red);}
+.login-btn{
+  width:100%;padding:14px;background:var(--red);color:white;
+  font-size:15px;font-weight:700;border-radius:var(--r-md);margin-top:6px;
+  transition:background 0.2s;
+}
+.login-btn:hover{background:var(--red-deep);}
+.login-error{font-size:12px;color:#ff5555;margin-top:8px;}
+
+/* HEADER */
+.adm-header{
+  position:fixed;top:0;left:0;right:0;height:52px;z-index:800;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;background:rgba(12,12,12,0.95);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
+}
+.adm-logo{font-family:var(--font-h);font-size:17px;color:var(--white);}
+.adm-logo span{color:var(--red);}
+.adm-user-row{display:flex;align-items:center;gap:10px;}
+.adm-email{font-size:12px;color:var(--muted);}
+.adm-logout{
+  padding:7px 14px;background:var(--surface-2);color:var(--text);
+  border-radius:var(--r-full);font-size:12px;font-weight:500;
+  border:1px solid var(--border-hi);transition:background 0.2s;
+}
+.adm-logout:hover{background:var(--surface-3);}
+
+/* MAIN */
+.adm-main{margin-top:52px;padding:28px 20px 60px;max-width:860px;margin-left:auto;margin-right:auto;}
+
+/* TABS */
+.adm-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.adm-tab{
+  padding:10px 18px;font-size:14px;font-weight:500;color:var(--muted);
+  border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;white-space:nowrap;
+}
+.adm-tab:hover{color:var(--text);}
+.adm-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;animation:fadeIn 0.25s ease;}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* CARDS */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:20px;margin-bottom:16px;
+}
+.card-title{
+  font-family:var(--font-h);font-size:20px;font-weight:700;
+  color:var(--white);margin-bottom:16px;display:flex;align-items:center;gap:8px;
+}
+.card-title i{color:var(--red);font-size:16px;}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+.form-input,.form-select,.form-textarea{
+  width:100%;padding:11px 13px;background:var(--surface-2);
+  border:1px solid var(--border-hi);border-radius:var(--r-sm);
+  color:var(--text);font-family:var(--font-b);font-size:14px;
+  transition:border-color 0.2s;-webkit-appearance:none;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  outline:none;border-color:var(--red);background:rgba(155,0,0,0.04);
+}
+.form-input::placeholder{color:var(--muted-2);}
+.form-select option{background:var(--surface-2);color:var(--text);}
+.form-textarea{resize:vertical;min-height:80px;}
+
+/* Selector de vehículo */
+.vehicle-selector{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;
+}
+.vehicle-option{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-md);overflow:hidden;cursor:pointer;
+  transition:border-color 0.2s;
+}
+.vehicle-option.selected{border-color:var(--red);background:rgba(155,0,0,0.08);}
+.vehicle-option-img{aspect-ratio:16/9;overflow:hidden;background:var(--surface-3);}
+.vehicle-option-img img{width:100%;height:100%;object-fit:cover;}
+.vehicle-option-body{padding:10px;}
+.vehicle-option-name{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px;}
+.vehicle-option-price{font-size:12px;color:var(--gold);}
+.vehicle-option-radio{
+  width:18px;height:18px;border-radius:50%;
+  border:2px solid var(--muted-2);margin-left:auto;margin-top:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.vehicle-option.selected .vehicle-option-radio{border-color:var(--red);background:var(--red);}
+.vehicle-option-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:white;opacity:0;}
+.vehicle-option.selected .vehicle-option-radio::after{opacity:1;}
+.vehicle-option-footer{display:flex;align-items:center;justify-content:space-between;padding:0 10px 10px;}
+
+/* BOTONES */
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 22px;background:var(--red);color:white;
+  font-size:14px;font-weight:700;border-radius:var(--r-md);
+  transition:background 0.2s;
+}
+.btn-primary:hover{background:var(--red-deep);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-danger{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;background:rgba(255,50,50,0.15);color:#ff6060;
+  font-size:13px;font-weight:600;border-radius:var(--r-md);
+  border:1px solid rgba(255,50,50,0.25);transition:background 0.2s;
+}
+.btn-danger:hover{background:rgba(255,50,50,0.25);}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;background:var(--surface-2);color:var(--text);
+  font-size:13px;font-weight:500;border-radius:var(--r-md);
+  border:1px solid var(--border-hi);transition:background 0.2s;
+}
+.btn-ghost:hover{background:var(--surface-3);}
+
+/* SORTEO ACTIVO PREVIEW */
+.sorteo-active{
+  background:linear-gradient(135deg,rgba(155,0,0,0.2),rgba(107,0,0,0.1));
+  border:1px solid rgba(155,0,0,0.4);border-radius:var(--r-lg);
+  padding:20px;margin-bottom:20px;
+}
+.sorteo-active-label{font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.sorteo-active-name{font-family:var(--font-h);font-size:24px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.sorteo-active-date{font-size:13px;color:var(--muted);}
+.sorteo-active-date strong{color:var(--orange);}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px;
+}
+.stat-val{font-family:var(--font-h);font-size:28px;font-weight:800;color:var(--white);line-height:1;}
+.stat-label{font-size:11px;color:var(--muted);margin-top:4px;}
+
+/* TABLA PARTICIPANTES */
+.part-table{width:100%;border-collapse:collapse;}
+.part-table th{
+  text-align:left;font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:0.6px;
+  padding:8px 12px;border-bottom:1px solid var(--border);
+}
+.part-table td{
+  padding:10px 12px;border-bottom:1px solid var(--border);
+  font-size:13px;color:var(--text);
+  vertical-align:middle;
+}
+.part-table tr:hover td{background:rgba(255,255,255,0.02);}
+.folio-cell{font-family:monospace;color:var(--gold);font-weight:700;}
+.pack-badge{
+  display:inline-block;padding:3px 9px;border-radius:var(--r-full);
+  font-size:11px;font-weight:600;
+}
+.pack-inicio{background:rgba(110,110,110,0.2);color:var(--muted);}
+.pack-popular{background:rgba(201,168,76,0.15);color:var(--gold);}
+.pack-coleccionista{background:rgba(59,130,246,0.15);color:#60A5FA;}
+
+/* SPINNER */
+.spin{width:28px;height:28px;border:3px solid var(--surface-3);border-top-color:var(--red);border-radius:50%;animation:spin 0.7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{display:flex;align-items:center;gap:10px;color:var(--muted);padding:20px 0;}
+
+/* NOTIF */
+.notif{
+  position:fixed;bottom:20px;right:20px;
+  background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);
+  padding:12px 18px;border-radius:var(--r-md);font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:8px;z-index:9999;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);animation:notifIn 0.3s ease;
+}
+@keyframes notifIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.notif-success i{color:var(--green);}
+.notif-error   i{color:#ff5555;}
+
+/* EXPORT BTN */
+.export-row{display:flex;justify-content:flex-end;margin-bottom:12px;}
+
+@media(max-width:500px){
+  .form-row{grid-template-columns:1fr;}
+  .vehicle-selector{grid-template-columns:1fr;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-title"><span>Import</span> American Cars</div>
+    <div class="login-sub">Admin Sorteo</div>
+    <input class="login-input" type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email">
+    <input class="login-input" type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- APP (oculto hasta login) -->
+<div id="appWrap" style="display:none">
+
+  <!-- HEADER -->
+  <header class="adm-header">
+    <div class="adm-logo"><span>Import</span> American Cars — Sorteo Admin</div>
+    <div class="adm-user-row">
+      <span class="adm-email" id="adminEmail"></span>
+      <button class="adm-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="adm-main">
+
+    <!-- TABS -->
+    <div class="adm-tabs">
+      <button class="adm-tab active" onclick="switchTab('sorteo')"><i class="fas fa-cog"></i> Configurar Sorteo</button>
+      <button class="adm-tab" onclick="switchTab('participantes')"><i class="fas fa-list"></i> Participantes</button>
+      <button class="adm-tab" onclick="switchTab('resumen')"><i class="fas fa-chart-bar"></i> Resumen</button>
+    </div>
+
+    <!-- TAB: CONFIGURAR SORTEO -->
+    <div class="tab-pane active" id="tab-sorteo">
+
+      <!-- Sorteo activo actual -->
+      <div id="sorteoActivoPreview"></div>
+
+      <div class="card">
+        <div class="card-title"><i class="fas fa-trophy"></i> Configurar Nuevo Sorteo</div>
+
+        <div class="form-group">
+          <label class="form-label">Nombre del sorteo</label>
+          <input class="form-input" type="text" id="sorteoNombre" placeholder="Ej: Sorteo Ford Mustang — IAC Arica 2025">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Fecha y hora del sorteo</label>
+            <input class="form-input" type="datetime-local" id="sorteoFecha">
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL Bases del sorteo (PDF)</label>
+            <input class="form-input" type="url" id="sorteoBasesUrl" placeholder="https://iac-arica.cl/bases-sorteo.pdf">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Descripción pública</label>
+          <textarea class="form-textarea" id="sorteoDesc" placeholder="Descripción visible en la página..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Vehículo Premio — Selecciona uno en stock</label>
+          <div class="loading-row" id="vehicleLoadingRow"><div class="spin"></div>Cargando vehículos en stock...</div>
+          <div class="vehicle-selector" id="vehicleSelector" style="display:none"></div>
+          <div id="vehicleError" style="display:none;font-size:13px;color:var(--muted);padding:12px 0;">No hay vehículos en stock disponibles.</div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn-primary" id="saveSorteoBtn" onclick="saveSorteo()">
+            <i class="fas fa-check"></i> Guardar y Activar Sorteo
+          </button>
+          <a href="stamper.html" target="_blank" class="btn-ghost">
+            <i class="fas fa-external-link-alt"></i> Ver página pública
+          </a>
+        </div>
+      </div>
+
+      <!-- Desactivar sorteo -->
+      <div class="card" id="deactivateCard" style="display:none">
+        <div class="card-title" style="font-size:17px;"><i class="fas fa-pause-circle"></i> Desactivar sorteo actual</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Desactiva el sorteo actual. La página stamper.html dejará de mostrar contenido hasta que configures uno nuevo.</p>
+        <button class="btn-danger" onclick="deactivateSorteo()"><i class="fas fa-times-circle"></i> Desactivar sorteo activo</button>
+      </div>
+    </div>
+
+    <!-- TAB: PARTICIPANTES -->
+    <div class="tab-pane" id="tab-participantes">
+      <div class="card">
+        <div class="card-title"><i class="fas fa-users"></i> Lista de Participantes</div>
+        <div class="export-row">
+          <button class="btn-ghost" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+        </div>
+        <div id="participantesContainer">
+          <div class="loading-row"><div class="spin"></div>Cargando participantes...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: RESUMEN -->
+    <div class="tab-pane" id="tab-resumen">
+      <div id="resumenContainer">
+        <div class="loading-row"><div class="spin"></div>Cargando datos...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ============================================
+   SUPABASE
+   ============================================ */
+const SB_URL  = 'https://cflpmluvhfldewiitymh.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmbHBtbHV2aGZsZGV3aWl0eW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTM0NzcsImV4cCI6MjA4MDk4OTQ3N30.of3ic6N1Y3U5dtSmzKzkTdvfvRnqYjqFI2fglmibaiM';
+const sb = supabase.createClient(SB_URL, SB_ANON);
+
+let currentUser   = null;
+let selectedVehicleId = null;
+let currentSorteo = null;
+let allParts      = [];
+
+/* ============================================
+   AUTH
+   ============================================ */
+sb.auth.onAuthStateChange((event, session) => {
+  if (session?.user) {
+    currentUser = session.user;
+    document.getElementById('loginWrap').style.display  = 'none';
+    document.getElementById('appWrap').style.display    = 'block';
+    document.getElementById('adminEmail').textContent   = session.user.email;
+    initApp();
+  } else {
+    document.getElementById('loginWrap').style.display  = 'flex';
+    document.getElementById('appWrap').style.display    = 'none';
+  }
+});
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  document.getElementById('loginError').textContent = '';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) document.getElementById('loginError').textContent = 'Credenciales incorrectas.';
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+}
+
+/* ============================================
+   INIT
+   ============================================ */
+async function initApp() {
+  await Promise.all([
+    loadCurrentSorteo(),
+    loadStockVehicles()
+  ]);
+}
+
+/* ============================================
+   TABS
+   ============================================ */
+function switchTab(name) {
+  document.querySelectorAll('.adm-tab').forEach((t,i)=>{
+    const names = ['sorteo','participantes','resumen'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  if (name === 'participantes') loadParticipantes();
+  if (name === 'resumen') loadResumen();
+}
+
+/* ============================================
+   SORTEO ACTIVO
+   ============================================ */
+async function loadCurrentSorteo() {
+  try {
+    const { data } = await sb.from('sorteo_config').select('*,vehicles(name,price,vehicle_images(image_url,is_main))').eq('activo',true).single();
+    currentSorteo = data;
+    renderSorteoActivo(data);
+  } catch(e) {
+    renderSorteoActivo(null);
+  }
+}
+
+function renderSorteoActivo(sorteo) {
+  const preview = document.getElementById('sorteoActivoPreview');
+  const deact   = document.getElementById('deactivateCard');
+  if (!sorteo) {
+    preview.innerHTML = `
+      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:16px;padding:16px;margin-bottom:16px;font-size:13px;color:var(--orange);">
+        <i class="fas fa-exclamation-triangle"></i> No hay sorteo activo. Configura uno para que la página stamper.html funcione.
+      </div>`;
+    deact.style.display = 'none';
+    return;
+  }
+  const mainImg = sorteo.vehicles?.vehicle_images?.find(i=>i.is_main)?.image_url
+                || sorteo.vehicles?.vehicle_images?.[0]?.image_url || '';
+  const fecha   = new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  preview.innerHTML = `
+    <div class="sorteo-activo" style="display:flex;gap:14px;align-items:flex-start;">
+      ${mainImg?`<img src="${mainImg}" alt="premio" style="width:80px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;">`:''}
+      <div>
+        <div class="sorteo-active-label">✅ Sorteo activo</div>
+        <div class="sorteo-active-name">${sorteo.nombre_sorteo}</div>
+        <div class="sorteo-active-date">Vehículo: <strong>${sorteo.vehicles?.name||'—'}</strong></div>
+        <div class="sorteo-active-date">Sorteo: <strong>${fecha}</strong></div>
+      </div>
+    </div>`;
+  deact.style.display = 'block';
+}
+
+/* ============================================
+   CARGAR VEHÍCULOS EN STOCK
+   ============================================ */
+async function loadStockVehicles() {
+  try {
+    const { data, error } = await sb.from('vehicles')
+      .select('id,name,price,vehicle_images(image_url,is_main,order_index)')
+      .eq('status','stock')
+      .order('created_at',{ascending:false});
+
+    document.getElementById('vehicleLoadingRow').style.display = 'none';
+
+    if (error || !data || data.length === 0) {
+      document.getElementById('vehicleError').style.display = 'block';
+      return;
+    }
+
+    const sel = document.getElementById('vehicleSelector');
+    sel.style.display = 'grid';
+    sel.innerHTML = data.map(v => {
+      const imgs = (v.vehicle_images||[]).sort((a,b)=>(a.order_index||0)-(b.order_index||0));
+      const mainImg = imgs.find(i=>i.is_main)?.image_url || imgs[0]?.image_url || '';
+      return `
+        <div class="vehicle-option" data-id="${v.id}" onclick="selectVehicle('${v.id}',this)">
+          <div class="vehicle-option-img">
+            ${mainImg?`<img src="${mainImg}" alt="${v.name}" loading="lazy">`:''}
+          </div>
+          <div class="vehicle-option-body">
+            <div class="vehicle-option-name">${v.name}</div>
+            <div class="vehicle-option-price">$${(v.price||0).toLocaleString('es-CL')} CLP</div>
+          </div>
+          <div class="vehicle-option-footer">
+            <span style="font-size:11px;color:var(--green);">● En Stock</span>
+            <div class="vehicle-option-radio"></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    // Si hay sorteo activo, preseleccionar su vehículo
+    if (currentSorteo?.vehicle_id) selectVehicle(currentSorteo.vehicle_id, null, true);
+
+  } catch(e) {
+    document.getElementById('vehicleLoadingRow').style.display = 'none';
+    document.getElementById('vehicleError').style.display = 'block';
+  }
+}
+
+function selectVehicle(id, el, silent=false) {
+  selectedVehicleId = id;
+  document.querySelectorAll('.vehicle-option').forEach(opt=>{
+    opt.classList.toggle('selected', opt.dataset.id === id);
+  });
+}
+
+/* ============================================
+   GUARDAR SORTEO
+   ============================================ */
+async function saveSorteo() {
+  const nombre = document.getElementById('sorteoNombre').value.trim();
+  const fecha  = document.getElementById('sorteoFecha').value;
+  const desc   = document.getElementById('sorteoDesc').value.trim();
+  const bases  = document.getElementById('sorteoBasesUrl').value.trim();
+
+  if (!nombre) { showNotif('Escribe el nombre del sorteo','error'); return; }
+  if (!fecha)  { showNotif('Selecciona la fecha del sorteo','error'); return; }
+  if (!selectedVehicleId) { showNotif('Selecciona el vehículo premio','error'); return; }
+
+  const btn = document.getElementById('saveSorteoBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+  try {
+    // Desactivar sorteos anteriores
+    await sb.from('sorteo_config').update({ activo:false }).eq('activo',true);
+
+    // Crear nuevo
+    const { error } = await sb.from('sorteo_config').insert({
+      nombre_sorteo: nombre,
+      fecha_sorteo:  new Date(fecha).toISOString(),
+      vehicle_id:    selectedVehicleId,
+      activo:        true,
+      descripcion:   desc || null,
+      bases_url:     bases || null
+    });
+
+    if (error) throw error;
+
+    showNotif('✅ Sorteo activado correctamente','success');
+    await loadCurrentSorteo();
+  } catch(e) {
+    showNotif('Error al guardar: '+e.message,'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-check"></i> Guardar y Activar Sorteo';
+  }
+}
+
+async function deactivateSorteo() {
+  if (!confirm('¿Desactivar el sorteo actual? La página stamper.html dejará de funcionar.')) return;
+  await sb.from('sorteo_config').update({ activo:false }).eq('activo',true);
+  showNotif('Sorteo desactivado','success');
+  loadCurrentSorteo();
+}
+
+/* ============================================
+   PARTICIPANTES
+   ============================================ */
+async function loadParticipantes() {
+  document.getElementById('participantesContainer').innerHTML =
+    '<div class="loading-row"><div class="spin"></div>Cargando...</div>';
+  try {
+    const { data } = await sb.from('estampillas')
+      .select('*').eq('estado','completado')
+      .order('created_at',{ascending:false});
+    allParts = data || [];
+    renderParticipantes(allParts);
+  } catch(e) {
+    document.getElementById('participantesContainer').innerHTML =
+      '<p style="color:var(--muted);font-size:13px;padding:16px 0;">Error al cargar participantes.</p>';
+  }
+}
+
+function renderParticipantes(rows) {
+  if (!rows.length) {
+    document.getElementById('participantesContainer').innerHTML =
+      '<p style="color:var(--muted);font-size:13px;padding:16px 0;">Aún no hay participantes registrados.</p>';
+    return;
+  }
+  document.getElementById('participantesContainer').innerHTML = `
+    <div style="overflow-x:auto;">
+      <table class="part-table">
+        <thead>
+          <tr>
+            <th>Folio</th><th>Nombre</th><th>Email</th>
+            <th>Pack</th><th>Monto</th><th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r=>`
+            <tr>
+              <td class="folio-cell">${r.numero_folio}</td>
+              <td>${r.nombre}</td>
+              <td style="color:var(--muted)">${r.email}</td>
+              <td><span class="pack-badge pack-${r.pack}">${r.pack}</span></td>
+              <td>$${(r.monto_pack||0).toLocaleString('es-CL')}</td>
+              <td style="color:var(--muted)">${new Date(r.created_at).toLocaleDateString('es-CL')}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+/* ============================================
+   RESUMEN
+   ============================================ */
+async function loadResumen() {
+  document.getElementById('resumenContainer').innerHTML =
+    '<div class="loading-row"><div class="spin"></div>Cargando...</div>';
+  try {
+    const { data: ests } = await sb.from('estampillas').select('*').eq('estado','completado');
+    const rows = ests || [];
+    const total      = rows.length;
+    const unicos     = new Set(rows.map(r=>r.email)).size;
+    // Recaudación: sumar por email+pack (1 pack = N estampillas, contar 1 vez)
+    const recMap = {};
+    rows.forEach(r=>{
+      const key = `${r.email}-${r.created_at?.slice(0,19)}`;
+      if (!recMap[key]) recMap[key] = r.monto_pack;
+    });
+    const recaudacion = Object.values(recMap).reduce((s,v)=>s+v,0);
+    const packs = { inicio:0, popular:0, coleccionista:0 };
+    rows.filter(r=>r.orden_en_pack===1).forEach(r=>{ if(packs[r.pack]!==undefined) packs[r.pack]++; });
+
+    document.getElementById('resumenContainer').innerHTML = `
+      <div class="card">
+        <div class="card-title"><i class="fas fa-chart-bar"></i> Resumen del Sorteo</div>
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-val">${total.toLocaleString('es-CL')}</div>
+            <div class="stat-label">Estampillas vendidas</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">${unicos.toLocaleString('es-CL')}</div>
+            <div class="stat-label">Compradores únicos</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">$${Math.round(recaudacion/1000).toLocaleString('es-CL')}K</div>
+            <div class="stat-label">Recaudación total</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">${unicos>0?Math.round(recaudacion/unicos/1000).toLocaleString('es-CL')+'K':'—'}</div>
+            <div class="stat-label">Ticket promedio</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
+          <div style="flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;text-align:center;">
+            <div style="font-size:20px;font-weight:700;color:var(--white)">${packs.inicio}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Pack Inicio</div>
+          </div>
+          <div style="flex:1;background:var(--surface-2);border:1px solid rgba(201,168,76,0.3);border-radius:var(--r-md);padding:12px;text-align:center;">
+            <div style="font-size:20px;font-weight:700;color:var(--gold)">${packs.popular}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Pack Popular</div>
+          </div>
+          <div style="flex:1;background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--r-md);padding:12px;text-align:center;">
+            <div style="font-size:20px;font-weight:700;color:#60A5FA">${packs.coleccionista}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Pack Coleccionista</div>
+          </div>
+        </div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('resumenContainer').innerHTML =
+      '<p style="color:var(--muted);padding:16px">Error al cargar.</p>';
+  }
+}
+
+/* ============================================
+   EXPORTAR CSV
+   ============================================ */
+function exportCSV() {
+  if (!allParts.length) { showNotif('Sin datos para exportar','error'); return; }
+  const headers = ['Folio','Nombre','Email','Teléfono','Pack','Monto','Orden','Hash Seguridad','Fecha'];
+  const rows = allParts.map(r=>[
+    r.numero_folio, r.nombre, r.email, r.telefono||'',
+    r.pack, r.monto_pack, r.orden_en_pack+'/'+r.total_en_pack,
+    r.hash_seguridad, r.created_at
+  ]);
+  const csv = [headers, ...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`estampillas-sorteo-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================
+   NOTIF
+   ============================================ */
+function showNotif(msg, type='info') {
+  const n=document.createElement('div');
+  n.className=`notif notif-${type}`;
+  n.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i>${msg}`;
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(),3500);
+}
+</script>
+</body>
+</html>

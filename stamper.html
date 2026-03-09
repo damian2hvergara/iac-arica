@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="Estampillas Digitales Coleccionables — IAC Arica. Participa en el sorteo del vehículo.">
+<title>Estampillas Digitales — IAC Arica</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- QR Code generator -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-83095XZ965"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date()); gtag('config','G-83095XZ965');
+</script>
+
+<style>
+:root {
+  --red:#9B0000; --red-deep:#6B0000; --red-glow:rgba(155,0,0,0.22);
+  --bg:#0C0C0C; --surface:#161616; --surface-2:#202020; --surface-3:#2A2A2A;
+  --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
+  --text:#F2F2F2; --muted:#6E6E6E; --muted-2:#3E3E3E;
+  --green:#00C566; --blue:#3B82F6; --orange:#F59E0B;
+  --gold:#C9A84C; --gold-light:#F0D080; --white:#FFFFFF;
+  --font-h:'Barlow Condensed',sans-serif;
+  --font-b:'DM Sans',sans-serif;
+  --r-sm:10px; --r-md:16px; --r-lg:22px; --r-full:999px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:15px;line-height:1.55;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+
+/* TOPBAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;
+  background:rgba(12,12,12,0.9);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.topbar-logo{font-family:var(--font-h);font-size:17px;letter-spacing:0.5px;color:var(--white);}
+.topbar-logo span{color:var(--red);}
+.topbar-back{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 14px;background:var(--surface-2);
+  color:var(--text);border-radius:var(--r-full);
+  font-size:13px;font-weight:500;border:1px solid var(--border-hi);
+}
+
+/* HERO */
+.hero{
+  position:relative;margin-top:52px;
+  padding:48px 20px 36px;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(155,0,0,0.15) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);
+  color:var(--gold-light);font-size:11px;font-weight:700;letter-spacing:1.2px;
+  text-transform:uppercase;padding:5px 12px;border-radius:var(--r-full);margin-bottom:14px;
+}
+.hero-title{
+  font-family:var(--font-h);
+  font-size:clamp(34px,9vw,52px);font-weight:800;line-height:1;letter-spacing:-0.5px;
+  color:var(--white);margin-bottom:10px;position:relative;z-index:1;
+}
+.hero-title em{color:var(--red);font-style:normal;}
+.hero-sub{font-size:14px;color:var(--muted);margin-bottom:28px;max-width:360px;line-height:1.65;position:relative;z-index:1;}
+
+/* COUNTDOWN */
+.countdown-wrap{
+  position:relative;z-index:1;
+  background:var(--surface-2);border:1px solid var(--border-hi);
+  border-radius:var(--r-lg);padding:20px;margin-bottom:0;
+}
+.countdown-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.countdown-grid{display:flex;gap:8px;justify-content:flex-start;}
+.cd-unit{
+  flex:1;background:var(--surface-3);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:12px 6px;text-align:center;
+  max-width:80px;
+}
+.cd-num{
+  font-family:var(--font-h);font-size:32px;font-weight:800;
+  color:var(--white);line-height:1;display:block;
+}
+.cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px;}
+.countdown-date{font-size:12px;color:var(--muted);margin-top:10px;}
+.countdown-date strong{color:var(--gold-light);}
+
+/* PREMIO */
+.premio-section{padding:36px 20px;border-bottom:1px solid var(--border);}
+.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+.section-title{font-family:var(--font-h);font-size:clamp(26px,7vw,36px);font-weight:800;color:var(--white);margin-bottom:6px;}
+.section-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+
+.premio-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);overflow:hidden;
+}
+.premio-img-wrap{
+  position:relative;aspect-ratio:16/9;background:var(--surface-2);overflow:hidden;
+}
+.premio-img{width:100%;height:100%;object-fit:cover;}
+.premio-img-skeleton{
+  width:100%;height:100%;
+  background:linear-gradient(90deg,var(--surface-2) 0%,var(--surface-3) 50%,var(--surface-2) 100%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.premio-badge-sorteo{
+  position:absolute;top:12px;left:12px;
+  background:var(--red);color:white;
+  font-size:11px;font-weight:700;padding:5px 12px;border-radius:var(--r-full);
+  letter-spacing:0.5px;
+}
+.premio-body{padding:16px;}
+.premio-name{font-family:var(--font-h);font-size:24px;font-weight:800;color:var(--white);margin-bottom:4px;}
+.premio-price{font-size:18px;font-weight:700;color:var(--gold-light);margin-bottom:12px;}
+.premio-specs{display:flex;gap:6px;flex-wrap:wrap;}
+.spec-tag{
+  display:flex;align-items:center;gap:5px;
+  background:var(--surface-2);border:1px solid var(--border);
+  padding:4px 10px;border-radius:var(--r-full);font-size:11px;color:var(--muted);
+}
+.spec-tag i{color:var(--red);font-size:10px;}
+
+/* Thumbnails del vehículo */
+.premio-thumbs{
+  display:flex;gap:6px;overflow-x:auto;padding:10px 16px;
+  border-top:1px solid var(--border);scrollbar-width:none;
+}
+.premio-thumbs::-webkit-scrollbar{display:none;}
+.premio-thumb{
+  flex-shrink:0;width:56px;height:40px;border-radius:6px;overflow:hidden;
+  border:2px solid transparent;cursor:pointer;transition:border-color 0.2s;
+}
+.premio-thumb.active{border-color:var(--gold);}
+.premio-thumb img{width:100%;height:100%;object-fit:cover;}
+
+/* VIDEO del vehículo */
+.premio-video-btn{
+  display:flex;align-items:center;gap:8px;
+  margin:12px 16px 16px;
+  padding:11px 14px;
+  background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);
+  border-radius:var(--r-md);font-size:13px;color:#60A5FA;font-weight:500;
+  cursor:pointer;transition:background 0.2s;
+}
+.premio-video-btn:active{background:rgba(59,130,246,0.2);}
+
+/* PACKS */
+.packs-section{padding:36px 20px;}
+.packs-grid{display:flex;flex-direction:column;gap:12px;}
+.pack-card{
+  position:relative;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:18px;cursor:pointer;
+  transition:border-color 0.2s,background 0.2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pack-card.selected{border-color:var(--red);background:rgba(155,0,0,0.08);}
+.pack-card.popular{border-color:rgba(201,168,76,0.3);}
+.pack-card.popular.selected{border-color:var(--gold);}
+.pack-popular-badge{
+  position:absolute;top:-1px;right:16px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:#1a0a00;font-size:10px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;
+  padding:4px 12px;border-radius:0 0 var(--r-sm) var(--r-sm);
+}
+.pack-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.pack-name{font-family:var(--font-h);font-size:22px;font-weight:700;color:var(--white);}
+.pack-radio{
+  width:22px;height:22px;border-radius:50%;border:2px solid var(--muted-2);
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;
+}
+.pack-card.selected .pack-radio{border-color:var(--red);background:var(--red);}
+.pack-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:white;opacity:0;transition:opacity 0.2s;}
+.pack-card.selected .pack-radio::after{opacity:1;}
+.pack-body{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
+.pack-stamps-display{display:flex;gap:4px;flex-wrap:wrap;}
+.mini-stamp{
+  width:36px;height:26px;background:linear-gradient(135deg,var(--surface-3),var(--surface-2));
+  border:1px dashed rgba(255,255,255,0.15);border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--gold);position:relative;overflow:hidden;
+}
+.mini-stamp::before{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,0.02) 3px,rgba(255,255,255,0.02) 4px);
+}
+.pack-price-block{text-align:right;}
+.pack-price{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--white);line-height:1;}
+.pack-unit{font-size:11px;color:var(--muted);margin-top:3px;}
+.pack-features{display:flex;gap:8px;flex-wrap:wrap;}
+.pack-feat{
+  display:flex;align-items:center;gap:5px;
+  background:var(--surface-2);border:1px solid var(--border);
+  padding:4px 10px;border-radius:var(--r-full);font-size:11px;color:var(--muted);
+}
+.pack-feat i{color:var(--red);font-size:10px;}
+.pack-card.popular .pack-feat i{color:var(--gold);}
+
+/* CHECKOUT */
+.checkout-section{padding:0 20px 48px;}
+.checkout-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;}
+.checkout-title{font-family:var(--font-h);font-size:20px;font-weight:700;color:var(--white);margin-bottom:16px;}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+.form-input{
+  width:100%;padding:13px 14px;
+  background:var(--surface-2);border:1px solid var(--border-hi);
+  border-radius:var(--r-sm);color:var(--text);font-family:var(--font-b);font-size:15px;
+  transition:border-color 0.2s;-webkit-appearance:none;
+}
+.form-input::placeholder{color:var(--muted-2);}
+.form-input:focus{outline:none;border-color:var(--red);background:rgba(155,0,0,0.05);}
+.form-input.error{border-color:#ff4444;}
+
+.order-summary{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:14px;margin-bottom:16px;
+}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;}
+.summary-row:not(:last-child){border-bottom:1px solid var(--border);}
+.summary-label{color:var(--muted);}
+.summary-val{color:var(--text);font-weight:500;}
+.summary-total .summary-label{font-weight:600;color:var(--text);}
+.summary-total .summary-val{font-family:var(--font-h);font-size:22px;font-weight:800;color:var(--white);}
+
+.sim-banner{
+  display:flex;align-items:flex-start;gap:10px;
+  background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);
+  border-radius:var(--r-sm);padding:12px;margin-bottom:16px;
+  font-size:12px;color:var(--orange);line-height:1.55;
+}
+.sim-banner i{margin-top:2px;flex-shrink:0;}
+
+.pay-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--red);color:white;font-size:16px;font-weight:700;
+  padding:17px;border-radius:var(--r-md);
+  transition:background 0.2s,transform 0.15s;-webkit-tap-highlight-color:transparent;
+}
+.pay-btn:active{background:var(--red-deep);transform:scale(0.98);}
+.pay-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.pay-note{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted);margin-top:10px;}
+.pay-note i{color:var(--green);}
+
+/* MODAL ÉXITO */
+.success-modal{display:none;position:fixed;inset:0;z-index:2000;overflow-y:auto;}
+.success-modal.active{display:block;}
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);}
+.success-sheet{
+  position:relative;z-index:1;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-lg);
+  margin:52px 12px 40px;padding:28px 20px;
+  animation:sheetUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes sheetUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.success-icon{
+  width:64px;height:64px;border-radius:50%;
+  background:rgba(0,197,102,0.15);border:2px solid rgba(0,197,102,0.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:var(--green);margin:0 auto 16px;
+}
+.success-title{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--white);margin-bottom:6px;text-align:center;}
+.success-sub{font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;line-height:1.6;}
+
+/* Estampillas generadas */
+.stamps-generated{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.stamp-item{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-md);overflow:hidden;
+}
+.stamp-item-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+}
+.stamp-folio{font-family:monospace;font-size:13px;font-weight:700;color:var(--gold-light);letter-spacing:1px;}
+.stamp-part{font-size:11px;color:var(--green);}
+.stamp-canvas-wrap{
+  padding:12px;display:flex;justify-content:center;
+  background:var(--surface-3);
+}
+.stamp-canvas-wrap canvas{border-radius:6px;max-width:100%;}
+.stamp-download-btn{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  width:100%;padding:11px;
+  background:var(--surface-3);color:var(--text);
+  font-size:13px;font-weight:600;cursor:pointer;
+  border:none;border-top:1px solid var(--border);
+  transition:background 0.2s;font-family:var(--font-b);
+}
+.stamp-download-btn:active{background:var(--surface-2);}
+.stamp-download-btn i{color:var(--gold);}
+
+.success-actions{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.success-btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;background:var(--red);color:white;
+  font-size:15px;font-weight:700;padding:15px;border-radius:var(--r-md);
+  transition:opacity 0.2s;font-family:var(--font-b);border:none;cursor:pointer;
+}
+.success-btn-ghost{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;background:var(--surface-2);color:var(--text);
+  font-size:14px;font-weight:500;padding:13px;border-radius:var(--r-md);
+  border:1px solid var(--border);transition:background 0.2s;
+  font-family:var(--font-b);cursor:pointer;
+}
+
+/* LOADING */
+.loading-state{display:flex;flex-direction:column;align-items:center;padding:40px 20px;gap:12px;color:var(--muted);font-size:13px;}
+.spin{width:32px;height:32px;border:3px solid var(--surface-3);border-top-color:var(--red);border-radius:50%;animation:spin 0.75s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* NOTIF */
+.notif{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);
+  padding:12px 20px;border-radius:var(--r-full);font-size:14px;font-weight:500;
+  display:flex;align-items:center;gap:8px;z-index:9999;
+  white-space:nowrap;animation:notifIn 0.3s ease;box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+@keyframes notifIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* FOOTER */
+.footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 20px;text-align:center;}
+.footer-logo{font-family:var(--font-h);font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px;}
+.footer-logo span{color:var(--red);}
+.footer-info{font-size:11px;color:var(--muted);line-height:1.8;}
+
+@media(min-width:600px){.packs-grid{display:grid;grid-template-columns:repeat(3,1fr);}}
+@media(min-width:768px){
+  .hero,.premio-section,.packs-section,.checkout-section{padding-left:40px;padding-right:40px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-logo"><span>Import</span> American Cars</div>
+  <a class="topbar-back" href="index.html"><i class="fas fa-arrow-left"></i> Volver</a>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div style="position:relative;z-index:1">
+    <div class="hero-badge"><i class="fas fa-star"></i> Sorteo Oficial — Colección Chile Norte</div>
+    <h1 class="hero-title">Estampillas<br><em>Digitales</em><br>Coleccionables</h1>
+    <p class="hero-sub">Cada estampilla tiene número de folio único e irrepetible. Participa automáticamente en el sorteo del vehículo.</p>
+    <div class="countdown-wrap">
+      <div class="countdown-label">⏱ Tiempo restante para el sorteo</div>
+      <div class="countdown-grid">
+        <div class="cd-unit"><span class="cd-num" id="cdDias">--</span><div class="cd-label">Días</div></div>
+        <div class="cd-unit"><span class="cd-num" id="cdHoras">--</span><div class="cd-label">Horas</div></div>
+        <div class="cd-unit"><span class="cd-num" id="cdMin">--</span><div class="cd-label">Min</div></div>
+        <div class="cd-unit"><span class="cd-num" id="cdSeg">--</span><div class="cd-label">Seg</div></div>
+      </div>
+      <div class="countdown-date">Sorteo: <strong id="sorteoFechaTexto">cargando...</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIO -->
+<section class="premio-section" id="premioSection">
+  <div class="section-label">Premio del sorteo</div>
+  <h2 class="section-title">El Vehículo</h2>
+  <p class="section-sub">Vehículo real en stock. El ganador se lo lleva.</p>
+  <div id="premioContainer">
+    <div class="loading-state"><div class="spin"></div>Cargando vehículo...</div>
+  </div>
+</section>
+
+<!-- PACKS -->
+<section class="packs-section" id="packs">
+  <div class="section-label">Colección Chile Norte</div>
+  <h2 class="section-title">Elige tu Pack</h2>
+  <p class="section-sub">Cada estampilla = 1 participación en el sorteo.</p>
+  <div class="packs-grid">
+
+    <div class="pack-card" data-pack="inicio" data-price="9990" data-stamps="2" onclick="selectPack(this)">
+      <div class="pack-top">
+        <span class="pack-name">Inicio</span>
+        <div class="pack-radio"></div>
+      </div>
+      <div class="pack-body">
+        <div class="pack-stamps-display">
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+        </div>
+        <div class="pack-price-block">
+          <div class="pack-price">$9.990</div>
+          <div class="pack-unit">$4.995 c/u</div>
+        </div>
+      </div>
+      <div class="pack-features">
+        <span class="pack-feat"><i class="fas fa-stamp"></i> 2 Estampillas</span>
+        <span class="pack-feat"><i class="fas fa-ticket-alt"></i> 2 Participaciones</span>
+      </div>
+    </div>
+
+    <div class="pack-card popular selected" data-pack="popular" data-price="14990" data-stamps="4" onclick="selectPack(this)">
+      <div class="pack-popular-badge">★ MÁS POPULAR</div>
+      <div class="pack-top">
+        <span class="pack-name">Popular</span>
+        <div class="pack-radio"></div>
+      </div>
+      <div class="pack-body">
+        <div class="pack-stamps-display">
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+        </div>
+        <div class="pack-price-block">
+          <div class="pack-price">$14.990</div>
+          <div class="pack-unit">$3.748 c/u</div>
+        </div>
+      </div>
+      <div class="pack-features">
+        <span class="pack-feat"><i class="fas fa-stamp"></i> 4 Estampillas</span>
+        <span class="pack-feat"><i class="fas fa-ticket-alt"></i> 4 Participaciones</span>
+      </div>
+    </div>
+
+    <div class="pack-card" data-pack="coleccionista" data-price="19990" data-stamps="6" onclick="selectPack(this)">
+      <div class="pack-top">
+        <span class="pack-name">Coleccionista</span>
+        <div class="pack-radio"></div>
+      </div>
+      <div class="pack-body">
+        <div class="pack-stamps-display">
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+        </div>
+        <div class="pack-price-block">
+          <div class="pack-price">$19.990</div>
+          <div class="pack-unit">$3.332 c/u</div>
+        </div>
+      </div>
+      <div class="pack-features">
+        <span class="pack-feat"><i class="fas fa-stamp"></i> 6 Estampillas</span>
+        <span class="pack-feat"><i class="fas fa-ticket-alt"></i> 6 Participaciones</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CHECKOUT -->
+<section class="checkout-section" id="checkout">
+  <div class="checkout-card">
+    <h3 class="checkout-title">Completa tu compra</h3>
+
+    <div class="sim-banner" id="simBanner">
+      <i class="fas fa-tools"></i>
+      <span><strong>Modo prueba activo.</strong> Cuando actives tu cuenta en Flow.cl, el pago conecta automáticamente con WebPay. Por ahora el flujo completo funciona en simulación.</span>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Nombre completo</label>
+      <input class="form-input" type="text" id="inputNombre" placeholder="Tu nombre completo" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Correo electrónico</label>
+      <input class="form-input" type="email" id="inputEmail" placeholder="tu@correo.cl" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Teléfono (opcional)</label>
+      <input class="form-input" type="tel" id="inputTelefono" placeholder="+56 9 XXXX XXXX" autocomplete="tel">
+    </div>
+
+    <div class="order-summary">
+      <div class="summary-row">
+        <span class="summary-label">Pack</span>
+        <span class="summary-val" id="summaryPack">Popular (x4)</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Estampillas numeradas</span>
+        <span class="summary-val" id="summaryStamps">4</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Participaciones sorteo</span>
+        <span class="summary-val" id="summaryParts">4</span>
+      </div>
+      <div class="summary-row summary-total">
+        <span class="summary-label">Total</span>
+        <span class="summary-val" id="summaryTotal">$14.990</span>
+      </div>
+    </div>
+
+    <button class="pay-btn" id="payBtn" onclick="handlePay()">
+      <i class="fas fa-lock"></i>
+      <span id="payBtnText">Pagar $14.990 con WebPay</span>
+    </button>
+    <div class="pay-note">
+      <i class="fas fa-shield-alt"></i> Pago 100% seguro · WebPay Plus · Transbank
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo"><span>Import</span> American Cars</div>
+  <div class="footer-info">
+    Sorteo sujeto a Bases del Sorteo publicadas.<br>
+    Promoción Comercial con Premio — IAC Arica · <a href="#" style="color:var(--red)">Ver Bases</a>
+  </div>
+</footer>
+
+<!-- MODAL ÉXITO -->
+<div class="success-modal" id="successModal">
+  <div class="success-overlay" onclick="closeSuccess()"></div>
+  <div class="success-sheet">
+    <div class="success-icon"><i class="fas fa-check"></i></div>
+    <h2 class="success-title">¡Listo!</h2>
+    <p class="success-sub" id="successSub">Tus estampillas están listas. Descárgalas y guárdalas — son tu comprobante de participación.</p>
+    <div class="stamps-generated" id="stampsGenerated"></div>
+    <div class="success-actions">
+      <button class="success-btn" onclick="compartirCompra()"><i class="fab fa-whatsapp"></i> Compartir mi participación</button>
+      <button class="success-btn-ghost" onclick="closeSuccess()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/config.js"></script>
+
+<script>
+/* ============================================
+   CONFIG & ESTADO
+   ============================================ */
+const SB_URL  = 'https://cflpmluvhfldewiitymh.supabase.co';
+const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmbHBtbHV2aGZsZGV3aWl0eW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTM0NzcsImV4cCI6MjA4MDk4OTQ3N30.of3ic6N1Y3U5dtSmzKzkTdvfvRnqYjqFI2fglmibaiM';
+const FLOW_MODE = 'simulation'; // cambiar a 'live' con Flow activo
+
+let sbClient = null;
+try { sbClient = supabase.createClient(SB_URL, SB_ANON); } catch(e) {}
+
+let selectedPackData = { name:'popular', price:14990, stamps:4 };
+let sorteoConfig     = null;   // config activa desde Supabase
+let premioVehicle    = null;   // vehículo premio
+let lastPurchase     = null;
+let countdownInterval= null;
+let currentFolioBase = 0;
+
+/* ============================================
+   INICIO
+   ============================================ */
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadSorteoConfig();
+});
+
+/* ============================================
+   CARGAR CONFIG SORTEO DESDE SUPABASE
+   ============================================ */
+async function loadSorteoConfig() {
+  if (!sbClient) { renderPremioError(); return; }
+  try {
+    // 1. Leer config activa del sorteo
+    const { data: cfg, error: cfgErr } = await sbClient
+      .from('sorteo_config')
+      .select('*')
+      .eq('activo', true)
+      .single();
+
+    if (cfgErr || !cfg) { renderPremioError('No hay sorteo activo configurado.'); return; }
+    sorteoConfig = cfg;
+
+    // 2. Iniciar countdown con la fecha del sorteo
+    startCountdown(new Date(cfg.fecha_sorteo));
+
+    // 3. Cargar vehículo premio
+    await loadPremioVehicle(cfg.vehicle_id);
+
+    // 4. Obtener último folio para continuar la secuencia
+    await loadFolioBase();
+
+  } catch(e) {
+    console.warn('Error cargando sorteo:', e.message);
+    renderPremioError();
+  }
+}
+
+/* ============================================
+   FOLIO BASE (para continuar numeración)
+   ============================================ */
+async function loadFolioBase() {
+  if (!sbClient) return;
+  try {
+    const { count } = await sbClient
+      .from('estampillas')
+      .select('*', { count:'exact', head:true })
+      .eq('estado','completado');
+    currentFolioBase = count || 0;
+  } catch(e) { currentFolioBase = 0; }
+}
+
+/* ============================================
+   COUNTDOWN
+   ============================================ */
+function startCountdown(fechaSorteo) {
+  // Mostrar fecha legible
+  const opts = { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' };
+  document.getElementById('sorteoFechaTexto').textContent =
+    fechaSorteo.toLocaleDateString('es-CL', opts);
+
+  function tick() {
+    const diff = fechaSorteo - new Date();
+    if (diff <= 0) {
+      document.getElementById('cdDias').textContent = '00';
+      document.getElementById('cdHoras').textContent = '00';
+      document.getElementById('cdMin').textContent = '00';
+      document.getElementById('cdSeg').textContent = '00';
+      clearInterval(countdownInterval);
+      return;
+    }
+    const dias  = Math.floor(diff / 86400000);
+    const horas = Math.floor((diff % 86400000) / 3600000);
+    const min   = Math.floor((diff % 3600000)  / 60000);
+    const seg   = Math.floor((diff % 60000)    / 1000);
+    document.getElementById('cdDias').textContent  = String(dias).padStart(2,'0');
+    document.getElementById('cdHoras').textContent = String(horas).padStart(2,'0');
+    document.getElementById('cdMin').textContent   = String(min).padStart(2,'0');
+    document.getElementById('cdSeg').textContent   = String(seg).padStart(2,'0');
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+/* ============================================
+   CARGAR VEHÍCULO PREMIO
+   ============================================ */
+async function loadPremioVehicle(vehicleId) {
+  try {
+    const { data, error } = await sbClient
+      .from('vehicles')
+      .select(`*, vehicle_images(image_url, is_main, order_index)`)
+      .eq('id', vehicleId)
+      .single();
+
+    if (error || !data) { renderPremioError(); return; }
+
+    // Ordenar imágenes
+    const imgs = (data.vehicle_images || [])
+      .sort((a,b)=>(a.order_index||0)-(b.order_index||0))
+      .map(i=>i.image_url).filter(Boolean);
+
+    premioVehicle = { ...data, gallery: imgs };
+    renderPremio(premioVehicle);
+  } catch(e) {
+    renderPremioError();
+  }
+}
+
+function renderPremio(v) {
+  const mainImg = v.gallery[0] || '';
+  const specs = [];
+  if (v.motor)       specs.push({ icon:'fa-cog',       val: v.motor });
+  if (v.traccion)    specs.push({ icon:'fa-road',       val: v.traccion });
+  if (v.transmision) specs.push({ icon:'fa-sliders-h',  val: v.transmision });
+  if (v.potencia)    specs.push({ icon:'fa-bolt',       val: v.potencia });
+
+  const thumbs = v.gallery.length > 1
+    ? `<div class="premio-thumbs">
+        ${v.gallery.map((img,i)=>`
+          <div class="premio-thumb ${i===0?'active':''}" onclick="switchPremioImg('${img}',this)">
+            <img src="${img}" alt="foto ${i+1}" loading="lazy">
+          </div>`).join('')}
+       </div>` : '';
+
+  const videoBtn = v.video_id
+    ? `<a href="https://youtube.com/watch?v=${v.video_id}" target="_blank" rel="noopener" class="premio-video-btn">
+        <i class="fab fa-youtube"></i> Ver video del vehículo
+       </a>` : '';
+
+  document.getElementById('premioContainer').innerHTML = `
+    <div class="premio-card">
+      <div class="premio-img-wrap">
+        ${mainImg ? `<img class="premio-img" id="premioMainImg" src="${mainImg}" alt="${v.name}">` : '<div class="premio-img-skeleton"></div>'}
+        <div class="premio-badge-sorteo">🏆 Premio del sorteo</div>
+      </div>
+      ${thumbs}
+      ${videoBtn}
+      <div class="premio-body">
+        <div class="premio-name">${v.name}</div>
+        <div class="premio-price">$${(v.price||0).toLocaleString('es-CL')} CLP</div>
+        ${specs.length ? `<div class="premio-specs">
+          ${specs.map(s=>`<span class="spec-tag"><i class="fas ${s.icon}"></i>${s.val}</span>`).join('')}
+        </div>` : ''}
+      </div>
+    </div>`;
+}
+
+function switchPremioImg(url, el) {
+  const main = document.getElementById('premioMainImg');
+  if (main) main.src = url;
+  document.querySelectorAll('.premio-thumb').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function renderPremioError(msg) {
+  document.getElementById('premioContainer').innerHTML =
+    `<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px;">
+      <i class="fas fa-car" style="font-size:36px;opacity:0.2;display:block;margin-bottom:12px;"></i>
+      ${msg||'No se pudo cargar el vehículo premio.'}
+    </div>`;
+}
+
+/* ============================================
+   SELECCIÓN DE PACK
+   ============================================ */
+function selectPack(el) {
+  document.querySelectorAll('.pack-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  const name=el.dataset.pack, price=parseInt(el.dataset.price), stamps=parseInt(el.dataset.stamps);
+  selectedPackData = { name, price, stamps };
+  const labels = { inicio:'Inicio (x2)', popular:'Popular (x4)', coleccionista:'Coleccionista (x6)' };
+  document.getElementById('summaryPack').textContent   = labels[name];
+  document.getElementById('summaryStamps').textContent = stamps;
+  document.getElementById('summaryParts').textContent  = stamps;
+  document.getElementById('summaryTotal').textContent  = `$${price.toLocaleString('es-CL')}`;
+  document.getElementById('payBtnText').textContent    = `Pagar $${price.toLocaleString('es-CL')} con WebPay`;
+  document.getElementById('checkout').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+/* ============================================
+   VALIDACIÓN
+   ============================================ */
+function validateForm() {
+  const nombre = document.getElementById('inputNombre').value.trim();
+  const email  = document.getElementById('inputEmail').value.trim();
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  let ok = true;
+  document.getElementById('inputNombre').classList.toggle('error', !nombre);
+  document.getElementById('inputEmail').classList.toggle('error', !emailOk);
+  if (!nombre || !emailOk) { showNotif('⚠️ Completa nombre y correo válido'); ok=false; }
+  return ok;
+}
+
+/* ============================================
+   GENERAR HASH DE SEGURIDAD
+   (SHA-256 simple en base64url sin backend)
+   ============================================ */
+async function generateSecurityHash(folio, email, timestamp) {
+  const msg  = `${folio}|${email}|${timestamp}|IAC-ARICA-2025`;
+  const data = new TextEncoder().encode(msg);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  const arr  = Array.from(new Uint8Array(hash));
+  // Tomar primeros 8 bytes como hex = 16 chars
+  return arr.slice(0,8).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+/* ============================================
+   GENERAR NÚMERO DE FOLIO
+   ============================================ */
+function generateFolio(index) {
+  const n = currentFolioBase + index + 1;
+  return `IAC-${new Date().getFullYear()}-${String(n).padStart(5,'0')}`;
+}
+
+/* ============================================
+   DIBUJAR ESTAMPILLA EN CANVAS
+   Frente: imagen del vehículo + datos sorteo
+   Dorso: número de folio + QR + hash seguridad
+   ============================================ */
+async function drawStamp(canvas, folio, secHash, vehicleImg, vehicleName, ownerName, sorteoFecha) {
+  // Canvas rectangular estilo estampilla postal
+  // Dimensiones: 600 x 400 px (frente y dorso lado a lado en el mismo canvas → 1200 x 400)
+  const W = 1200, H = 400;
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  /* ─── FONDO GLOBAL ─── */
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, W, H);
+
+  /* ─────────────── FRENTE (izquierda, 0–600) ─────────────── */
+  const drawFront = async () => {
+    // Fondo frente
+    const fg = ctx.createLinearGradient(0, 0, 600, 400);
+    fg.addColorStop(0, '#1a0a02');
+    fg.addColorStop(1, '#0d0d0d');
+    ctx.fillStyle = fg;
+    ctx.fillRect(0, 0, 600, 400);
+
+    // Imagen del vehículo (si está disponible)
+    if (vehicleImg) {
+      try {
+        const img = await loadImageCORS(vehicleImg);
+        // Cubrir la mitad superior (0-220) con la imagen
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(16, 16, 568, 210);
+        ctx.clip();
+        // Escalar para llenar sin deformar
+        const ir = img.width / img.height;
+        const cr = 568 / 210;
+        let sw, sh, sx=0, sy=0;
+        if (ir > cr) { sh=210; sw=sh*ir; sx=(568-sw)/2; }
+        else          { sw=568; sh=sw/ir; sy=(210-sh)/2; }
+        ctx.drawImage(img, 16+sx, 16+sy, sw, sh);
+        ctx.restore();
+        // Overlay gradiente en imagen
+        const ov = ctx.createLinearGradient(0, 100, 0, 230);
+        ov.addColorStop(0, 'rgba(26,10,2,0)');
+        ov.addColorStop(1, 'rgba(26,10,2,0.85)');
+        ctx.fillStyle = ov;
+        ctx.fillRect(16, 16, 568, 210);
+      } catch(e) { /* sin imagen */ }
+    }
+
+    // Borde dentado (simulado con línea punteada)
+    ctx.save();
+    ctx.strokeStyle = '#C9A84C';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(8, 8, 584, 384);
+    ctx.restore();
+
+    // Etiqueta superior "CHILE · ARICA"
+    ctx.font = 'bold 11px "Barlow Condensed", monospace';
+    ctx.fillStyle = 'rgba(201,168,76,0.7)';
+    ctx.letterSpacing = '3px';
+    ctx.textAlign = 'center';
+    ctx.fillText('C H I L E  ·  A R I C A', 300, 38);
+
+    // Nombre del vehículo
+    ctx.font = 'bold 28px "Barlow Condensed", sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.fillText(vehicleName.toUpperCase(), 300, 258);
+
+    // Subtítulo "COLECCIÓN CHILE NORTE"
+    ctx.font = 'bold 12px "Barlow Condensed", monospace';
+    ctx.fillStyle = 'rgba(240,208,128,0.85)';
+    ctx.fillText('COLECCIÓN CHILE NORTE  ·  EDICIÓN LIMITADA', 300, 278);
+
+    // Línea separadora dorada
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(201,168,76,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.moveTo(40, 295); ctx.lineTo(560, 295);
+    ctx.stroke();
+
+    // Datos del sorteo (parte inferior)
+    ctx.font = '12px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.textAlign = 'left';
+    ctx.fillText('SORTEO:', 40, 322);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.font = 'bold 13px "DM Sans", sans-serif';
+    ctx.fillText(sorteoFecha || 'Por confirmar', 40, 340);
+
+    ctx.font = '12px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.textAlign = 'right';
+    ctx.fillText('FOLIO:', 560, 322);
+    ctx.font = 'bold 14px monospace';
+    ctx.fillStyle = '#F0D080';
+    ctx.fillText(folio, 560, 340);
+
+    // Nombre propietario
+    ctx.font = '11px "DM Sans", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.textAlign = 'center';
+    ctx.fillText(`Propietario: ${ownerName}`, 300, 372);
+
+    // Sello "IAC" decorativo
+    ctx.save();
+    ctx.translate(540, 60);
+    ctx.rotate(0.2);
+    ctx.strokeStyle = 'rgba(155,0,0,0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, 32, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 26, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.font = 'bold 14px "Barlow Condensed"';
+    ctx.fillStyle = 'rgba(155,0,0,0.7)';
+    ctx.textAlign = 'center';
+    ctx.fillText('IAC', 0, 5);
+    ctx.restore();
+  };
+
+  /* ─────────────── DORSO (derecha, 600–1200) ─────────────── */
+  const drawBack = async () => {
+    // Fondo dorso (papel envejecido digital)
+    const bg = ctx.createLinearGradient(600, 0, 1200, 400);
+    bg.addColorStop(0, '#f5f0e8');
+    bg.addColorStop(1, '#ede8dc');
+    ctx.fillStyle = bg;
+    ctx.fillRect(600, 0, 600, 400);
+
+    // Patrón de fondo sutil (líneas de seguridad)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(180,160,120,0.15)';
+    ctx.lineWidth = 0.5;
+    for (let y = 600; y < 1200; y += 12) {
+      ctx.beginPath();
+      ctx.moveTo(y, 0); ctx.lineTo(y, 400); ctx.stroke();
+    }
+    for (let x = 0; x < 400; x += 12) {
+      ctx.beginPath();
+      ctx.moveTo(600, x); ctx.lineTo(1200, x); ctx.stroke();
+    }
+    ctx.restore();
+
+    // Borde dentado dorso
+    ctx.save();
+    ctx.strokeStyle = '#8B7355';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.strokeRect(608, 8, 584, 384);
+    ctx.restore();
+
+    // Divisor vertical entre frente y dorso (perforación)
+    ctx.save();
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.beginPath();
+    ctx.moveTo(600, 0); ctx.lineTo(600, 400);
+    ctx.stroke();
+    ctx.restore();
+
+    // Título DORSO
+    ctx.font = 'bold 11px monospace';
+    ctx.fillStyle = 'rgba(100,80,40,0.7)';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '3px';
+    ctx.fillText('CERTIFICADO DE AUTENTICIDAD', 900, 38);
+
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(139,115,85,0.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([]);
+    ctx.moveTo(630, 46); ctx.lineTo(1170, 46);
+    ctx.stroke();
+
+    // Número de folio grande
+    ctx.font = 'bold 11px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.6)';
+    ctx.textAlign = 'left';
+    ctx.fillText('NÚMERO DE FOLIO', 630, 75);
+
+    ctx.font = 'bold 32px monospace';
+    ctx.fillStyle = '#1a0a00';
+    ctx.fillText(folio, 630, 112);
+
+    // Línea separadora
+    ctx.beginPath();
+    ctx.strokeStyle = 'rgba(139,115,85,0.3)';
+    ctx.lineWidth = 1;
+    ctx.moveTo(630, 124); ctx.lineTo(1170, 124);
+    ctx.stroke();
+
+    // Hash de seguridad
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.55)';
+    ctx.textAlign = 'left';
+    ctx.fillText('CÓDIGO DE SEGURIDAD', 630, 148);
+
+    ctx.font = 'bold 15px monospace';
+    ctx.fillStyle = '#5a3a00';
+    ctx.fillText(secHash, 630, 168);
+
+    ctx.font = '10px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.4)';
+    ctx.fillText('Verificable en: iac-arica.cl/verificar', 630, 184);
+
+    // Datos del propietario
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.55)';
+    ctx.fillText('PROPIETARIO', 630, 216);
+    ctx.font = 'bold 14px "DM Sans", sans-serif';
+    ctx.fillStyle = '#1a0a00';
+    ctx.fillText(ownerName, 630, 234);
+
+    // Sorteo
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.55)';
+    ctx.fillText('SORTEO', 630, 262);
+    ctx.font = 'bold 13px "DM Sans", sans-serif';
+    ctx.fillStyle = '#1a0a00';
+    ctx.fillText(sorteoFecha || 'Por confirmar', 630, 280);
+
+    // Vehículo
+    ctx.font = 'bold 10px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.55)';
+    ctx.fillText('VEHÍCULO SORTEO', 630, 308);
+    ctx.font = 'bold 13px "DM Sans", sans-serif';
+    ctx.fillStyle = '#9B0000';
+    ctx.fillText(vehicleName.toUpperCase(), 630, 326);
+
+    // QR en la esquina inferior derecha
+    const qrSize = 90;
+    const qrX = 1200 - qrSize - 30;
+    const qrY = 400  - qrSize - 30;
+    await renderQROnCanvas(ctx, folio, secHash, qrX, qrY, qrSize);
+
+    // Etiqueta QR
+    ctx.font = '9px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText('VERIFICAR', qrX + qrSize/2, qrY - 6);
+
+    // Sello VÁLIDO
+    ctx.save();
+    ctx.translate(1130, 130);
+    ctx.rotate(-0.15);
+    ctx.strokeStyle = 'rgba(155,0,0,0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.rect(-36, -18, 72, 36);
+    ctx.stroke();
+    ctx.font = 'bold 13px "Barlow Condensed"';
+    ctx.fillStyle = 'rgba(155,0,0,0.4)';
+    ctx.textAlign = 'center';
+    ctx.fillText('✓ VÁLIDO', 0, 6);
+    ctx.restore();
+
+    // Pie de página
+    ctx.font = '9px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.4)';
+    ctx.textAlign = 'center';
+    ctx.fillText('Import American Cars · Arica, Chile · iac-arica.cl', 900, 388);
+  };
+
+  await drawFront();
+  await drawBack();
+}
+
+/* Cargar imagen para canvas respetando CORS */
+function loadImageCORS(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload  = () => resolve(img);
+    img.onerror = () => reject(new Error('img load fail'));
+    // Para Cloudinary: agregar parámetro de transformación que activa CORS
+    img.src = url.includes('cloudinary.com')
+      ? url.replace('/upload/', '/upload/fl_attachment/')
+      : url;
+    // Fallback sin crossOrigin si falla
+    setTimeout(() => {
+      if (!img.complete) {
+        const img2 = new Image();
+        img2.onload = () => resolve(img2);
+        img2.onerror = () => reject();
+        img2.src = url;
+      }
+    }, 3000);
+  });
+}
+
+/* Renderizar QR en canvas usando qrcode.js */
+async function renderQROnCanvas(ctx, folio, hash, x, y, size) {
+  try {
+    const qrText = `https://iac-arica.cl/verificar?f=${folio}&h=${hash}`;
+    const tmpDiv = document.createElement('div');
+    tmpDiv.style.display = 'none';
+    document.body.appendChild(tmpDiv);
+
+    await new Promise((resolve) => {
+      new QRCode(tmpDiv, {
+        text: qrText,
+        width: size * 2, height: size * 2,
+        colorDark: '#1a0a00', colorLight: '#f5f0e8',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      setTimeout(() => {
+        const img = tmpDiv.querySelector('img') || tmpDiv.querySelector('canvas');
+        if (img) {
+          if (img.tagName === 'IMG') {
+            const qrImg = new Image();
+            qrImg.onload = () => { ctx.drawImage(qrImg, x, y, size, size); resolve(); };
+            qrImg.src = img.src;
+          } else {
+            ctx.drawImage(img, x, y, size, size);
+            resolve();
+          }
+        } else resolve();
+        document.body.removeChild(tmpDiv);
+      }, 200);
+    });
+  } catch(e) {
+    // Si QR falla, dibujar un placeholder
+    ctx.fillStyle = 'rgba(80,60,20,0.2)';
+    ctx.fillRect(x, y, size, size);
+    ctx.font = '8px monospace';
+    ctx.fillStyle = 'rgba(80,60,20,0.5)';
+    ctx.textAlign = 'center';
+    ctx.fillText('QR', x+size/2, y+size/2);
+  }
+}
+
+/* ============================================
+   MANEJO DEL PAGO
+   ============================================ */
+async function handlePay() {
+  if (!validateForm()) return;
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+  try {
+    if (FLOW_MODE === 'simulation') await simulatePurchase();
+    else await initFlowPayment();
+  } catch(e) {
+    console.error(e);
+    showNotif('❌ Error al procesar. Inténtalo de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fas fa-lock"></i> <span>Pagar $${selectedPackData.price.toLocaleString('es-CL')} con WebPay</span>`;
+  }
+}
+
+/* ============================================
+   SIMULACIÓN DE COMPRA
+   ============================================ */
+async function simulatePurchase() {
+  const nombre   = document.getElementById('inputNombre').value.trim();
+  const email    = document.getElementById('inputEmail').value.trim();
+  const telefono = document.getElementById('inputTelefono').value.trim();
+  const timestamp= Date.now();
+
+  // Generar folios y hashes para cada estampilla del pack
+  const estampillas = [];
+  for (let i = 0; i < selectedPackData.stamps; i++) {
+    const folio = generateFolio(i);
+    const hash  = await generateSecurityHash(folio, email, timestamp);
+    estampillas.push({ folio, hash, index: i });
+  }
+
+  // Guardar en Supabase
+  if (sbClient) {
+    try {
+      const rows = estampillas.map(e => ({
+        nombre,
+        email,
+        telefono: telefono || null,
+        pack:           selectedPackData.name,
+        monto_pack:     selectedPackData.price,
+        numero_folio:   e.folio,
+        hash_seguridad: e.hash,
+        orden_en_pack:  e.index + 1,
+        total_en_pack:  selectedPackData.stamps,
+        vehicle_id:     premioVehicle?.id || null,
+        sorteo_id:      sorteoConfig?.id  || null,
+        estado:         'completado',
+        modo_pago:      'simulacion',
+        created_at:     new Date(timestamp).toISOString()
+      }));
+      const { error } = await sbClient.from('estampillas').insert(rows);
+      if (error) console.warn('Supabase insert error:', error.message);
+      else currentFolioBase += selectedPackData.stamps;
+    } catch(e) { console.warn(e.message); }
+  }
+
+  lastPurchase = { nombre, email, estampillas };
+  await showSuccessModal(nombre, email, estampillas);
+}
+
+/* ============================================
+   FLOW.CL (pendiente)
+   ============================================ */
+async function initFlowPayment() {
+  showNotif('🔧 Integración Flow pendiente. Activa tu cuenta primero.');
+}
+
+/* ============================================
+   MODAL DE ÉXITO + GENERACIÓN DE ESTAMPILLAS
+   ============================================ */
+async function showSuccessModal(nombre, email, estampillas) {
+  document.getElementById('successSub').textContent =
+    `${nombre}, tus ${estampillas.length} estampilla${estampillas.length>1?'s':''} fueron generadas. ` +
+    `Descárgalas — son tu comprobante de participación en el sorteo.`;
+
+  const container = document.getElementById('stampsGenerated');
+  container.innerHTML = '<div class="loading-state"><div class="spin"></div>Generando estampillas...</div>';
+
+  document.getElementById('successModal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+
+  // Generar cada estampilla
+  container.innerHTML = '';
+  const fechaStr = sorteoConfig?.fecha_sorteo
+    ? new Date(sorteoConfig.fecha_sorteo).toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})
+    : 'Por confirmar';
+
+  for (const e of estampillas) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'stamp-item';
+    wrapper.innerHTML = `
+      <div class="stamp-item-header">
+        <span class="stamp-folio">${e.folio}</span>
+        <span class="stamp-part">Participación #${e.index+1}</span>
+      </div>
+      <div class="stamp-canvas-wrap" id="canvasWrap-${e.index}">
+        <div class="loading-state" style="padding:20px"><div class="spin"></div></div>
+      </div>
+      <button class="stamp-download-btn" id="dlBtn-${e.index}" onclick="downloadStamp(${e.index})" disabled>
+        <i class="fas fa-download"></i> Descargar estampilla
+      </button>`;
+    container.appendChild(wrapper);
+
+    // Dibujar canvas asíncronamente
+    const canvas = document.createElement('canvas');
+    try {
+      await drawStamp(
+        canvas, e.folio, e.hash,
+        premioVehicle?.gallery?.[0] || null,
+        premioVehicle?.name || 'Vehículo',
+        nombre,
+        fechaStr
+      );
+      document.getElementById(`canvasWrap-${e.index}`).innerHTML = '';
+      document.getElementById(`canvasWrap-${e.index}`).appendChild(canvas);
+      // Guardar referencia para descarga
+      canvas.dataset.folio = e.folio;
+      const dlBtn = document.getElementById(`dlBtn-${e.index}`);
+      dlBtn.disabled = false;
+    } catch(err) {
+      document.getElementById(`canvasWrap-${e.index}`).innerHTML =
+        '<div style="padding:16px;color:var(--muted);font-size:12px;text-align:center;">Error generando imagen</div>';
+    }
+  }
+
+  if (typeof gtag !== 'undefined') {
+    gtag('event','purchase',{ value: selectedPackData.price/1000, currency:'CLP' });
+  }
+}
+
+/* ============================================
+   DESCARGA DE ESTAMPILLA
+   ============================================ */
+function downloadStamp(index) {
+  const wrap = document.getElementById(`canvasWrap-${index}`);
+  const canvas = wrap?.querySelector('canvas');
+  if (!canvas) return;
+  const folio = canvas.dataset.folio || `estampilla-${index+1}`;
+  const link  = document.createElement('a');
+  link.download = `${folio}.png`;
+  link.href = canvas.toDataURL('image/png', 1.0);
+  link.click();
+}
+
+function closeSuccess() {
+  document.getElementById('successModal').classList.remove('active');
+  document.body.style.overflow = '';
+  // Limpiar form
+  ['inputNombre','inputEmail','inputTelefono'].forEach(id=>document.getElementById(id).value='');
+}
+
+/* ============================================
+   COMPARTIR
+   ============================================ */
+function compartirCompra() {
+  if (!lastPurchase) return;
+  const folios = lastPurchase.estampillas.map(e=>e.folio).join(', ');
+  const msg = `🏆 ¡Estoy participando en el sorteo del ${premioVehicle?.name||'vehículo'} de @importamericancars!\n\nMis folios: ${folios}\n\n¡Consigue las tuyas en iac-arica.cl/stamper.html 🚗`;
+  if (navigator.share) navigator.share({ text:msg, url:'https://iac-arica.cl/stamper.html' }).catch(()=>{});
+  else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+/* ============================================
+   NOTIFICACIÓN
+   ============================================ */
+function showNotif(msg) {
+  const n = document.createElement('div');
+  n.className = 'notif';
+  n.innerHTML = `<i class="fas fa-info-circle"></i>${msg}`;
+  document.body.appendChild(n);
+  setTimeout(()=>n.remove(), 3000);
+}
+</script>
+</body>
+</html>
