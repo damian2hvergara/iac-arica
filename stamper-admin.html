@@ -578,28 +578,54 @@ function renderParticipantes(rows) {
       '<p style="color:var(--muted);font-size:13px;padding:16px 0;">Aún no hay participantes registrados.</p>';
     return;
   }
-  document.getElementById('participantesContainer').innerHTML = `
-    <div style="overflow-x:auto;">
-      <table class="part-table">
-        <thead>
-          <tr>
-            <th>Folio</th><th>Nombre</th><th>Email</th>
-            <th>Pack</th><th>Monto</th><th>Fecha</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(r=>`
-            <tr>
-              <td class="folio-cell">${r.numero_folio}</td>
-              <td>${r.nombre}</td>
-              <td style="color:var(--muted)">${r.email}</td>
-              <td><span class="pack-badge pack-${r.pack}">${r.pack}</span></td>
-              <td>$${(r.monto_pack||0).toLocaleString('es-CL')}</td>
-              <td style="color:var(--muted)">${new Date(r.created_at).toLocaleDateString('es-CL')}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>
-    </div>`;
+
+  // Agrupar por compra: mismo email + mismo minuto = 1 transacción
+  const comprasMap = {};
+  rows.forEach(r => {
+    const key = r.email + '__' + (r.created_at||'').slice(0,16);
+    if (!comprasMap[key]) {
+      comprasMap[key] = {
+        nombre:       r.nombre,
+        email:        r.email,
+        pack:         r.pack,
+        monto_pack:   r.monto_pack,
+        total_en_pack:r.total_en_pack,
+        fecha:        r.created_at,
+        folios:       []
+      };
+    }
+    comprasMap[key].folios.push(r.numero_folio);
+  });
+
+  const compras = Object.values(comprasMap)
+    .sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+  document.getElementById('participantesContainer').innerHTML =
+    '<div style="overflow-x:auto;">' +
+    '<table class="part-table"><thead><tr>' +
+    '<th>Folios</th><th>Nombre</th><th>Email</th>' +
+    '<th>Pack</th><th>Precio pack</th><th>Precio c/u</th><th>Fecha</th>' +
+    '</tr></thead><tbody>' +
+    compras.map(function(c) {
+      var precioCU = Math.round(c.monto_pack / (c.total_en_pack || 1));
+      var foliosHtml = c.folios.map(function(f) {
+        return '<span class="folio-cell" style="display:inline-block;margin:1px 3px;">' + f + '</span>';
+      }).join('');
+      return '<tr>' +
+        '<td style="max-width:240px;line-height:2;">' + foliosHtml + '</td>' +
+        '<td>' + c.nombre + '</td>' +
+        '<td style="color:var(--muted);font-size:12px;">' + c.email + '</td>' +
+        '<td><span class="pack-badge pack-' + c.pack + '">' + c.pack + ' (x' + c.total_en_pack + ')</span></td>' +
+        '<td style="font-weight:600;">$' + (c.monto_pack||0).toLocaleString('es-CL') + '</td>' +
+        '<td style="color:var(--muted);">$' + precioCU.toLocaleString('es-CL') + '</td>' +
+        '<td style="color:var(--muted);white-space:nowrap;">' + new Date(c.fecha).toLocaleDateString('es-CL') + '</td>' +
+        '</tr>';
+    }).join('') +
+    '</tbody></table></div>' +
+    '<div style="font-size:12px;color:var(--muted);margin-top:10px;">' +
+    compras.length + ' compra' + (compras.length !== 1 ? 's' : '') +
+    ' &nbsp;·&nbsp; ' + rows.length + ' estampilla' + (rows.length !== 1 ? 's' : '') +
+    '</div>';
 }
 
 /* ============================================
@@ -611,57 +637,73 @@ async function loadResumen() {
   try {
     const { data: ests } = await sb.from('estampillas').select('*').eq('estado','completado');
     const rows = ests || [];
-    const total      = rows.length;
-    const unicos     = new Set(rows.map(r=>r.email)).size;
-    // Recaudación: sumar por email+pack (1 pack = N estampillas, contar 1 vez)
-    const recMap = {};
-    rows.forEach(r=>{
-      const key = `${r.email}-${r.created_at?.slice(0,19)}`;
-      if (!recMap[key]) recMap[key] = r.monto_pack;
-    });
-    const recaudacion = Object.values(recMap).reduce((s,v)=>s+v,0);
-    const packs = { inicio:0, popular:0, coleccionista:0 };
-    rows.filter(r=>r.orden_en_pack===1).forEach(r=>{ if(packs[r.pack]!==undefined) packs[r.pack]++; });
+    const total  = rows.length;
+    const unicos = new Set(rows.map(function(r){ return r.email; })).size;
 
-    document.getElementById('resumenContainer').innerHTML = `
-      <div class="card">
-        <div class="card-title"><i class="fas fa-chart-bar"></i> Resumen del Sorteo</div>
-        <div class="stats-grid">
-          <div class="stat-box">
-            <div class="stat-val">${total.toLocaleString('es-CL')}</div>
-            <div class="stat-label">Estampillas vendidas</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val">${unicos.toLocaleString('es-CL')}</div>
-            <div class="stat-label">Compradores únicos</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val">$${Math.round(recaudacion/1000).toLocaleString('es-CL')}K</div>
-            <div class="stat-label">Recaudación total</div>
-          </div>
-          <div class="stat-box">
-            <div class="stat-val">${unicos>0?Math.round(recaudacion/unicos/1000).toLocaleString('es-CL')+'K':'—'}</div>
-            <div class="stat-label">Ticket promedio</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;">
-          <div style="flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:12px;text-align:center;">
-            <div style="font-size:20px;font-weight:700;color:var(--white)">${packs.inicio}</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Pack Inicio</div>
-          </div>
-          <div style="flex:1;background:var(--surface-2);border:1px solid rgba(201,168,76,0.3);border-radius:var(--r-md);padding:12px;text-align:center;">
-            <div style="font-size:20px;font-weight:700;color:var(--gold)">${packs.popular}</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Pack Popular</div>
-          </div>
-          <div style="flex:1;background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--r-md);padding:12px;text-align:center;">
-            <div style="font-size:20px;font-weight:700;color:#60A5FA">${packs.coleccionista}</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">Pack Coleccionista</div>
-          </div>
-        </div>
-      </div>`;
+    // Recaudación: contar monto_pack UNA sola vez por compra (orden_en_pack === 1)
+    var recaudacion = 0;
+    rows.forEach(function(r){
+      if (r.orden_en_pack === 1) recaudacion += (r.monto_pack || 0);
+    });
+
+    // Contar packs vendidos (también por orden_en_pack === 1)
+    var packs = { inicio:0, popular:0, coleccionista:0 };
+    rows.filter(function(r){ return r.orden_en_pack === 1; })
+        .forEach(function(r){ if (packs[r.pack] !== undefined) packs[r.pack]++; });
+
+    var ticketProm = unicos > 0
+      ? '$' + Math.round(recaudacion / unicos).toLocaleString('es-CL')
+      : '—';
+
+    document.getElementById('resumenContainer').innerHTML =
+      '<div class="card">' +
+      '<div class="card-title"><i class="fas fa-chart-bar"></i> Resumen del Sorteo</div>' +
+      '<div class="stats-grid">' +
+
+        '<div class="stat-box">' +
+          '<div class="stat-val">' + total.toLocaleString('es-CL') + '</div>' +
+          '<div class="stat-label">Estampillas vendidas</div>' +
+        '</div>' +
+
+        '<div class="stat-box">' +
+          '<div class="stat-val">' + unicos.toLocaleString('es-CL') + '</div>' +
+          '<div class="stat-label">Compradores únicos</div>' +
+        '</div>' +
+
+        '<div class="stat-box">' +
+          '<div class="stat-val" style="font-size:clamp(16px,3vw,26px);">$' + recaudacion.toLocaleString('es-CL') + '</div>' +
+          '<div class="stat-label">Recaudación total</div>' +
+        '</div>' +
+
+        '<div class="stat-box">' +
+          '<div class="stat-val" style="font-size:clamp(16px,3vw,26px);">' + ticketProm + '</div>' +
+          '<div class="stat-label">Ticket promedio</div>' +
+        '</div>' +
+
+      '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+
+        '<div style="flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;text-align:center;">' +
+          '<div style="font-size:22px;font-weight:700;color:var(--white);">' + packs.inicio + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);margin-top:3px;">Pack Inicio<br><span style="color:var(--text);">x2 · $9.990</span></div>' +
+        '</div>' +
+
+        '<div style="flex:1;background:var(--surface-2);border:1px solid rgba(201,168,76,0.3);border-radius:var(--r-md);padding:14px;text-align:center;">' +
+          '<div style="font-size:22px;font-weight:700;color:var(--gold);">' + packs.popular + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);margin-top:3px;">Pack Popular<br><span style="color:var(--gold);">x4 · $14.990</span></div>' +
+        '</div>' +
+
+        '<div style="flex:1;background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--r-md);padding:14px;text-align:center;">' +
+          '<div style="font-size:22px;font-weight:700;color:#60A5FA;">' + packs.coleccionista + '</div>' +
+          '<div style="font-size:10px;color:var(--muted);margin-top:3px;">Pack Coleccionista<br><span style="color:#60A5FA;">x6 · $19.990</span></div>' +
+        '</div>' +
+
+      '</div>' +
+      '</div>';
+
   } catch(e) {
     document.getElementById('resumenContainer').innerHTML =
-      '<p style="color:var(--muted);padding:16px">Error al cargar.</p>';
+      '<p style="color:var(--muted);padding:16px">Error al cargar: ' + e.message + '</p>';
   }
 }
 
