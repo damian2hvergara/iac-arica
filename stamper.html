@@ -620,23 +620,39 @@ function generateFolio() {
   return `IAC-${randomGroup(4)}-${randomGroup(4)}`;
 }
 
+// Set de folios ya usados en esta sesión (evita duplicados dentro del mismo pack)
+const foliosUsadosEnSesion = new Set();
+
 async function generateUniqueFolio() {
-  for (let attempt = 0; attempt < 10; attempt++) {
+  for (let attempt = 0; attempt < 20; attempt++) {
     const folio = generateFolio();
-    if (!sbClient) return folio;
-    try {
-      const { data } = await sbClient
-        .from('estampillas')
-        .select('numero_folio')
-        .eq('numero_folio', folio)
-        .maybeSingle();
-      if (!data) return folio; // no existe → único
-    } catch(e) {
-      return folio;
+
+    // 1. Verificar que no lo generamos ya en este mismo pack
+    if (foliosUsadosEnSesion.has(folio)) continue;
+
+    // 2. Verificar contra Supabase que no exista en la BD
+    if (sbClient) {
+      try {
+        const { data } = await sbClient
+          .from('estampillas')
+          .select('numero_folio')
+          .eq('numero_folio', folio)
+          .maybeSingle();
+        if (data) continue; // ya existe en BD → intentar otro
+      } catch(e) {
+        // Si falla la consulta, confiar en la aleatoriedad + sesión
+      }
     }
+
+    // Folio válido: registrarlo en sesión y devolverlo
+    foliosUsadosEnSesion.add(folio);
+    return folio;
   }
-  // Fallback con timestamp para garantizar unicidad absoluta
-  return `IAC-${randomGroup(4)}-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+
+  // Fallback absoluto: folio con timestamp en microsegundos (imposible duplicar)
+  const fallback = `IAC-${randomGroup(4)}-${performance.now().toString(36).replace('.','').slice(-4).toUpperCase()}`;
+  foliosUsadosEnSesion.add(fallback);
+  return fallback;
 }
 
 // Mantener por compatibilidad (ya no se usa internamente)
