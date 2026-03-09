@@ -263,8 +263,7 @@ img{display:block;max-width:100%;}
     <!-- TABS -->
     <div class="adm-tabs">
       <button class="adm-tab active" onclick="switchTab('sorteo')"><i class="fas fa-cog"></i> Configurar Sorteo</button>
-      <button class="adm-tab" onclick="switchTab('participantes')"><i class="fas fa-list"></i> Participantes</button>
-      <button class="adm-tab" onclick="switchTab('resumen')"><i class="fas fa-chart-bar"></i> Resumen</button>
+      <button class="adm-tab" onclick="switchTab('participantes')"><i class="fas fa-chart-bar"></i> Dashboard</button>
     </div>
 
     <!-- TAB: CONFIGURAR SORTEO -->
@@ -322,23 +321,10 @@ img{display:block;max-width:100%;}
       </div>
     </div>
 
-    <!-- TAB: PARTICIPANTES -->
+    <!-- TAB: DASHBOARD -->
     <div class="tab-pane" id="tab-participantes">
-      <div class="card">
-        <div class="card-title"><i class="fas fa-users"></i> Lista de Participantes</div>
-        <div class="export-row">
-          <button class="btn-ghost" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
-        </div>
-        <div id="participantesContainer">
-          <div class="loading-row"><div class="spin"></div>Cargando participantes...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB: RESUMEN -->
-    <div class="tab-pane" id="tab-resumen">
-      <div id="resumenContainer">
-        <div class="loading-row"><div class="spin"></div>Cargando datos...</div>
+      <div id="dashboardContainer">
+        <div class="loading-row"><div class="spin"></div>Cargando dashboard...</div>
       </div>
     </div>
 
@@ -401,13 +387,12 @@ async function initApp() {
    ============================================ */
 function switchTab(name) {
   document.querySelectorAll('.adm-tab').forEach((t,i)=>{
-    const names = ['sorteo','participantes','resumen'];
+    const names = ['sorteo','participantes'];
     t.classList.toggle('active', names[i] === name);
   });
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById(`tab-${name}`).classList.add('active');
-  if (name === 'participantes') loadParticipantes();
-  if (name === 'resumen') loadResumen();
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name === 'participantes') loadDashboard();
 }
 
 /* ============================================
@@ -555,175 +540,240 @@ async function deactivateSorteo() {
 }
 
 /* ============================================
-   PARTICIPANTES
+   DASHBOARD
    ============================================ */
-async function loadParticipantes() {
-  document.getElementById('participantesContainer').innerHTML =
-    '<div class="loading-row"><div class="spin"></div>Cargando...</div>';
+async function loadDashboard() {
+  const el = document.getElementById('dashboardContainer');
+  el.innerHTML = '<div class="loading-row"><div class="spin"></div>Cargando dashboard...</div>';
   try {
-    const { data } = await sb.from('estampillas')
-      .select('*').eq('estado','completado')
-      .order('created_at',{ascending:false});
-    allParts = data || [];
-    renderParticipantes(allParts);
-  } catch(e) {
-    document.getElementById('participantesContainer').innerHTML =
-      '<p style="color:var(--muted);font-size:13px;padding:16px 0;">Error al cargar participantes.</p>';
-  }
-}
+    // Traer solo campos necesarios — eficiente para 10.000 filas
+    const { data, error } = await sb
+      .from('estampillas')
+      .select('email,pack,monto_pack,orden_en_pack,total_en_pack,numero_folio,created_at')
+      .eq('estado','completado')
+      .order('created_at', { ascending: true });
 
-function renderParticipantes(rows) {
-  if (!rows.length) {
-    document.getElementById('participantesContainer').innerHTML =
-      '<p style="color:var(--muted);font-size:13px;padding:16px 0;">Aún no hay participantes registrados.</p>';
-    return;
-  }
+    if (error) throw error;
+    const rows = data || [];
 
-  // Agrupar por compra: mismo email + mismo minuto = 1 transacción
-  const comprasMap = {};
-  rows.forEach(r => {
-    const key = r.email + '__' + (r.created_at||'').slice(0,16);
-    if (!comprasMap[key]) {
-      comprasMap[key] = {
-        nombre:       r.nombre,
-        email:        r.email,
-        pack:         r.pack,
-        monto_pack:   r.monto_pack,
-        total_en_pack:r.total_en_pack,
-        fecha:        r.created_at,
-        folios:       []
-      };
+    if (!rows.length) {
+      el.innerHTML = '<div class="card"><div style="color:var(--muted);font-size:14px;padding:24px 0;text-align:center;"><i class="fas fa-inbox" style="font-size:32px;opacity:0.2;display:block;margin-bottom:12px;"></i>Aún no hay ventas registradas.</div></div>';
+      return;
     }
-    comprasMap[key].folios.push(r.numero_folio);
-  });
 
-  const compras = Object.values(comprasMap)
-    .sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+    // ── MÉTRICAS GENERALES ──
+    const totalStamps   = rows.length;
+    const totalCompras  = rows.filter(r => r.orden_en_pack === 1).length;
+    const emailsUnicos  = new Set(rows.map(r => r.email)).size;
+    var   recaudacion   = 0;
+    rows.forEach(r => { if (r.orden_en_pack === 1) recaudacion += (r.monto_pack || 0); });
+    const ticketProm    = totalCompras > 0 ? Math.round(recaudacion / totalCompras) : 0;
 
-  document.getElementById('participantesContainer').innerHTML =
-    '<div style="overflow-x:auto;">' +
-    '<table class="part-table"><thead><tr>' +
-    '<th>Folios</th><th>Nombre</th><th>Email</th>' +
-    '<th>Pack</th><th>Precio pack</th><th>Precio c/u</th><th>Fecha</th>' +
-    '</tr></thead><tbody>' +
-    compras.map(function(c) {
-      var precioCU = Math.round(c.monto_pack / (c.total_en_pack || 1));
-      var foliosHtml = c.folios.map(function(f) {
-        return '<span class="folio-cell" style="display:inline-block;margin:1px 3px;">' + f + '</span>';
-      }).join('');
-      return '<tr>' +
-        '<td style="max-width:240px;line-height:2;">' + foliosHtml + '</td>' +
-        '<td>' + c.nombre + '</td>' +
-        '<td style="color:var(--muted);font-size:12px;">' + c.email + '</td>' +
-        '<td><span class="pack-badge pack-' + c.pack + '">' + c.pack + ' (x' + c.total_en_pack + ')</span></td>' +
-        '<td style="font-weight:600;">$' + (c.monto_pack||0).toLocaleString('es-CL') + '</td>' +
-        '<td style="color:var(--muted);">$' + precioCU.toLocaleString('es-CL') + '</td>' +
-        '<td style="color:var(--muted);white-space:nowrap;">' + new Date(c.fecha).toLocaleDateString('es-CL') + '</td>' +
-        '</tr>';
-    }).join('') +
-    '</tbody></table></div>' +
-    '<div style="font-size:12px;color:var(--muted);margin-top:10px;">' +
-    compras.length + ' compra' + (compras.length !== 1 ? 's' : '') +
-    ' &nbsp;·&nbsp; ' + rows.length + ' estampilla' + (rows.length !== 1 ? 's' : '') +
-    '</div>';
-}
+    // Meta: 25.000.000
+    const META          = 25000000;
+    const pctMeta       = Math.min(100, Math.round((recaudacion / META) * 100));
 
-/* ============================================
-   RESUMEN
-   ============================================ */
-async function loadResumen() {
-  document.getElementById('resumenContainer').innerHTML =
-    '<div class="loading-row"><div class="spin"></div>Cargando...</div>';
-  try {
-    const { data: ests } = await sb.from('estampillas').select('*').eq('estado','completado');
-    const rows = ests || [];
-    const total  = rows.length;
-    const unicos = new Set(rows.map(function(r){ return r.email; })).size;
-
-    // Recaudación: contar monto_pack UNA sola vez por compra (orden_en_pack === 1)
-    var recaudacion = 0;
-    rows.forEach(function(r){
-      if (r.orden_en_pack === 1) recaudacion += (r.monto_pack || 0);
+    // ── PACKS ──
+    const packs = { inicio:0, popular:0, coleccionista:0 };
+    rows.filter(r => r.orden_en_pack === 1).forEach(r => {
+      if (packs[r.pack] !== undefined) packs[r.pack]++;
     });
+    const recPacks = {
+      inicio:       packs.inicio * 9990,
+      popular:      packs.popular * 14990,
+      coleccionista:packs.coleccionista * 19990
+    };
 
-    // Contar packs vendidos (también por orden_en_pack === 1)
-    var packs = { inicio:0, popular:0, coleccionista:0 };
-    rows.filter(function(r){ return r.orden_en_pack === 1; })
-        .forEach(function(r){ if (packs[r.pack] !== undefined) packs[r.pack]++; });
+    // ── VENTAS POR DÍA (últimos 14 días) ──
+    const diasMap = {};
+    rows.filter(r => r.orden_en_pack === 1).forEach(r => {
+      const d = (r.created_at||'').slice(0,10);
+      diasMap[d] = (diasMap[d]||0) + 1;
+    });
+    const hoy     = new Date();
+    const dias14  = [];
+    for (let i = 13; i >= 0; i--) {
+      const d  = new Date(hoy); d.setDate(d.getDate() - i);
+      const key= d.toISOString().slice(0,10);
+      dias14.push({ key, label: d.toLocaleDateString('es-CL',{day:'numeric',month:'short'}), val: diasMap[key]||0 });
+    }
+    const maxDia = Math.max(...dias14.map(d=>d.val), 1);
 
-    var ticketProm = unicos > 0
-      ? '$' + Math.round(recaudacion / unicos).toLocaleString('es-CL')
-      : '—';
+    // ── ÚLTIMAS COMPRAS ──
+    const comprasMap = {};
+    [...rows].reverse().forEach(r => {
+      const key = r.email + '__' + (r.created_at||'').slice(0,16);
+      if (!comprasMap[key]) comprasMap[key] = { email:r.email, pack:r.pack, monto:r.monto_pack, total:r.total_en_pack, fecha:r.created_at };
+    });
+    const ultimas = Object.values(comprasMap).slice(0,8);
 
-    document.getElementById('resumenContainer').innerHTML =
-      '<div class="card">' +
-      '<div class="card-title"><i class="fas fa-chart-bar"></i> Resumen del Sorteo</div>' +
-      '<div class="stats-grid">' +
+    // ── RENDER ──
+    el.innerHTML =
 
-        '<div class="stat-box">' +
-          '<div class="stat-val">' + total.toLocaleString('es-CL') + '</div>' +
-          '<div class="stat-label">Estampillas vendidas</div>' +
+    // Barra meta + header
+    '<div class="card" style="margin-bottom:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+        '<div class="card-title" style="margin:0;"><i class="fas fa-chart-bar"></i> Dashboard del Sorteo</div>' +
+        '<button class="btn-ghost" style="font-size:12px;" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>' +
+      '</div>' +
+      '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Meta de recaudación · $' + META.toLocaleString('es-CL') + '</div>' +
+      '<div style="background:var(--surface-3);border-radius:999px;height:10px;overflow:hidden;margin-bottom:6px;">' +
+        '<div style="height:100%;width:' + pctMeta + '%;background:linear-gradient(90deg,var(--red),#ff4444);border-radius:999px;transition:width 0.8s;"></div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;font-size:12px;">' +
+        '<span style="color:var(--red);font-weight:700;">$' + recaudacion.toLocaleString('es-CL') + ' recaudados</span>' +
+        '<span style="color:var(--muted);">' + pctMeta + '% de la meta</span>' +
+      '</div>' +
+    '</div>' +
+
+    // KPIs grid 4 cols
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;">' +
+
+      '<div class="stat-box">' +
+        '<div class="stat-val">' + totalStamps.toLocaleString('es-CL') + '</div>' +
+        '<div class="stat-label">Estampillas vendidas</div>' +
+      '</div>' +
+
+      '<div class="stat-box">' +
+        '<div class="stat-val">' + totalCompras.toLocaleString('es-CL') + '</div>' +
+        '<div class="stat-label">Transacciones</div>' +
+      '</div>' +
+
+      '<div class="stat-box">' +
+        '<div class="stat-val">' + emailsUnicos.toLocaleString('es-CL') + '</div>' +
+        '<div class="stat-label">Compradores únicos</div>' +
+      '</div>' +
+
+      '<div class="stat-box">' +
+        '<div class="stat-val" style="font-size:clamp(14px,3vw,24px);">$' + ticketProm.toLocaleString('es-CL') + '</div>' +
+        '<div class="stat-label">Ticket promedio</div>' +
+      '</div>' +
+
+    '</div>' +
+
+    // Packs breakdown
+    '<div class="card" style="margin-bottom:12px;">' +
+      '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Ventas por Pack</div>' +
+      '<div style="display:flex;gap:10px;">' +
+
+        '<div style="flex:1;padding:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);text-align:center;">' +
+          '<div style="font-size:26px;font-weight:800;color:var(--white);">' + packs.inicio + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Inicio</div>' +
+          '<div style="font-size:11px;color:var(--muted);">x2 · $9.990</div>' +
+          '<div style="font-size:12px;font-weight:600;color:var(--text);margin-top:6px;">$' + recPacks.inicio.toLocaleString('es-CL') + '</div>' +
         '</div>' +
 
-        '<div class="stat-box">' +
-          '<div class="stat-val">' + unicos.toLocaleString('es-CL') + '</div>' +
-          '<div class="stat-label">Compradores únicos</div>' +
+        '<div style="flex:1;padding:14px;background:var(--surface-2);border:1px solid rgba(201,168,76,0.3);border-radius:var(--r-md);text-align:center;">' +
+          '<div style="font-size:26px;font-weight:800;color:var(--gold);">' + packs.popular + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Popular</div>' +
+          '<div style="font-size:11px;color:var(--muted);">x4 · $14.990</div>' +
+          '<div style="font-size:12px;font-weight:600;color:var(--gold);margin-top:6px;">$' + recPacks.popular.toLocaleString('es-CL') + '</div>' +
         '</div>' +
 
-        '<div class="stat-box">' +
-          '<div class="stat-val" style="font-size:clamp(16px,3vw,26px);">$' + recaudacion.toLocaleString('es-CL') + '</div>' +
-          '<div class="stat-label">Recaudación total</div>' +
-        '</div>' +
-
-        '<div class="stat-box">' +
-          '<div class="stat-val" style="font-size:clamp(16px,3vw,26px);">' + ticketProm + '</div>' +
-          '<div class="stat-label">Ticket promedio</div>' +
+        '<div style="flex:1;padding:14px;background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--r-md);text-align:center;">' +
+          '<div style="font-size:26px;font-weight:800;color:#60A5FA;">' + packs.coleccionista + '</div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Coleccionista</div>' +
+          '<div style="font-size:11px;color:var(--muted);">x6 · $19.990</div>' +
+          '<div style="font-size:12px;font-weight:600;color:#60A5FA;margin-top:6px;">$' + recPacks.coleccionista.toLocaleString('es-CL') + '</div>' +
         '</div>' +
 
       '</div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">' +
+    '</div>' +
 
-        '<div style="flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;text-align:center;">' +
-          '<div style="font-size:22px;font-weight:700;color:var(--white);">' + packs.inicio + '</div>' +
-          '<div style="font-size:10px;color:var(--muted);margin-top:3px;">Pack Inicio<br><span style="color:var(--text);">x2 · $9.990</span></div>' +
-        '</div>' +
-
-        '<div style="flex:1;background:var(--surface-2);border:1px solid rgba(201,168,76,0.3);border-radius:var(--r-md);padding:14px;text-align:center;">' +
-          '<div style="font-size:22px;font-weight:700;color:var(--gold);">' + packs.popular + '</div>' +
-          '<div style="font-size:10px;color:var(--muted);margin-top:3px;">Pack Popular<br><span style="color:var(--gold);">x4 · $14.990</span></div>' +
-        '</div>' +
-
-        '<div style="flex:1;background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--r-md);padding:14px;text-align:center;">' +
-          '<div style="font-size:22px;font-weight:700;color:#60A5FA;">' + packs.coleccionista + '</div>' +
-          '<div style="font-size:10px;color:var(--muted);margin-top:3px;">Pack Coleccionista<br><span style="color:#60A5FA;">x6 · $19.990</span></div>' +
-        '</div>' +
-
+    // Gráfico barras últimos 14 días
+    '<div class="card" style="margin-bottom:12px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+        '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Compras por día (últimos 14 días)</div>' +
       '</div>' +
-      '</div>';
+      '<div style="display:flex;align-items:flex-end;gap:4px;height:90px;">' +
+        dias14.map(function(d) {
+          var h = Math.round((d.val / maxDia) * 80);
+          var isHoy = d.key === hoy.toISOString().slice(0,10);
+          return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;" title="' + d.label + ': ' + d.val + ' compras">' +
+            '<div style="font-size:9px;color:' + (d.val > 0 ? 'var(--text)' : 'transparent') + ';">' + d.val + '</div>' +
+            '<div style="width:100%;height:' + (h||2) + 'px;background:' + (isHoy ? 'var(--gold)' : 'var(--red)') + ';border-radius:3px 3px 0 0;opacity:' + (d.val > 0 ? '1' : '0.15') + ';min-height:2px;"></div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+      '<div style="display:flex;gap:4px;margin-top:4px;">' +
+        dias14.map(function(d) {
+          return '<div style="flex:1;font-size:8px;color:var(--muted);text-align:center;overflow:hidden;">' + d.label.split(' ')[0] + '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>' +
+
+    // Últimas transacciones
+    '<div class="card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+        '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Últimas ' + ultimas.length + ' transacciones</div>' +
+        '<span style="font-size:11px;color:var(--muted);">Total: ' + totalCompras.toLocaleString('es-CL') + ' · Exporta CSV para ver todo</span>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        ultimas.map(function(c) {
+          var label = { inicio:'Inicio x2', popular:'Popular x4', coleccionista:'Coleccionista x6' };
+          var color = { inicio:'var(--muted)', popular:'var(--gold)', coleccionista:'#60A5FA' };
+          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--border);">' +
+            '<div>' +
+              '<div style="font-size:13px;font-weight:500;color:var(--text);">' + c.email + '</div>' +
+              '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + new Date(c.fecha).toLocaleDateString('es-CL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) + '</div>' +
+            '</div>' +
+            '<div style="text-align:right;">' +
+              '<div style="font-size:12px;font-weight:700;color:' + color[c.pack] + ';">' + (label[c.pack]||c.pack) + '</div>' +
+              '<div style="font-size:13px;font-weight:600;color:var(--white);">$' + (c.monto||0).toLocaleString('es-CL') + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+
+    // Guardar para CSV
+    allParts = rows;
 
   } catch(e) {
-    document.getElementById('resumenContainer').innerHTML =
-      '<p style="color:var(--muted);padding:16px">Error al cargar: ' + e.message + '</p>';
+    document.getElementById('dashboardContainer').innerHTML =
+      '<div class="card"><p style="color:var(--muted);padding:16px">Error: ' + e.message + '</p></div>';
   }
 }
 
 /* ============================================
-   EXPORTAR CSV
+   EXPORTAR CSV — pagina de a 1000 para soportar 10.000+ filas
    ============================================ */
-function exportCSV() {
-  if (!allParts.length) { showNotif('Sin datos para exportar','error'); return; }
-  const headers = ['Folio','Nombre','Email','Teléfono','Pack','Monto','Orden','Hash Seguridad','Fecha'];
-  const rows = allParts.map(r=>[
-    r.numero_folio, r.nombre, r.email, r.telefono||'',
-    r.pack, r.monto_pack, r.orden_en_pack+'/'+r.total_en_pack,
-    r.hash_seguridad, r.created_at
-  ]);
-  const csv = [headers, ...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href=url; a.download=`estampillas-sorteo-${new Date().toISOString().slice(0,10)}.csv`; a.click();
-  URL.revokeObjectURL(url);
+async function exportCSV() {
+  showNotif('Preparando CSV...','info');
+  try {
+    var allRows = [];
+    var from    = 0;
+    var PAGE    = 1000;
+    while (true) {
+      var res = await sb
+        .from('estampillas')
+        .select('numero_folio,nombre,email,telefono,pack,monto_pack,total_en_pack,orden_en_pack,hash_seguridad,created_at')
+        .eq('estado','completado')
+        .order('created_at',{ascending:true})
+        .range(from, from+PAGE-1);
+      if (res.error) throw res.error;
+      if (!res.data || res.data.length === 0) break;
+      allRows = allRows.concat(res.data);
+      if (res.data.length < PAGE) break;
+      from += PAGE;
+    }
+    if (!allRows.length) { showNotif('Sin datos para exportar','error'); return; }
+    var headers = ['Folio','Nombre','Email','Telefono','Pack','Monto Pack','Stamps en Pack','Orden en Pack','Hash Seguridad','Fecha'];
+    var csvRows = allRows.map(function(r) {
+      return [r.numero_folio, r.nombre, r.email, r.telefono||'', r.pack, r.monto_pack, r.total_en_pack, r.orden_en_pack, r.hash_seguridad, r.created_at];
+    });
+    var csv = [headers].concat(csvRows).map(function(row) {
+      return row.map(function(v){ return '"'+String(v||'').replace(/"/g,'""')+'"'; }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href=url; a.download='estampillas-sorteo-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+    URL.revokeObjectURL(url);
+    showNotif('CSV con '+allRows.length.toLocaleString('es-CL')+' registros descargado','success');
+  } catch(e) {
+    showNotif('Error al exportar: '+e.message,'error');
+  }
 }
 
 /* ============================================
