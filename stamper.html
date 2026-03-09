@@ -604,18 +604,43 @@ async function loadSorteoConfig() {
 }
 
 /* ============================================
-   FOLIO BASE (para continuar numeración)
+   FOLIO — generación aleatoria criptográfica
+   Formato: IAC-XXXX-XXXX
+   Alfabeto sin caracteres ambiguos (O,0,I,1)
    ============================================ */
-async function loadFolioBase() {
-  if (!sbClient) return;
-  try {
-    const { count } = await sbClient
-      .from('estampillas')
-      .select('*', { count:'exact', head:true })
-      .eq('estado','completado');
-    currentFolioBase = count || 0;
-  } catch(e) { currentFolioBase = 0; }
+const FOLIO_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+function randomGroup(length) {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array).map(b => FOLIO_CHARS[b % FOLIO_CHARS.length]).join('');
 }
+
+function generateFolio() {
+  return `IAC-${randomGroup(4)}-${randomGroup(4)}`;
+}
+
+async function generateUniqueFolio() {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const folio = generateFolio();
+    if (!sbClient) return folio;
+    try {
+      const { data } = await sbClient
+        .from('estampillas')
+        .select('numero_folio')
+        .eq('numero_folio', folio)
+        .maybeSingle();
+      if (!data) return folio; // no existe → único
+    } catch(e) {
+      return folio;
+    }
+  }
+  // Fallback con timestamp para garantizar unicidad absoluta
+  return `IAC-${randomGroup(4)}-${Date.now().toString(36).slice(-4).toUpperCase()}`;
+}
+
+// Mantener por compatibilidad (ya no se usa internamente)
+async function loadFolioBase() { currentFolioBase = 0; }
 
 /* ============================================
    COUNTDOWN
@@ -1149,10 +1174,10 @@ async function simulatePurchase() {
   const telefono = document.getElementById('inputTelefono').value.trim();
   const timestamp= Date.now();
 
-  // Generar folios y hashes para cada estampilla del pack
+  // Generar folios únicos aleatorios y hashes para cada estampilla del pack
   const estampillas = [];
   for (let i = 0; i < selectedPackData.stamps; i++) {
-    const folio = generateFolio(i);
+    const folio = await generateUniqueFolio();
     const hash  = await generateSecurityHash(folio, email, timestamp);
     estampillas.push({ folio, hash, index: i });
   }
@@ -1178,7 +1203,6 @@ async function simulatePurchase() {
       }));
       const { error } = await sbClient.from('estampillas').insert(rows);
       if (error) console.warn('Supabase insert error:', error.message);
-      else currentFolioBase += selectedPackData.stamps;
     } catch(e) { console.warn(e.message); }
   }
 
