@@ -10,8 +10,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- QR Code generator -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-83095XZ965"></script>
 <script>
@@ -21,8 +19,11 @@
 </script>
 
 <style>
+/* ============================================================
+   VARIABLES & RESET
+   ============================================================ */
 :root {
-  --red:#9B0000; --red-deep:#6B0000; --red-glow:rgba(155,0,0,0.22);
+  --red:#9B0000; --red-deep:#6B0000;
   --bg:#0C0C0C; --surface:#161616; --surface-2:#202020; --surface-3:#2A2A2A;
   --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
   --text:#F2F2F2; --muted:#6E6E6E; --muted-2:#3E3E3E;
@@ -31,37 +32,35 @@
   --font-h:'Barlow Condensed',sans-serif;
   --font-b:'DM Sans',sans-serif;
   --r-sm:10px; --r-md:16px; --r-lg:22px; --r-full:999px;
+  --safe-b:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
 body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:15px;line-height:1.55;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-button{font-family:inherit;cursor:pointer;border:none;background:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;-webkit-tap-highlight-color:transparent}
+input{-webkit-appearance:none;appearance:none}
 
 /* TOPBAR */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 18px;
-  background:rgba(12,12,12,0.9);backdrop-filter:blur(20px);
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+  background:rgba(12,12,12,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
 }
 .topbar-logo{font-family:var(--font-h);font-size:17px;letter-spacing:0.5px;color:var(--white);}
 .topbar-logo span{color:var(--red);}
 .topbar-back{
-  display:flex;align-items:center;gap:7px;
-  padding:8px 14px;background:var(--surface-2);
-  color:var(--text);border-radius:var(--r-full);
+  display:flex;align-items:center;gap:7px;padding:8px 14px;
+  background:var(--surface-2);color:var(--text);border-radius:var(--r-full);
   font-size:13px;font-weight:500;border:1px solid var(--border-hi);
 }
 
 /* HERO */
 .hero{
-  position:relative;margin-top:52px;
-  padding:48px 20px 36px;
-  background:var(--surface);border-bottom:1px solid var(--border);
-  overflow:hidden;
+  position:relative;margin-top:52px;padding:48px 20px 36px;
+  background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;
 }
 .hero::before{
   content:'';position:absolute;inset:0;
@@ -75,30 +74,25 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   text-transform:uppercase;padding:5px 12px;border-radius:var(--r-full);margin-bottom:14px;
 }
 .hero-title{
-  font-family:var(--font-h);
-  font-size:clamp(34px,9vw,52px);font-weight:800;line-height:1;letter-spacing:-0.5px;
-  color:var(--white);margin-bottom:10px;position:relative;z-index:1;
+  font-family:var(--font-h);font-size:clamp(34px,9vw,52px);font-weight:800;
+  line-height:1;letter-spacing:-0.5px;color:var(--white);margin-bottom:10px;
+  position:relative;z-index:1;
 }
 .hero-title em{color:var(--red);font-style:normal;}
 .hero-sub{font-size:14px;color:var(--muted);margin-bottom:28px;max-width:360px;line-height:1.65;position:relative;z-index:1;}
 
 /* COUNTDOWN */
 .countdown-wrap{
-  position:relative;z-index:1;
-  background:var(--surface-2);border:1px solid var(--border-hi);
-  border-radius:var(--r-lg);padding:20px;margin-bottom:0;
+  position:relative;z-index:1;background:var(--surface-2);
+  border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:20px;
 }
 .countdown-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
-.countdown-grid{display:flex;gap:8px;justify-content:flex-start;}
+.countdown-grid{display:flex;gap:8px;}
 .cd-unit{
   flex:1;background:var(--surface-3);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:12px 6px;text-align:center;
-  max-width:80px;
+  border-radius:var(--r-md);padding:12px 6px;text-align:center;max-width:80px;
 }
-.cd-num{
-  font-family:var(--font-h);font-size:32px;font-weight:800;
-  color:var(--white);line-height:1;display:block;
-}
+.cd-num{font-family:var(--font-h);font-size:32px;font-weight:800;color:var(--white);line-height:1;display:block;}
 .cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px;}
 .countdown-date{font-size:12px;color:var(--muted);margin-top:10px;}
 .countdown-date strong{color:var(--gold-light);}
@@ -108,14 +102,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
 .section-title{font-family:var(--font-h);font-size:clamp(26px,7vw,36px);font-weight:800;color:var(--white);margin-bottom:6px;}
 .section-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
-
-.premio-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-lg);overflow:hidden;
-}
-.premio-img-wrap{
-  position:relative;aspect-ratio:16/9;background:var(--surface-2);overflow:hidden;
-}
+.premio-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
+.premio-img-wrap{position:relative;aspect-ratio:16/9;background:var(--surface-2);overflow:hidden;}
 .premio-img{width:100%;height:100%;object-fit:cover;}
 .premio-img-skeleton{
   width:100%;height:100%;
@@ -124,23 +112,18 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .premio-badge-sorteo{
-  position:absolute;top:12px;left:12px;
-  background:var(--red);color:white;
+  position:absolute;top:12px;left:12px;background:var(--red);color:white;
   font-size:11px;font-weight:700;padding:5px 12px;border-radius:var(--r-full);
-  letter-spacing:0.5px;
 }
 .premio-body{padding:16px;}
 .premio-name{font-family:var(--font-h);font-size:24px;font-weight:800;color:var(--white);margin-bottom:4px;}
 .premio-price{font-size:18px;font-weight:700;color:var(--gold-light);margin-bottom:12px;}
 .premio-specs{display:flex;gap:6px;flex-wrap:wrap;}
 .spec-tag{
-  display:flex;align-items:center;gap:5px;
-  background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);
   padding:4px 10px;border-radius:var(--r-full);font-size:11px;color:var(--muted);
 }
 .spec-tag i{color:var(--red);font-size:10px;}
-
-/* Thumbnails del vehículo */
 .premio-thumbs{
   display:flex;gap:6px;overflow-x:auto;padding:10px 16px;
   border-top:1px solid var(--border);scrollbar-width:none;
@@ -152,17 +135,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 .premio-thumb.active{border-color:var(--gold);}
 .premio-thumb img{width:100%;height:100%;object-fit:cover;}
-
-/* VIDEO del vehículo */
 .premio-video-btn{
-  display:flex;align-items:center;gap:8px;
-  margin:12px 16px 16px;
-  padding:11px 14px;
+  display:flex;align-items:center;gap:8px;margin:12px 16px 16px;padding:11px 14px;
   background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);
-  border-radius:var(--r-md);font-size:13px;color:#60A5FA;font-weight:500;
-  cursor:pointer;transition:background 0.2s;
+  border-radius:var(--r-md);font-size:13px;color:#60A5FA;font-weight:500;cursor:pointer;
 }
-.premio-video-btn:active{background:rgba(59,130,246,0.2);}
 
 /* PACKS */
 .packs-section{padding:36px 20px;}
@@ -170,8 +147,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .pack-card{
   position:relative;background:var(--surface);border:1px solid var(--border);
   border-radius:var(--r-lg);padding:18px;cursor:pointer;
-  transition:border-color 0.2s,background 0.2s;
-  -webkit-tap-highlight-color:transparent;
+  transition:border-color 0.2s,background 0.2s;user-select:none;
 }
 .pack-card.selected{border-color:var(--red);background:rgba(155,0,0,0.08);}
 .pack-card.popular{border-color:rgba(201,168,76,0.3);}
@@ -196,8 +172,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .mini-stamp{
   width:36px;height:26px;background:linear-gradient(135deg,var(--surface-3),var(--surface-2));
   border:1px dashed rgba(255,255,255,0.15);border-radius:3px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:var(--gold);position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);
+  position:relative;overflow:hidden;
 }
 .mini-stamp::before{
   content:'';position:absolute;inset:0;
@@ -208,8 +184,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .pack-unit{font-size:11px;color:var(--muted);margin-top:3px;}
 .pack-features{display:flex;gap:8px;flex-wrap:wrap;}
 .pack-feat{
-  display:flex;align-items:center;gap:5px;
-  background:var(--surface-2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);
   padding:4px 10px;border-radius:var(--r-full);font-size:11px;color:var(--muted);
 }
 .pack-feat i{color:var(--red);font-size:10px;}
@@ -218,22 +193,58 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 /* CHECKOUT */
 .checkout-section{padding:0 20px 48px;}
 .checkout-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;}
-.checkout-title{font-family:var(--font-h);font-size:20px;font-weight:700;color:var(--white);margin-bottom:16px;}
+.checkout-title{font-family:var(--font-h);font-size:20px;font-weight:700;color:var(--white);margin-bottom:4px;}
+.checkout-subtitle{font-size:12px;color:var(--muted);margin-bottom:18px;}
+
+/* BANNER WHATSAPP */
+.wsp-banner{
+  display:flex;align-items:flex-start;gap:12px;
+  background:rgba(0,197,102,0.07);border:1px solid rgba(0,197,102,0.22);
+  border-radius:var(--r-md);padding:14px;margin-bottom:18px;
+}
+.wsp-banner-icon{
+  width:40px;height:40px;flex-shrink:0;border-radius:50%;
+  background:rgba(0,197,102,0.15);border:1px solid rgba(0,197,102,0.3);
+  display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--green);
+}
+.wsp-banner-text strong{display:block;color:var(--white);font-size:13px;font-weight:700;margin-bottom:3px;}
+.wsp-banner-text span{font-size:12px;color:var(--muted);line-height:1.5;}
+
+/* DEMO BANNER */
+.sim-banner{
+  display:flex;align-items:flex-start;gap:10px;
+  background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);
+  border-radius:var(--r-sm);padding:12px;margin-bottom:16px;
+  font-size:12px;color:var(--orange);line-height:1.55;
+}
+.sim-banner i{margin-top:2px;flex-shrink:0;}
+
+/* FORM */
 .form-group{margin-bottom:14px;}
 .form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
+.form-label .highlight{color:var(--green);}
 .form-input{
-  width:100%;padding:13px 14px;
+  width:100%;padding:14px;
   background:var(--surface-2);border:1px solid var(--border-hi);
-  border-radius:var(--r-sm);color:var(--text);font-family:var(--font-b);font-size:15px;
-  transition:border-color 0.2s;-webkit-appearance:none;
+  border-radius:var(--r-sm);color:var(--text);font-family:var(--font-b);
+  font-size:16px; /* 16px evita zoom automático en iOS Safari */
+  transition:border-color 0.2s;
 }
 .form-input::placeholder{color:var(--muted-2);}
 .form-input:focus{outline:none;border-color:var(--red);background:rgba(155,0,0,0.05);}
 .form-input.error{border-color:#ff4444;}
+.phone-wrap{position:relative;}
+.phone-prefix{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:15px;color:var(--muted);pointer-events:none;
+  display:flex;align-items:center;gap:5px;
+}
+.phone-wrap .form-input{padding-left:72px;}
 
+/* RESUMEN */
 .order-summary{
   background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:14px;margin-bottom:16px;
+  border-radius:var(--r-md);padding:14px;margin-bottom:18px;
 }
 .summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;}
 .summary-row:not(:last-child){border-bottom:1px solid var(--border);}
@@ -242,21 +253,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .summary-total .summary-label{font-weight:600;color:var(--text);}
 .summary-total .summary-val{font-family:var(--font-h);font-size:22px;font-weight:800;color:var(--white);}
 
-.sim-banner{
-  display:flex;align-items:flex-start;gap:10px;
-  background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);
-  border-radius:var(--r-sm);padding:12px;margin-bottom:16px;
-  font-size:12px;color:var(--orange);line-height:1.55;
-}
-.sim-banner i{margin-top:2px;flex-shrink:0;}
-
+/* BOTÓN PAGO — grande para dedos */
 .pay-btn{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  background:var(--red);color:white;font-size:16px;font-weight:700;
-  padding:17px;border-radius:var(--r-md);
-  transition:background 0.2s,transform 0.15s;-webkit-tap-highlight-color:transparent;
+  background:var(--red);color:white;font-size:18px;font-weight:700;
+  padding:20px;border-radius:var(--r-md);min-height:62px;
+  transition:background 0.15s,transform 0.1s;touch-action:manipulation;
 }
-.pay-btn:active{background:var(--red-deep);transform:scale(0.98);}
+.pay-btn:active{background:var(--red-deep);transform:scale(0.985);}
 .pay-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
 .pay-note{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted);margin-top:10px;}
 .pay-note i{color:var(--green);}
@@ -264,82 +268,161 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 /* MODAL ÉXITO */
 .success-modal{display:none;position:fixed;inset:0;z-index:2000;overflow-y:auto;}
 .success-modal.active{display:block;}
-.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);}
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.93);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .success-sheet{
   position:relative;z-index:1;background:var(--surface);
   border:1px solid var(--border);border-radius:var(--r-lg);
-  margin:52px 12px 40px;padding:28px 20px;
+  margin:52px 12px calc(40px + var(--safe-b));padding:28px 20px;
   animation:sheetUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
 }
 @keyframes sheetUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
 .success-icon{
-  width:64px;height:64px;border-radius:50%;
+  width:64px;height:64px;border-radius:50%;margin:0 auto 16px;
   background:rgba(0,197,102,0.15);border:2px solid rgba(0,197,102,0.4);
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;color:var(--green);margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);
 }
 .success-title{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--white);margin-bottom:6px;text-align:center;}
 .success-sub{font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;line-height:1.6;}
-
-/* Estampillas generadas */
 .stamps-generated{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
-.stamp-item{
-  background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r-md);overflow:hidden;
-}
+
+/* TARJETA DE ESTAMPILLA (HTML puro — sin canvas, sin CORS) */
+.stamp-item{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
 .stamp-item-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;border-bottom:1px solid var(--border);
 }
 .stamp-folio{font-family:monospace;font-size:13px;font-weight:700;color:var(--gold-light);letter-spacing:1px;}
 .stamp-part{font-size:11px;color:var(--green);}
-.stamp-canvas-wrap{
-  padding:12px;display:flex;justify-content:center;
-  background:var(--surface-3);
-}
-.stamp-canvas-wrap canvas{border-radius:6px;max-width:100%;}
-.stamp-download-btn{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  width:100%;padding:11px;
-  background:var(--surface-3);color:var(--text);
-  font-size:13px;font-weight:600;cursor:pointer;
-  border:none;border-top:1px solid var(--border);
-  transition:background 0.2s;font-family:var(--font-b);
-}
-.stamp-download-btn:active{background:var(--surface-2);}
-.stamp-download-btn i{color:var(--gold);}
 
+.stamp-card{
+  position:relative;background:linear-gradient(140deg,#1c0b03 0%,#0d0d0d 100%);
+  padding:14px 16px;overflow:hidden;
+}
+.stamp-card-border{
+  position:absolute;inset:7px;border:2px dashed rgba(201,168,76,0.35);
+  border-radius:5px;pointer-events:none;
+}
+.stamp-card-row1{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;position:relative;z-index:1;
+}
+.stamp-card-country{
+  font-family:var(--font-h);font-size:10px;font-weight:700;
+  color:rgba(201,168,76,0.65);letter-spacing:2px;text-transform:uppercase;
+}
+.stamp-card-seal{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid rgba(155,0,0,0.45);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-h);font-size:10px;font-weight:800;color:rgba(155,0,0,0.7);
+}
+.stamp-card-img{
+  width:100%;aspect-ratio:16/6;object-fit:cover;border-radius:4px;
+  margin-bottom:10px;position:relative;z-index:1;display:block;
+}
+.stamp-card-img-ph{
+  width:100%;aspect-ratio:16/6;background:var(--surface-3);border-radius:4px;
+  margin-bottom:10px;display:flex;align-items:center;justify-content:center;
+  color:var(--muted-2);font-size:22px;
+}
+.stamp-card-vehicle{
+  font-family:var(--font-h);font-size:19px;font-weight:800;color:var(--white);
+  text-align:center;letter-spacing:0.5px;position:relative;z-index:1;
+}
+.stamp-card-coll{
+  font-size:9px;color:rgba(240,208,128,0.6);text-align:center;
+  letter-spacing:1.5px;text-transform:uppercase;margin:3px 0 10px;
+  position:relative;z-index:1;
+}
+.stamp-card-line{height:1px;background:rgba(201,168,76,0.2);margin-bottom:10px;position:relative;z-index:1;}
+.stamp-card-foot{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  position:relative;z-index:1;
+}
+.stamp-card-fl small{font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:2px;}
+.stamp-card-fl span{font-size:11px;color:rgba(255,255,255,0.75);font-weight:600;}
+.stamp-card-fr{text-align:right;}
+.stamp-card-fr small{font-size:9px;color:rgba(240,208,128,0.45);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:2px;}
+.stamp-card-fr span{font-family:monospace;font-size:12px;color:var(--gold-light);font-weight:700;}
+.stamp-card-owner{
+  font-size:9px;color:rgba(255,255,255,0.25);text-align:center;
+  margin-top:8px;position:relative;z-index:1;
+}
+
+/* ACCIONES POR ESTAMPILLA */
+.stamp-actions{display:flex;border-top:1px solid var(--border);}
+.stamp-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  padding:12px 6px;font-size:11px;font-weight:600;color:var(--muted);
+  cursor:pointer;transition:background 0.15s;border-right:1px solid var(--border);
+  touch-action:manipulation;
+}
+.stamp-btn:last-child{border-right:none;}
+.stamp-btn:active{background:var(--surface-3);}
+.stamp-btn i{font-size:16px;}
+.stamp-btn.wsp i{color:#25D366;}
+.stamp-btn.screen i{color:var(--blue);}
+.stamp-btn.save i{color:var(--gold);}
+
+/* BANDA WHATSAPP POST-COMPRA */
+.wsp-send-band{
+  background:rgba(0,197,102,0.07);border:1px solid rgba(0,197,102,0.2);
+  border-radius:var(--r-md);padding:14px;text-align:center;
+}
+.wsp-send-band p{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
+.wsp-send-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:#25D366;color:#000;font-size:15px;font-weight:700;
+  padding:14px;border-radius:var(--r-full);border:none;cursor:pointer;
+  touch-action:manipulation;
+}
+
+/* IOS HINT */
+.ios-hint{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.18);
+  border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:#60A5FA;line-height:1.5;
+}
+
+/* ACCIONES FINALES */
 .success-actions{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
 .success-btn{
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  width:100%;background:var(--red);color:white;
-  font-size:15px;font-weight:700;padding:15px;border-radius:var(--r-md);
-  transition:opacity 0.2s;font-family:var(--font-b);border:none;cursor:pointer;
+  width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
+  background:var(--red);color:white;font-size:15px;font-weight:700;
+  padding:16px;border-radius:var(--r-md);border:none;cursor:pointer;touch-action:manipulation;
 }
 .success-btn-ghost{
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  width:100%;background:var(--surface-2);color:var(--text);
-  font-size:14px;font-weight:500;padding:13px;border-radius:var(--r-md);
-  border:1px solid var(--border);transition:background 0.2s;
-  font-family:var(--font-b);cursor:pointer;
+  width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
+  background:var(--surface-2);color:var(--text);font-size:14px;font-weight:500;
+  padding:14px;border-radius:var(--r-md);border:1px solid var(--border);cursor:pointer;touch-action:manipulation;
 }
 
-/* LOADING */
+/* PANTALLA COMPLETA DE ESTAMPILLA */
+.stamp-fullscreen{
+  position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.97);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
+}
+.stamp-fullscreen-close{
+  position:absolute;top:16px;right:16px;
+  width:36px;height:36px;border-radius:50%;background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;cursor:pointer;
+}
+.stamp-fullscreen-hint{color:var(--muted);font-size:12px;margin-bottom:14px;text-align:center;}
+.stamp-fullscreen-card{width:100%;max-width:380px;border-radius:12px;overflow:hidden;}
+
+/* MISC */
 .loading-state{display:flex;flex-direction:column;align-items:center;padding:40px 20px;gap:12px;color:var(--muted);font-size:13px;}
 .spin{width:32px;height:32px;border:3px solid var(--surface-3);border-top-color:var(--red);border-radius:50%;animation:spin 0.75s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* NOTIF */
 .notif{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  position:fixed;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%);
   background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);
   padding:12px 20px;border-radius:var(--r-full);font-size:14px;font-weight:500;
   display:flex;align-items:center;gap:8px;z-index:9999;
   white-space:nowrap;animation:notifIn 0.3s ease;box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  max-width:calc(100vw - 40px);
 }
 @keyframes notifIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
-
-/* FOOTER */
 .footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 20px;text-align:center;}
 .footer-logo{font-family:var(--font-h);font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px;}
 .footer-logo span{color:var(--red);}
@@ -349,6 +432,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 @media(min-width:768px){
   .hero,.premio-section,.packs-section,.checkout-section{padding-left:40px;padding-right:40px;}
 }
+@media(max-width:360px){.pack-price{font-size:22px;}.cd-num{font-size:26px;}}
 </style>
 </head>
 <body>
@@ -383,9 +467,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="section-label">Premio del sorteo</div>
   <h2 class="section-title">El Vehículo</h2>
   <p class="section-sub">Vehículo real en stock. El ganador se lo lleva.</p>
-  <div id="premioContainer">
-    <div class="loading-state"><div class="spin"></div>Cargando vehículo...</div>
-  </div>
+  <div id="premioContainer"><div class="loading-state"><div class="spin"></div>Cargando vehículo...</div></div>
 </section>
 
 <!-- PACKS -->
@@ -396,19 +478,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="packs-grid">
 
     <div class="pack-card" data-pack="inicio" data-price="9990" data-stamps="2" onclick="selectPack(this)">
-      <div class="pack-top">
-        <span class="pack-name">Inicio</span>
-        <div class="pack-radio"></div>
-      </div>
+      <div class="pack-top"><span class="pack-name">Inicio</span><div class="pack-radio"></div></div>
       <div class="pack-body">
         <div class="pack-stamps-display">
           <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
           <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
         </div>
-        <div class="pack-price-block">
-          <div class="pack-price">$9.990</div>
-          <div class="pack-unit">$4.995 c/u</div>
-        </div>
+        <div class="pack-price-block"><div class="pack-price">$9.990</div><div class="pack-unit">$4.995 c/u</div></div>
       </div>
       <div class="pack-features">
         <span class="pack-feat"><i class="fas fa-stamp"></i> 2 Estampillas</span>
@@ -418,21 +494,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
     <div class="pack-card popular selected" data-pack="popular" data-price="14990" data-stamps="4" onclick="selectPack(this)">
       <div class="pack-popular-badge">★ MÁS POPULAR</div>
-      <div class="pack-top">
-        <span class="pack-name">Popular</span>
-        <div class="pack-radio"></div>
-      </div>
+      <div class="pack-top"><span class="pack-name">Popular</span><div class="pack-radio"></div></div>
       <div class="pack-body">
         <div class="pack-stamps-display">
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
         </div>
-        <div class="pack-price-block">
-          <div class="pack-price">$14.990</div>
-          <div class="pack-unit">$3.748 c/u</div>
-        </div>
+        <div class="pack-price-block"><div class="pack-price">$14.990</div><div class="pack-unit">$3.748 c/u</div></div>
       </div>
       <div class="pack-features">
         <span class="pack-feat"><i class="fas fa-stamp"></i> 4 Estampillas</span>
@@ -441,23 +509,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     </div>
 
     <div class="pack-card" data-pack="coleccionista" data-price="19990" data-stamps="6" onclick="selectPack(this)">
-      <div class="pack-top">
-        <span class="pack-name">Coleccionista</span>
-        <div class="pack-radio"></div>
-      </div>
+      <div class="pack-top"><span class="pack-name">Coleccionista</span><div class="pack-radio"></div></div>
       <div class="pack-body">
         <div class="pack-stamps-display">
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
         </div>
-        <div class="pack-price-block">
-          <div class="pack-price">$19.990</div>
-          <div class="pack-unit">$3.332 c/u</div>
-        </div>
+        <div class="pack-price-block"><div class="pack-price">$19.990</div><div class="pack-unit">$3.332 c/u</div></div>
       </div>
       <div class="pack-features">
         <span class="pack-feat"><i class="fas fa-stamp"></i> 6 Estampillas</span>
@@ -472,47 +531,56 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 <section class="checkout-section" id="checkout">
   <div class="checkout-card">
     <h3 class="checkout-title">Completa tu compra</h3>
+    <p class="checkout-subtitle">Tus estampillas se muestran al instante en pantalla</p>
 
-    <div class="sim-banner" id="simBanner">
+    <!-- BANNER WHATSAPP -->
+    <div class="wsp-banner">
+      <div class="wsp-banner-icon"><i class="fab fa-whatsapp"></i></div>
+      <div class="wsp-banner-text">
+        <strong>📲 Guárdalas por WhatsApp</strong>
+        <span>Ingresa tu número y te las enviamos directo como mensaje. Sin apps, sin descargas.</span>
+      </div>
+    </div>
+
+    <div id="simBanner" class="sim-banner">
       <i class="fas fa-tools"></i>
-      <span><strong>Modo prueba activo.</strong> Cuando actives tu cuenta en Flow.cl, el pago conecta automáticamente con WebPay. Por ahora el flujo completo funciona en simulación.</span>
+      <span><strong>Modo prueba activo.</strong> El flujo completo funciona en simulación. Para cobros reales conecta Flow.cl.</span>
     </div>
 
     <div class="form-group">
       <label class="form-label">Nombre completo</label>
-      <input class="form-input" type="text" id="inputNombre" placeholder="Tu nombre completo" autocomplete="name">
+      <input class="form-input" type="text" id="inputNombre" placeholder="Tu nombre completo" autocomplete="name" inputmode="text">
     </div>
     <div class="form-group">
       <label class="form-label">Correo electrónico</label>
-      <input class="form-input" type="email" id="inputEmail" placeholder="tu@correo.cl" autocomplete="email">
+      <input class="form-input" type="email" id="inputEmail" placeholder="tu@correo.cl" autocomplete="email" inputmode="email">
     </div>
     <div class="form-group">
-      <label class="form-label">Teléfono (opcional)</label>
-      <input class="form-input" type="tel" id="inputTelefono" placeholder="+56 9 XXXX XXXX" autocomplete="tel">
+      <label class="form-label">WhatsApp <span class="highlight">← para recibir tus estampillas</span></label>
+      <div class="phone-wrap">
+        <span class="phone-prefix">🇨🇱 +56</span>
+        <input class="form-input" type="tel" id="inputTelefono" placeholder="9 XXXX XXXX" autocomplete="tel" inputmode="numeric" maxlength="12">
+      </div>
     </div>
 
     <div class="order-summary">
       <div class="summary-row">
-        <span class="summary-label">Pack</span>
-        <span class="summary-val" id="summaryPack">Popular (x4)</span>
+        <span class="summary-label">Pack</span><span class="summary-val" id="summaryPack">Popular (x4)</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">Estampillas numeradas</span>
-        <span class="summary-val" id="summaryStamps">4</span>
+        <span class="summary-label">Estampillas numeradas</span><span class="summary-val" id="summaryStamps">4</span>
       </div>
       <div class="summary-row">
-        <span class="summary-label">Participaciones sorteo</span>
-        <span class="summary-val" id="summaryParts">4</span>
+        <span class="summary-label">Participaciones sorteo</span><span class="summary-val" id="summaryParts">4</span>
       </div>
       <div class="summary-row summary-total">
-        <span class="summary-label">Total</span>
-        <span class="summary-val" id="summaryTotal">$14.990</span>
+        <span class="summary-label">Total</span><span class="summary-val" id="summaryTotal">$14.990</span>
       </div>
     </div>
 
     <button class="pay-btn" id="payBtn" onclick="handlePay()">
-      <i class="fas fa-stamp"></i>
-      <span id="payBtnText">Obtener mis estampillas (demo)</span>
+      <i class="fas fa-stamp" id="payIcon"></i>
+      <span id="payBtnText">Obtener mis 4 estampillas</span>
     </button>
     <div class="pay-note" id="payNote">
       <i class="fas fa-tools"></i> Modo prueba — sin cobro real
@@ -535,227 +603,179 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="success-sheet">
     <div class="success-icon"><i class="fas fa-check"></i></div>
     <h2 class="success-title">¡Listo!</h2>
-    <p class="success-sub" id="successSub">Tus estampillas están listas. Descárgalas y guárdalas — son tu comprobante de participación.</p>
+    <p class="success-sub" id="successSub">Tus estampillas están listas.</p>
     <div class="stamps-generated" id="stampsGenerated"></div>
     <div class="success-actions">
-      <button class="success-btn" onclick="compartirCompra()"><i class="fab fa-whatsapp"></i> Compartir mi participación</button>
+      <button class="success-btn" onclick="compartirTodas()"><i class="fab fa-whatsapp"></i> Compartir mi participación</button>
       <button class="success-btn-ghost" onclick="closeSuccess()">Cerrar</button>
     </div>
   </div>
 </div>
 
-<!-- Scripts -->
 <script src="js/config.js"></script>
 
 <script>
-/* ============================================
-   CONFIG & ESTADO
-   ============================================ */
+/* ============================================================
+   CONFIG
+   ============================================================ */
 const SB_URL  = 'https://cflpmluvhfldewiitymh.supabase.co';
 const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmbHBtbHV2aGZsZGV3aWl0eW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTM0NzcsImV4cCI6MjA4MDk4OTQ3N30.of3ic6N1Y3U5dtSmzKzkTdvfvRnqYjqFI2fglmibaiM';
-const FLOW_MODE = 'simulation'; // cambiar a 'live' con Flow activo
+const FLOW_MODE = 'simulation'; // → cambiar a 'live' con Flow.cl activo
 
 let sbClient = null;
 try { sbClient = supabase.createClient(SB_URL, SB_ANON); } catch(e) {}
 
 let selectedPackData = { name:'popular', price:14990, stamps:4 };
-let sorteoConfig     = null;   // config activa desde Supabase
-let premioVehicle    = null;   // vehículo premio
+let sorteoConfig     = null;
+let premioVehicle    = null;
 let lastPurchase     = null;
 let countdownInterval= null;
-let currentFolioBase = 0;
 
-/* ============================================
+/* ============================================================
    INICIO
-   ============================================ */
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadSorteoConfig();
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadSorteoConfig();
+  syncPayButton();
 });
 
-/* ============================================
-   CARGAR CONFIG SORTEO DESDE SUPABASE
-   ============================================ */
+/* ============================================================
+   SORTEO CONFIG
+   ============================================================ */
 async function loadSorteoConfig() {
   if (!sbClient) { renderPremioError(); return; }
   try {
-    // 1. Leer config activa del sorteo
-    const { data: cfg, error: cfgErr } = await sbClient
-      .from('sorteo_config')
-      .select('*')
-      .eq('activo', true)
-      .single();
-
-    if (cfgErr || !cfg) { renderPremioError('No hay sorteo activo configurado.'); return; }
+    const { data: cfg, error } = await sbClient
+      .from('sorteo_config').select('*').eq('activo', true).single();
+    if (error || !cfg) { renderPremioError('No hay sorteo activo configurado.'); return; }
     sorteoConfig = cfg;
-
-    // 2. Iniciar countdown con la fecha del sorteo
     startCountdown(new Date(cfg.fecha_sorteo));
-
-    // 3. Cargar vehículo premio
     await loadPremioVehicle(cfg.vehicle_id);
-
-    // 4. Obtener último folio para continuar la secuencia
-    await loadFolioBase();
-
   } catch(e) {
-    console.warn('Error cargando sorteo:', e.message);
+    console.warn('loadSorteoConfig:', e.message);
     renderPremioError();
   }
 }
 
-/* ============================================
-   FOLIO — generación aleatoria criptográfica
-   Formato: IAC-XXXX-XXXX
-   Alfabeto sin caracteres ambiguos (O,0,I,1)
-   ============================================ */
+/* ============================================================
+   FOLIO CRIPTOGRÁFICO — formato IAC-XXXX-XXXX
+   Alfabeto sin ambigüedades: sin O, 0, I, 1
+   ============================================================ */
 const FOLIO_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
-function randomGroup(length) {
-  const array = new Uint8Array(length);
-  crypto.getRandomValues(array);
-  return Array.from(array).map(b => FOLIO_CHARS[b % FOLIO_CHARS.length]).join('');
+function rndGroup(n) {
+  const a = new Uint8Array(n);
+  crypto.getRandomValues(a);
+  return Array.from(a).map(b => FOLIO_CHARS[b % FOLIO_CHARS.length]).join('');
 }
 
-function generateFolio() {
-  return `IAC-${randomGroup(4)}-${randomGroup(4)}`;
-}
+function makeFolio() { return `IAC-${rndGroup(4)}-${rndGroup(4)}`; }
 
-// Set de folios ya usados en esta sesión (evita duplicados dentro del mismo pack)
-const foliosUsadosEnSesion = new Set();
+const usedFolios = new Set();
 
-async function generateUniqueFolio() {
-  for (let attempt = 0; attempt < 20; attempt++) {
-    const folio = generateFolio();
-
-    // 1. Verificar que no lo generamos ya en este mismo pack
-    if (foliosUsadosEnSesion.has(folio)) continue;
-
-    // 2. Verificar contra Supabase que no exista en la BD
+async function uniqueFolio() {
+  for (let i = 0; i < 20; i++) {
+    const f = makeFolio();
+    if (usedFolios.has(f)) continue;
     if (sbClient) {
       try {
-        const { data } = await sbClient
-          .from('estampillas')
-          .select('numero_folio')
-          .eq('numero_folio', folio)
-          .maybeSingle();
-        if (data) continue; // ya existe en BD → intentar otro
-      } catch(e) {
-        // Si falla la consulta, confiar en la aleatoriedad + sesión
-      }
+        const { data } = await sbClient.from('estampillas')
+          .select('numero_folio').eq('numero_folio', f).maybeSingle();
+        if (data) continue;
+      } catch(e) { /* seguir */ }
     }
-
-    // Folio válido: registrarlo en sesión y devolverlo
-    foliosUsadosEnSesion.add(folio);
-    return folio;
+    usedFolios.add(f);
+    return f;
   }
-
-  // Fallback absoluto: folio con timestamp en microsegundos (imposible duplicar)
-  const fallback = `IAC-${randomGroup(4)}-${performance.now().toString(36).replace('.','').slice(-4).toUpperCase()}`;
-  foliosUsadosEnSesion.add(fallback);
-  return fallback;
+  const fb = `IAC-${rndGroup(4)}-${performance.now().toString(36).replace('.','').slice(-4).toUpperCase()}`;
+  usedFolios.add(fb);
+  return fb;
 }
 
-async function loadFolioBase() { currentFolioBase = 0; }
+/* ============================================================
+   HASH SHA-256
+   ============================================================ */
+async function secHash(folio, email, ts) {
+  const raw  = `${folio}|${email}|${ts}|IAC-ARICA-2025`;
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
+  return Array.from(new Uint8Array(buf)).slice(0,8)
+    .map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
 
-/* ============================================
+/* ============================================================
    COUNTDOWN
-   ============================================ */
-function startCountdown(fechaSorteo) {
-  // Mostrar fecha legible
+   ============================================================ */
+function startCountdown(fecha) {
   const opts = { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' };
-  document.getElementById('sorteoFechaTexto').textContent =
-    fechaSorteo.toLocaleDateString('es-CL', opts);
-
+  document.getElementById('sorteoFechaTexto').textContent = fecha.toLocaleDateString('es-CL', opts);
   function tick() {
-    const diff = fechaSorteo - new Date();
-    if (diff <= 0) {
-      document.getElementById('cdDias').textContent = '00';
-      document.getElementById('cdHoras').textContent = '00';
-      document.getElementById('cdMin').textContent = '00';
-      document.getElementById('cdSeg').textContent = '00';
-      clearInterval(countdownInterval);
-      return;
+    const d = fecha - new Date();
+    if (d <= 0) {
+      ['cdDias','cdHoras','cdMin','cdSeg'].forEach(id => document.getElementById(id).textContent = '00');
+      return clearInterval(countdownInterval);
     }
-    const dias  = Math.floor(diff / 86400000);
-    const horas = Math.floor((diff % 86400000) / 3600000);
-    const min   = Math.floor((diff % 3600000)  / 60000);
-    const seg   = Math.floor((diff % 60000)    / 1000);
-    document.getElementById('cdDias').textContent  = String(dias).padStart(2,'0');
-    document.getElementById('cdHoras').textContent = String(horas).padStart(2,'0');
-    document.getElementById('cdMin').textContent   = String(min).padStart(2,'0');
-    document.getElementById('cdSeg').textContent   = String(seg).padStart(2,'0');
+    document.getElementById('cdDias').textContent  = String(Math.floor(d/86400000)).padStart(2,'0');
+    document.getElementById('cdHoras').textContent = String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('cdMin').textContent   = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    document.getElementById('cdSeg').textContent   = String(Math.floor((d%60000)/1000)).padStart(2,'0');
   }
   tick();
   countdownInterval = setInterval(tick, 1000);
 }
 
-/* ============================================
-   CARGAR VEHÍCULO PREMIO
-   ============================================ */
-async function loadPremioVehicle(vehicleId) {
+/* ============================================================
+   VEHÍCULO PREMIO
+   ============================================================ */
+async function loadPremioVehicle(id) {
   try {
-    const { data, error } = await sbClient
-      .from('vehicles')
-      .select(`*, vehicle_images(image_url, is_main, order_index)`)
-      .eq('id', vehicleId)
-      .single();
-
+    const { data, error } = await sbClient.from('vehicles')
+      .select('*, vehicle_images(image_url, is_main, order_index)')
+      .eq('id', id).single();
     if (error || !data) { renderPremioError(); return; }
-
-    // Ordenar imágenes
-    const imgs = (data.vehicle_images || [])
+    const imgs = (data.vehicle_images||[])
       .sort((a,b)=>(a.order_index||0)-(b.order_index||0))
       .map(i=>i.image_url).filter(Boolean);
-
     premioVehicle = { ...data, gallery: imgs };
     renderPremio(premioVehicle);
-  } catch(e) {
-    renderPremioError();
-  }
+  } catch(e) { renderPremioError(); }
 }
 
 function renderPremio(v) {
-  const mainImg = v.gallery[0] || '';
-  const specs = [];
-  if (v.motor)       specs.push({ icon:'fa-cog',       val: v.motor });
-  if (v.traccion)    specs.push({ icon:'fa-road',       val: v.traccion });
-  if (v.transmision) specs.push({ icon:'fa-sliders-h',  val: v.transmision });
-  if (v.potencia)    specs.push({ icon:'fa-bolt',       val: v.potencia });
+  const mainImg = v.gallery[0]||'';
+  const specs = [
+    v.motor       && { icon:'fa-cog',      val:v.motor },
+    v.traccion    && { icon:'fa-road',      val:v.traccion },
+    v.transmision && { icon:'fa-sliders-h', val:v.transmision },
+    v.potencia    && { icon:'fa-bolt',      val:v.potencia },
+  ].filter(Boolean);
 
   const thumbs = v.gallery.length > 1
-    ? `<div class="premio-thumbs">
-        ${v.gallery.map((img,i)=>`
-          <div class="premio-thumb ${i===0?'active':''}" onclick="switchPremioImg('${img}',this)">
-            <img src="${img}" alt="foto ${i+1}" loading="lazy">
-          </div>`).join('')}
-       </div>` : '';
+    ? `<div class="premio-thumbs">${v.gallery.map((img,i)=>`
+        <div class="premio-thumb ${i===0?'active':''}" onclick="switchImg('${img}',this)">
+          <img src="${img}" alt="" loading="lazy"></div>`).join('')}</div>` : '';
 
-  const videoBtn = v.video_id
+  const vbtn = v.video_id
     ? `<a href="https://youtube.com/watch?v=${v.video_id}" target="_blank" rel="noopener" class="premio-video-btn">
-        <i class="fab fa-youtube"></i> Ver video del vehículo
-       </a>` : '';
+        <i class="fab fa-youtube"></i> Ver video</a>` : '';
 
   document.getElementById('premioContainer').innerHTML = `
     <div class="premio-card">
       <div class="premio-img-wrap">
-        ${mainImg ? `<img class="premio-img" id="premioMainImg" src="${mainImg}" alt="${v.name}">` : '<div class="premio-img-skeleton"></div>'}
+        ${mainImg ? `<img class="premio-img" id="pMainImg" src="${mainImg}" alt="${v.name}">` : '<div class="premio-img-skeleton"></div>'}
         <div class="premio-badge-sorteo">🏆 Premio del sorteo</div>
       </div>
-      ${thumbs}
-      ${videoBtn}
+      ${thumbs}${vbtn}
       <div class="premio-body">
         <div class="premio-name">${v.name}</div>
         <div class="premio-price">$${(v.price||0).toLocaleString('es-CL')} CLP</div>
-        ${specs.length ? `<div class="premio-specs">
-          ${specs.map(s=>`<span class="spec-tag"><i class="fas ${s.icon}"></i>${s.val}</span>`).join('')}
-        </div>` : ''}
+        ${specs.length?`<div class="premio-specs">${specs.map(s=>`<span class="spec-tag"><i class="fas ${s.icon}"></i>${s.val}</span>`).join('')}</div>`:''}
       </div>
     </div>`;
 }
 
-function switchPremioImg(url, el) {
-  const main = document.getElementById('premioMainImg');
-  if (main) main.src = url;
+function switchImg(url, el) {
+  const m = document.getElementById('pMainImg');
+  if (m) m.src = url;
   document.querySelectorAll('.premio-thumb').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
 }
@@ -764,457 +784,92 @@ function renderPremioError(msg) {
   document.getElementById('premioContainer').innerHTML =
     `<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px;">
       <i class="fas fa-car" style="font-size:36px;opacity:0.2;display:block;margin-bottom:12px;"></i>
-      ${msg||'No se pudo cargar el vehículo premio.'}
-    </div>`;
+      ${msg||'No se pudo cargar el vehículo premio.'}</div>`;
 }
 
-/* ============================================
-   SELECCIÓN DE PACK
-   ============================================ */
+/* ============================================================
+   PACK SELECTION
+   ============================================================ */
 function selectPack(el) {
   document.querySelectorAll('.pack-card').forEach(c=>c.classList.remove('selected'));
   el.classList.add('selected');
-  const name=el.dataset.pack, price=parseInt(el.dataset.price), stamps=parseInt(el.dataset.stamps);
+  const name   = el.dataset.pack;
+  const price  = parseInt(el.dataset.price);
+  const stamps = parseInt(el.dataset.stamps);
   selectedPackData = { name, price, stamps };
   const labels = { inicio:'Inicio (x2)', popular:'Popular (x4)', coleccionista:'Coleccionista (x6)' };
   document.getElementById('summaryPack').textContent   = labels[name];
   document.getElementById('summaryStamps').textContent = stamps;
   document.getElementById('summaryParts').textContent  = stamps;
   document.getElementById('summaryTotal').textContent  = `$${price.toLocaleString('es-CL')}`;
-  const isLive = FLOW_MODE === 'live';
-  document.getElementById('payBtnText').textContent = isLive
-    ? `Pagar $${price.toLocaleString('es-CL')} con WebPay`
-    : `Obtener mis estampillas (demo)`;
-  document.getElementById('payNote').innerHTML = isLive
-    ? '<i class="fas fa-shield-alt"></i> Pago 100% seguro · WebPay Plus · Transbank'
-    : '<i class="fas fa-tools"></i> Modo prueba — sin cobro real';
+  syncPayButton();
   document.getElementById('checkout').scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-/* ============================================
+function syncPayButton() {
+  const { price, stamps } = selectedPackData;
+  const live = FLOW_MODE === 'live';
+  document.getElementById('payBtnText').textContent = live
+    ? `Pagar $${price.toLocaleString('es-CL')} con WebPay`
+    : `Obtener mis ${stamps} estampilla${stamps>1?'s':''}`;
+  document.getElementById('payNote').innerHTML = live
+    ? '<i class="fas fa-shield-alt"></i> Pago 100% seguro · WebPay Plus · Transbank'
+    : '<i class="fas fa-tools"></i> Modo prueba — sin cobro real';
+  const sb = document.getElementById('simBanner');
+  if (sb) sb.style.display = live ? 'none' : '';
+}
+
+/* ============================================================
    VALIDACIÓN
-   ============================================ */
-function validateForm() {
+   ============================================================ */
+function validate() {
   const nombre = document.getElementById('inputNombre').value.trim();
   const email  = document.getElementById('inputEmail').value.trim();
   const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  let ok = true;
   document.getElementById('inputNombre').classList.toggle('error', !nombre);
   document.getElementById('inputEmail').classList.toggle('error', !emailOk);
-  if (!nombre || !emailOk) { showNotif('⚠️ Completa nombre y correo válido'); ok=false; }
-  return ok;
+  if (!nombre)  { showNotif('⚠️ Ingresa tu nombre'); return false; }
+  if (!emailOk) { showNotif('⚠️ Correo inválido'); return false; }
+  return true;
 }
 
-/* ============================================
-   GENERAR HASH DE SEGURIDAD
-   (SHA-256 simple en base64url sin backend)
-   ============================================ */
-async function generateSecurityHash(folio, email, timestamp) {
-  const msg  = `${folio}|${email}|${timestamp}|IAC-ARICA-2025`;
-  const data = new TextEncoder().encode(msg);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  const arr  = Array.from(new Uint8Array(hash));
-  // Tomar primeros 8 bytes como hex = 16 chars
-  return arr.slice(0,8).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
-}
-
-/* ============================================
-   DIBUJAR ESTAMPILLA EN CANVAS
-   Frente: imagen del vehículo + datos sorteo
-   Dorso: número de folio + QR + hash seguridad
-   ============================================ */
-async function drawStamp(canvas, folio, secHash, vehicleImg, vehicleName, ownerName, sorteoFecha) {
-  // Canvas rectangular estilo estampilla postal
-  // Dimensiones: 600 x 400 px (frente y dorso lado a lado en el mismo canvas → 1200 x 400)
-  const W = 1200, H = 400;
-  canvas.width  = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  /* ─── FONDO GLOBAL ─── */
-  ctx.fillStyle = '#111';
-  ctx.fillRect(0, 0, W, H);
-
-  /* ─────────────── FRENTE (izquierda, 0–600) ─────────────── */
-  const drawFront = async () => {
-    // Fondo frente
-    const fg = ctx.createLinearGradient(0, 0, 600, 400);
-    fg.addColorStop(0, '#1a0a02');
-    fg.addColorStop(1, '#0d0d0d');
-    ctx.fillStyle = fg;
-    ctx.fillRect(0, 0, 600, 400);
-
-    // Imagen del vehículo (si está disponible)
-    if (vehicleImg) {
-      try {
-        const img = await loadImageCORS(vehicleImg);
-        // Cubrir la mitad superior (0-220) con la imagen
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(16, 16, 568, 210);
-        ctx.clip();
-        // Escalar para llenar sin deformar
-        const ir = img.width / img.height;
-        const cr = 568 / 210;
-        let sw, sh, sx=0, sy=0;
-        if (ir > cr) { sh=210; sw=sh*ir; sx=(568-sw)/2; }
-        else          { sw=568; sh=sw/ir; sy=(210-sh)/2; }
-        ctx.drawImage(img, 16+sx, 16+sy, sw, sh);
-        ctx.restore();
-        // Overlay gradiente en imagen
-        const ov = ctx.createLinearGradient(0, 100, 0, 230);
-        ov.addColorStop(0, 'rgba(26,10,2,0)');
-        ov.addColorStop(1, 'rgba(26,10,2,0.85)');
-        ctx.fillStyle = ov;
-        ctx.fillRect(16, 16, 568, 210);
-      } catch(e) { /* sin imagen */ }
-    }
-
-    // Borde dentado (simulado con línea punteada)
-    ctx.save();
-    ctx.strokeStyle = '#C9A84C';
-    ctx.lineWidth = 2;
-    ctx.setLineDash([6, 4]);
-    ctx.strokeRect(8, 8, 584, 384);
-    ctx.restore();
-
-    // Etiqueta superior "CHILE · ARICA"
-    ctx.font = 'bold 11px "Barlow Condensed", monospace';
-    ctx.fillStyle = 'rgba(201,168,76,0.7)';
-    ctx.letterSpacing = '3px';
-    ctx.textAlign = 'center';
-    ctx.fillText('C H I L E  ·  A R I C A', 300, 38);
-
-    // Nombre del vehículo
-    ctx.font = 'bold 28px "Barlow Condensed", sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.textAlign = 'center';
-    ctx.fillText(vehicleName.toUpperCase(), 300, 258);
-
-    // Subtítulo "COLECCIÓN CHILE NORTE"
-    ctx.font = 'bold 12px "Barlow Condensed", monospace';
-    ctx.fillStyle = 'rgba(240,208,128,0.85)';
-    ctx.fillText('COLECCIÓN CHILE NORTE  ·  EDICIÓN LIMITADA', 300, 278);
-
-    // Línea separadora dorada
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(201,168,76,0.4)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([]);
-    ctx.moveTo(40, 295); ctx.lineTo(560, 295);
-    ctx.stroke();
-
-    // Datos del sorteo (parte inferior)
-    ctx.font = '12px "DM Sans", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.textAlign = 'left';
-    ctx.fillText('SORTEO:', 40, 322);
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.font = 'bold 13px "DM Sans", sans-serif';
-    ctx.fillText(sorteoFecha || 'Por confirmar', 40, 340);
-
-    ctx.font = '12px "DM Sans", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.textAlign = 'right';
-    ctx.fillText('FOLIO:', 560, 322);
-    ctx.font = 'bold 14px monospace';
-    ctx.fillStyle = '#F0D080';
-    ctx.fillText(folio, 560, 340);
-
-    // Nombre propietario
-    ctx.font = '11px "DM Sans", sans-serif';
-    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-    ctx.textAlign = 'center';
-    ctx.fillText(`Propietario: ${ownerName}`, 300, 372);
-
-    // Sello "IAC" decorativo
-    ctx.save();
-    ctx.translate(540, 60);
-    ctx.rotate(0.2);
-    ctx.strokeStyle = 'rgba(155,0,0,0.5)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(0, 0, 32, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, 26, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.font = 'bold 14px "Barlow Condensed"';
-    ctx.fillStyle = 'rgba(155,0,0,0.7)';
-    ctx.textAlign = 'center';
-    ctx.fillText('IAC', 0, 5);
-    ctx.restore();
-  };
-
-  /* ─────────────── DORSO (derecha, 600–1200) ─────────────── */
-  const drawBack = async () => {
-    // Fondo dorso (papel envejecido digital)
-    const bg = ctx.createLinearGradient(600, 0, 1200, 400);
-    bg.addColorStop(0, '#f5f0e8');
-    bg.addColorStop(1, '#ede8dc');
-    ctx.fillStyle = bg;
-    ctx.fillRect(600, 0, 600, 400);
-
-    // Patrón de fondo sutil (líneas de seguridad)
-    ctx.save();
-    ctx.strokeStyle = 'rgba(180,160,120,0.15)';
-    ctx.lineWidth = 0.5;
-    for (let y = 600; y < 1200; y += 12) {
-      ctx.beginPath();
-      ctx.moveTo(y, 0); ctx.lineTo(y, 400); ctx.stroke();
-    }
-    for (let x = 0; x < 400; x += 12) {
-      ctx.beginPath();
-      ctx.moveTo(600, x); ctx.lineTo(1200, x); ctx.stroke();
-    }
-    ctx.restore();
-
-    // Borde dentado dorso
-    ctx.save();
-    ctx.strokeStyle = '#8B7355';
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([6, 4]);
-    ctx.strokeRect(608, 8, 584, 384);
-    ctx.restore();
-
-    // Divisor vertical entre frente y dorso (perforación)
-    ctx.save();
-    ctx.strokeStyle = '#888';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 6]);
-    ctx.beginPath();
-    ctx.moveTo(600, 0); ctx.lineTo(600, 400);
-    ctx.stroke();
-    ctx.restore();
-
-    // Título DORSO
-    ctx.font = 'bold 11px monospace';
-    ctx.fillStyle = 'rgba(100,80,40,0.7)';
-    ctx.textAlign = 'center';
-    ctx.letterSpacing = '3px';
-    ctx.fillText('CERTIFICADO DE AUTENTICIDAD', 900, 38);
-
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(139,115,85,0.4)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([]);
-    ctx.moveTo(630, 46); ctx.lineTo(1170, 46);
-    ctx.stroke();
-
-    // Número de folio grande
-    ctx.font = 'bold 11px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.6)';
-    ctx.textAlign = 'left';
-    ctx.fillText('NÚMERO DE FOLIO', 630, 75);
-
-    ctx.font = 'bold 32px monospace';
-    ctx.fillStyle = '#1a0a00';
-    ctx.fillText(folio, 630, 112);
-
-    // Línea separadora
-    ctx.beginPath();
-    ctx.strokeStyle = 'rgba(139,115,85,0.3)';
-    ctx.lineWidth = 1;
-    ctx.moveTo(630, 124); ctx.lineTo(1170, 124);
-    ctx.stroke();
-
-    // Hash de seguridad
-    ctx.font = 'bold 10px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.55)';
-    ctx.textAlign = 'left';
-    ctx.fillText('CÓDIGO DE SEGURIDAD', 630, 148);
-
-    ctx.font = 'bold 15px monospace';
-    ctx.fillStyle = '#5a3a00';
-    ctx.fillText(secHash, 630, 168);
-
-    ctx.font = '10px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.4)';
-    ctx.fillText('Verificable en: iac-arica.cl/verificar', 630, 184);
-
-    // Datos del propietario
-    ctx.font = 'bold 10px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.55)';
-    ctx.fillText('PROPIETARIO', 630, 216);
-    ctx.font = 'bold 14px "DM Sans", sans-serif';
-    ctx.fillStyle = '#1a0a00';
-    ctx.fillText(ownerName, 630, 234);
-
-    // Sorteo
-    ctx.font = 'bold 10px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.55)';
-    ctx.fillText('SORTEO', 630, 262);
-    ctx.font = 'bold 13px "DM Sans", sans-serif';
-    ctx.fillStyle = '#1a0a00';
-    ctx.fillText(sorteoFecha || 'Por confirmar', 630, 280);
-
-    // Vehículo
-    ctx.font = 'bold 10px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.55)';
-    ctx.fillText('VEHÍCULO SORTEO', 630, 308);
-    ctx.font = 'bold 13px "DM Sans", sans-serif';
-    ctx.fillStyle = '#9B0000';
-    ctx.fillText(vehicleName.toUpperCase(), 630, 326);
-
-    // QR en la esquina inferior derecha
-    const qrSize = 90;
-    const qrX = 1200 - qrSize - 30;
-    const qrY = 400  - qrSize - 30;
-    await renderQROnCanvas(ctx, folio, secHash, qrX, qrY, qrSize);
-
-    // Etiqueta QR
-    ctx.font = '9px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.5)';
-    ctx.textAlign = 'center';
-    ctx.fillText('VERIFICAR', qrX + qrSize/2, qrY - 6);
-
-    // Sello VÁLIDO
-    ctx.save();
-    ctx.translate(1130, 130);
-    ctx.rotate(-0.15);
-    ctx.strokeStyle = 'rgba(155,0,0,0.35)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.rect(-36, -18, 72, 36);
-    ctx.stroke();
-    ctx.font = 'bold 13px "Barlow Condensed"';
-    ctx.fillStyle = 'rgba(155,0,0,0.4)';
-    ctx.textAlign = 'center';
-    ctx.fillText('✓ VÁLIDO', 0, 6);
-    ctx.restore();
-
-    // Pie de página
-    ctx.font = '9px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.4)';
-    ctx.textAlign = 'center';
-    ctx.fillText('Import American Cars · Arica, Chile · iac-arica.cl', 900, 388);
-  };
-
-  await drawFront();
-  await drawBack();
-}
-
-/* Cargar imagen para canvas respetando CORS — mobile safe
-   Estrategia en 3 pasos:
-   1. Cloudinary: forzar CORS con transformación neutral (w_1/w_1 = sin cambio)
-   2. Si falla crossOrigin, intentar fetch→blob→objectURL (evita taint del canvas)
-   3. Si todo falla, rechazar limpiamente (el canvas dibuja sin imagen)
-*/
-async function loadImageCORS(url) {
-  // Paso 1: Para Cloudinary agregar transformación que no altera la imagen
-  // pero sí activa el header CORS en la respuesta
-  const corsUrl = url.includes('cloudinary.com')
-    ? url.replace('/upload/', '/upload/fl_progressive,q_auto/')
-    : url;
-
-  // Intentar carga directa con crossOrigin
-  const tryDirectLoad = (src) => new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload  = () => resolve(img);
-    img.onerror = () => reject();
-    img.src = src;
-  });
-
-  // Intentar carga via fetch→blob (funciona en móvil cuando crossOrigin falla)
-  const tryFetchBlob = async (src) => {
-    const resp = await fetch(src, { mode: 'cors' });
-    if (!resp.ok) throw new Error('fetch fail');
-    const blob = await resp.blob();
-    const blobUrl = URL.createObjectURL(blob);
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload  = () => { URL.revokeObjectURL(blobUrl); resolve(img); };
-      img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(); };
-      img.src = blobUrl;
-    });
-  };
-
-  // Intentar en orden: crossOrigin directo → fetch blob → sin crossOrigin (fallback visual)
-  try { return await tryDirectLoad(corsUrl); } catch(e) {}
-  try { return await tryFetchBlob(corsUrl); } catch(e) {}
-  try { return await tryDirectLoad(url); } catch(e) {}
-  throw new Error('No se pudo cargar imagen para canvas');
-}
-
-/* Renderizar QR en canvas usando qrcode.js */
-async function renderQROnCanvas(ctx, folio, hash, x, y, size) {
-  try {
-    const qrText = `https://iac-arica.cl/verificar?f=${folio}&h=${hash}`;
-    const tmpDiv = document.createElement('div');
-    tmpDiv.style.display = 'none';
-    document.body.appendChild(tmpDiv);
-
-    await new Promise((resolve) => {
-      new QRCode(tmpDiv, {
-        text: qrText,
-        width: size * 2, height: size * 2,
-        colorDark: '#1a0a00', colorLight: '#f5f0e8',
-        correctLevel: QRCode.CorrectLevel.M
-      });
-      setTimeout(() => {
-        const img = tmpDiv.querySelector('img') || tmpDiv.querySelector('canvas');
-        if (img) {
-          if (img.tagName === 'IMG') {
-            const qrImg = new Image();
-            qrImg.onload = () => { ctx.drawImage(qrImg, x, y, size, size); resolve(); };
-            qrImg.src = img.src;
-          } else {
-            ctx.drawImage(img, x, y, size, size);
-            resolve();
-          }
-        } else resolve();
-        document.body.removeChild(tmpDiv);
-      }, 200);
-    });
-  } catch(e) {
-    // Si QR falla, dibujar un placeholder
-    ctx.fillStyle = 'rgba(80,60,20,0.2)';
-    ctx.fillRect(x, y, size, size);
-    ctx.font = '8px monospace';
-    ctx.fillStyle = 'rgba(80,60,20,0.5)';
-    ctx.textAlign = 'center';
-    ctx.fillText('QR', x+size/2, y+size/2);
-  }
-}
-
-/* ============================================
+/* ============================================================
    MANEJO DEL PAGO
-   ============================================ */
+   ============================================================ */
 async function handlePay() {
-  if (!validateForm()) return;
-  const btn = document.getElementById('payBtn');
+  if (!validate()) return;
+  const btn  = document.getElementById('payBtn');
+  const icon = document.getElementById('payIcon');
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+  icon.className = 'fas fa-spinner fa-spin';
+  document.getElementById('payBtnText').textContent = 'Procesando...';
   try {
     if (FLOW_MODE === 'simulation') await simulatePurchase();
     else await initFlowPayment();
   } catch(e) {
-    console.error(e);
+    console.error('handlePay:', e);
     showNotif('❌ Error al procesar. Inténtalo de nuevo.');
   } finally {
     btn.disabled = false;
-    const isLive = FLOW_MODE === 'live';
-    btn.innerHTML = isLive
-      ? `<i class="fas fa-lock"></i> <span>Pagar $${selectedPackData.price.toLocaleString('es-CL')} con WebPay</span>`
-      : `<i class="fas fa-stamp"></i> <span>Obtener mis estampillas (demo)</span>`;
+    icon.className = 'fas fa-stamp';
+    syncPayButton();
   }
 }
 
-/* ============================================
+/* ============================================================
    SIMULACIÓN DE COMPRA
-   ============================================ */
+   ============================================================ */
 async function simulatePurchase() {
   const nombre   = document.getElementById('inputNombre').value.trim();
   const email    = document.getElementById('inputEmail').value.trim();
-  const telefono = document.getElementById('inputTelefono').value.trim();
-  const timestamp= Date.now();
+  const telefono = document.getElementById('inputTelefono').value.replace(/\D/g,'');
+  const ts = Date.now();
 
-  // Generar folios únicos aleatorios y hashes para cada estampilla del pack
+  // Generar folios y hashes
   const estampillas = [];
   for (let i = 0; i < selectedPackData.stamps; i++) {
-    const folio = await generateUniqueFolio();
-    const hash  = await generateSecurityHash(folio, email, timestamp);
+    const folio = await uniqueFolio();
+    const hash  = await secHash(folio, email, ts);
     estampillas.push({ folio, hash, index: i });
   }
 
@@ -1222,195 +877,249 @@ async function simulatePurchase() {
   if (sbClient) {
     try {
       const rows = estampillas.map(e => ({
-        nombre,
-        email,
-        telefono: telefono || null,
+        nombre, email,
+        telefono:       telefono || null,
         pack:           selectedPackData.name,
         monto_pack:     selectedPackData.price,
         numero_folio:   e.folio,
         hash_seguridad: e.hash,
         orden_en_pack:  e.index + 1,
         total_en_pack:  selectedPackData.stamps,
-        vehicle_id:     premioVehicle?.id || null,
-        sorteo_id:      sorteoConfig?.id  || null,
+        vehicle_id:     premioVehicle?.id  || null,
+        sorteo_id:      sorteoConfig?.id   || null,
         estado:         'completado',
         modo_pago:      'simulacion',
-        created_at:     new Date(timestamp).toISOString()
+        created_at:     new Date(ts).toISOString()
       }));
       const { error } = await sbClient.from('estampillas').insert(rows);
-      if (error) console.warn('Supabase insert error:', error.message);
+      if (error) console.warn('Supabase insert:', error.message);
     } catch(e) { console.warn(e.message); }
   }
 
-  lastPurchase = { nombre, email, estampillas };
-  await showSuccessModal(nombre, email, estampillas);
+  lastPurchase = { nombre, email, telefono, estampillas };
+  await showSuccessModal(nombre, email, telefono, estampillas);
+
+  if (typeof gtag !== 'undefined') {
+    gtag('event','purchase',{
+      value: selectedPackData.price, currency:'CLP',
+      transaction_id: estampillas[0]?.folio
+    });
+  }
 }
 
-/* ============================================
+/* ============================================================
    FLOW.CL (pendiente)
-   ============================================ */
+   ============================================================ */
 async function initFlowPayment() {
-  showNotif('🔧 Integración Flow pendiente. Activa tu cuenta primero.');
+  showNotif('🔧 Conecta tu cuenta Flow.cl para activar pagos reales.');
 }
 
-/* ============================================
-   MODAL DE ÉXITO + GENERACIÓN DE ESTAMPILLAS
-   ============================================ */
-async function showSuccessModal(nombre, email, estampillas) {
+/* ============================================================
+   MODAL ÉXITO + TARJETAS HTML (SIN CANVAS, SIN CORS)
+   
+   ✅ IDEA MOBILE: Se eliminó completamente el Canvas.
+   Las estampillas son divs HTML con CSS, lo que resuelve:
+     - Problema CORS de imágenes Cloudinary
+     - Error toDataURL en iOS Safari
+     - Descarga que falla en Android Chrome
+   
+   FLUJO MÓVIL NUEVO:
+   1. Cada estampilla tiene botón "WhatsApp" → envía el folio
+   2. "Ver imagen" → pantalla completa para captura nativa
+   3. Si ingresó teléfono → botón único "Envíame las estampillas"
+      que abre WA directo a su número con todos los folios
+   ============================================================ */
+async function showSuccessModal(nombre, email, telefono, estampillas) {
+  const pl = estampillas.length > 1 ? 's' : '';
   document.getElementById('successSub').textContent =
-    `${nombre}, tus ${estampillas.length} estampilla${estampillas.length>1?'s':''} fueron generadas. ` +
-    `Descárgalas — son tu comprobante de participación en el sorteo.`;
+    `${nombre}, tus ${estampillas.length} estampilla${pl} están registradas con folio único.`;
 
   const container = document.getElementById('stampsGenerated');
-  container.innerHTML = '<div class="loading-state"><div class="spin"></div>Generando estampillas...</div>';
-
+  container.innerHTML = '<div class="loading-state"><div class="spin"></div></div>';
   document.getElementById('successModal').classList.add('active');
   document.body.style.overflow = 'hidden';
 
-  // Generar cada estampilla
-  container.innerHTML = '';
   const fechaStr = sorteoConfig?.fecha_sorteo
     ? new Date(sorteoConfig.fecha_sorteo).toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})
     : 'Por confirmar';
+  const vName = premioVehicle?.name || 'Vehículo';
+  const vImg  = premioVehicle?.gallery?.[0] || null;
 
+  container.innerHTML = '';
+
+  // Tarjetas individuales
   for (const e of estampillas) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'stamp-item';
-    wrapper.innerHTML = `
-      <div class="stamp-item-header">
-        <span class="stamp-folio">${e.folio}</span>
-        <span class="stamp-part">Participación #${e.index+1}</span>
-      </div>
-      <div class="stamp-canvas-wrap" id="canvasWrap-${e.index}">
-        <div class="loading-state" style="padding:20px"><div class="spin"></div></div>
-      </div>
-      <button class="stamp-download-btn" id="dlBtn-${e.index}" onclick="downloadStamp(${e.index})" disabled>
-        <i class="fas fa-download"></i> Descargar estampilla
+    container.appendChild(buildStampCard(e.folio, e.hash, vName, vImg, nombre, fechaStr, e.index));
+  }
+
+  // Banda de envío por WhatsApp si dejó número
+  if (telefono) {
+    const folios = estampillas.map(e => e.folio).join(', ');
+    const msg    = buildWspMsg(nombre, vName, folios, estampillas.length);
+    const phone  = '56' + telefono;
+    const band   = document.createElement('div');
+    band.className = 'wsp-send-band';
+    band.innerHTML = `
+      <p>📲 Envíate los folios a tu WhatsApp para guardarlos como respaldo</p>
+      <button class="wsp-send-btn" onclick="openWsp('${phone}','${encodeURIComponent(msg)}')">
+        <i class="fab fa-whatsapp"></i> Enviar a mi WhatsApp (+56 ${telefono})
       </button>`;
-    container.appendChild(wrapper);
-
-    // Dibujar canvas asíncronamente
-    const canvas = document.createElement('canvas');
-    try {
-      await drawStamp(
-        canvas, e.folio, e.hash,
-        premioVehicle?.gallery?.[0] || null,
-        premioVehicle?.name || 'Vehículo',
-        nombre,
-        fechaStr
-      );
-      const wrap = document.getElementById(`canvasWrap-${e.index}`);
-      wrap.innerHTML = '';
-      canvas.dataset.folio = e.folio;
-      wrap.appendChild(canvas);
-
-      // Para iOS: generar <img> visible debajo del canvas
-      // (en Safari mobile, "mantener presionado" → guardar imagen funciona sobre <img>, no sobre <canvas>)
-      try {
-        const dataUrl = canvas.toDataURL('image/png', 1.0);
-        const imgEl = document.createElement('img');
-        imgEl.src = dataUrl;
-        imgEl.alt = `Estampilla ${e.folio}`;
-        imgEl.style.cssText = 'max-width:100%;border-radius:6px;display:block;margin-top:8px;';
-        imgEl.title = 'iOS: mantén presionada para guardar';
-        wrap.appendChild(imgEl);
-      } catch(corsErr) {
-        // Canvas tainted — no se puede exportar, mostrar aviso iOS
-        const iosHint = document.createElement('div');
-        iosHint.style.cssText = 'font-size:11px;color:var(--orange);text-align:center;padding:6px 12px;';
-        iosHint.textContent = '📲 En iOS: usa el botón "Compartir" para guardar la imagen';
-        wrap.appendChild(iosHint);
-      }
-
-      const dlBtn = document.getElementById(`dlBtn-${e.index}`);
-      dlBtn.disabled = false;
-    } catch(err) {
-      document.getElementById(`canvasWrap-${e.index}`).innerHTML =
-        '<div style="padding:16px;color:var(--muted);font-size:12px;text-align:center;">Error generando imagen</div>';
-    }
+    container.appendChild(band);
   }
 
-  if (typeof gtag !== 'undefined') {
-    gtag('event','purchase',{ value: selectedPackData.price, currency:'CLP' });
+  // Hint iOS
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    const hint = document.createElement('div');
+    hint.className = 'ios-hint';
+    hint.innerHTML = `<i class="fas fa-info-circle"></i>
+      <span>En iPhone: toca <strong>"Ver"</strong> → captura de pantalla para guardar en Fotos</span>`;
+    container.appendChild(hint);
   }
 }
 
-/* ============================================
-   DESCARGA DE ESTAMPILLA — mobile safe
-   En iOS/Android toDataURL puede fallar si hay
-   problemas CORS residuales. Se usa toBlob como
-   método principal y dataURL como fallback.
-   ============================================ */
-function downloadStamp(index) {
-  const wrap = document.getElementById(`canvasWrap-${index}`);
-  const canvas = wrap?.querySelector('canvas');
-  if (!canvas) return;
-  const folio = canvas.dataset.folio || `estampilla-${index+1}`;
-  const filename = `${folio}.png`;
+/* ============================================================
+   CONSTRUIR TARJETA DE ESTAMPILLA (HTML puro)
+   ============================================================ */
+function buildStampCard(folio, hash, vName, vImg, ownerName, fechaStr, idx) {
+  const wrap = document.createElement('div');
+  wrap.className = 'stamp-item';
+  wrap.id = `si-${idx}`;
 
-  // Método 1: toBlob (más compatible en móvil, no bloquea UI)
-  if (canvas.toBlob) {
-    canvas.toBlob(blob => {
-      if (!blob) { downloadViaDataURL(canvas, filename); return; }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-    }, 'image/png', 1.0);
+  const imgHtml = vImg
+    ? `<img class="stamp-card-img" src="${vImg}" alt="${vName}" loading="lazy">`
+    : `<div class="stamp-card-img-ph"><i class="fas fa-car"></i></div>`;
+
+  wrap.innerHTML = `
+    <div class="stamp-item-header">
+      <span class="stamp-folio">${folio}</span>
+      <span class="stamp-part">Participación #${idx+1}</span>
+    </div>
+    <div class="stamp-card" id="sc-${idx}">
+      <div class="stamp-card-border"></div>
+      <div class="stamp-card-row1">
+        <span class="stamp-card-country">CHILE · ARICA</span>
+        <div class="stamp-card-seal">IAC</div>
+      </div>
+      ${imgHtml}
+      <div class="stamp-card-vehicle">${vName.toUpperCase()}</div>
+      <div class="stamp-card-coll">Colección Chile Norte · Edición Limitada</div>
+      <div class="stamp-card-line"></div>
+      <div class="stamp-card-foot">
+        <div class="stamp-card-fl">
+          <small>Sorteo</small>
+          <span>${fechaStr}</span>
+        </div>
+        <div class="stamp-card-fr">
+          <small>Folio</small>
+          <span>${folio}</span>
+        </div>
+      </div>
+      <div class="stamp-card-owner">Propietario: ${ownerName} · ${hash}</div>
+    </div>
+    <div class="stamp-actions">
+      <button class="stamp-btn wsp" onclick="shareStamp('${folio}','${vName}','${ownerName}')">
+        <i class="fab fa-whatsapp"></i>WhatsApp
+      </button>
+      <button class="stamp-btn screen" onclick="viewFullscreen(${idx})">
+        <i class="fas fa-expand"></i>Ver
+      </button>
+    </div>`;
+  return wrap;
+}
+
+/* ============================================================
+   ACCIONES MOBILE
+   ============================================================ */
+
+// Compartir folio individual por WhatsApp (mensaje de texto)
+function shareStamp(folio, vName, ownerName) {
+  const msg =
+    `🏆 Mi estampilla IAC\n\n` +
+    `🚗 Sorteo: *${vName}*\n` +
+    `📋 Folio: *${folio}*\n` +
+    `👤 ${ownerName}\n\n` +
+    `¡Participo en el sorteo de @importamericancars!\n` +
+    `Consigue las tuyas → iac-arica.cl/stamper.html`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// Abrir estampilla en pantalla completa para captura nativa
+function viewFullscreen(idx) {
+  const card = document.getElementById(`sc-${idx}`);
+  if (!card) return;
+
+  const fs = document.createElement('div');
+  fs.className = 'stamp-fullscreen';
+  fs.id = 'stampFS';
+
+  const hint = document.createElement('div');
+  hint.className = 'stamp-fullscreen-hint';
+  hint.textContent = 'Toca afuera para cerrar · Captura de pantalla para guardar';
+
+  const close = document.createElement('div');
+  close.className = 'stamp-fullscreen-close';
+  close.innerHTML = '<i class="fas fa-times"></i>';
+  close.onclick = () => fs.remove();
+
+  const clone = card.cloneNode(true);
+  clone.className = 'stamp-fullscreen-card';
+  clone.style.cssText = 'border-radius:12px;overflow:hidden;';
+  // Remover id del clone para evitar duplicados
+  clone.removeAttribute('id');
+
+  fs.appendChild(close);
+  fs.appendChild(hint);
+  fs.appendChild(clone);
+  fs.onclick = (ev) => { if (ev.target === fs) fs.remove(); };
+  document.body.appendChild(fs);
+}
+
+// Abrir WhatsApp en número específico
+function openWsp(phone, msgEnc) {
+  window.open(`https://wa.me/${phone}?text=${msgEnc}`, '_blank');
+}
+
+// Mensaje de todos los folios
+function buildWspMsg(nombre, vName, folios, count) {
+  const lines = folios.split(', ').map(f => `  · *${f}*`).join('\n');
+  return `🏆 Tus estampillas IAC — ${vName}\n\n` +
+    `Hola *${nombre}*, guardá estos folios:\n${lines}\n\n` +
+    `✅ Son tus ${count} participación${count>1?'es':''} en el sorteo.\n` +
+    `Import American Cars · iac-arica.cl`;
+}
+
+// Compartir todos los folios juntos
+function compartirTodas() {
+  if (!lastPurchase) return;
+  const { nombre, estampillas } = lastPurchase;
+  const folios = estampillas.map(e => e.folio).join(', ');
+  const msg = buildWspMsg(nombre, premioVehicle?.name||'Vehículo', folios, estampillas.length);
+  if (navigator.share) {
+    navigator.share({ text: msg, url: 'https://iac-arica.cl/stamper.html' }).catch(()=>{});
   } else {
-    downloadViaDataURL(canvas, filename);
-  }
-}
-
-function downloadViaDataURL(canvas, filename) {
-  try {
-    const link = document.createElement('a');
-    link.download = filename;
-    link.href = canvas.toDataURL('image/png', 1.0);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch(e) {
-    // Canvas tainted: abrir en nueva pestaña como último recurso
-    showNotif('📲 Mantén presionada la imagen para guardarla');
-    const w = window.open();
-    if (w) {
-      w.document.write(`<img src="${canvas.toDataURL()}" style="max-width:100%">`);
-    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   }
 }
 
 function closeSuccess() {
   document.getElementById('successModal').classList.remove('active');
   document.body.style.overflow = '';
-  // Limpiar form
-  ['inputNombre','inputEmail','inputTelefono'].forEach(id=>document.getElementById(id).value='');
+  ['inputNombre','inputEmail','inputTelefono'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
 }
 
-/* ============================================
-   COMPARTIR
-   ============================================ */
-function compartirCompra() {
-  if (!lastPurchase) return;
-  const folios = lastPurchase.estampillas.map(e=>e.folio).join(', ');
-  const msg = `🏆 ¡Estoy participando en el sorteo del ${premioVehicle?.name||'vehículo'} de @importamericancars!\n\nMis folios: ${folios}\n\n¡Consigue las tuyas en iac-arica.cl/stamper.html 🚗`;
-  if (navigator.share) navigator.share({ text:msg, url:'https://iac-arica.cl/stamper.html' }).catch(()=>{});
-  else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
-
-/* ============================================
+/* ============================================================
    NOTIFICACIÓN
-   ============================================ */
-function showNotif(msg) {
+   ============================================================ */
+function showNotif(msg, dur=3000) {
+  document.querySelectorAll('.notif').forEach(n => n.remove());
   const n = document.createElement('div');
   n.className = 'notif';
   n.innerHTML = `<i class="fas fa-info-circle"></i>${msg}`;
   document.body.appendChild(n);
-  setTimeout(()=>n.remove(), 3000);
+  setTimeout(() => n.remove(), dur);
 }
 </script>
 </body>
