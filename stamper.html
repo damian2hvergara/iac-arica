@@ -876,20 +876,26 @@ async function simulatePurchase() {
   // Guardar en Supabase
   if (sbClient) {
     try {
+      // IMPORTANTE: monto_pack solo en la fila 1 de cada compra.
+      // Las filas 2..N llevan monto_pack=0 para que cualquier SUM()
+      // sobre la columna dé el total real sin necesidad de filtrar.
+      // precio_unitario = precio por cada estampilla individual.
+      const precioUnitario = Math.round(selectedPackData.price / selectedPackData.stamps);
       const rows = estampillas.map(e => ({
         nombre, email,
-        telefono:       telefono || null,
-        pack:           selectedPackData.name,
-        monto_pack:     selectedPackData.price,
-        numero_folio:   e.folio,
-        hash_seguridad: e.hash,
-        orden_en_pack:  e.index + 1,
-        total_en_pack:  selectedPackData.stamps,
-        vehicle_id:     premioVehicle?.id  || null,
-        sorteo_id:      sorteoConfig?.id   || null,
-        estado:         'completado',
-        modo_pago:      'simulacion',
-        created_at:     new Date(ts).toISOString()
+        telefono:        telefono || null,
+        pack:            selectedPackData.name,
+        monto_pack:      e.index === 0 ? selectedPackData.price : 0,
+        precio_unitario: precioUnitario,
+        numero_folio:    e.folio,
+        hash_seguridad:  e.hash,
+        orden_en_pack:   e.index + 1,
+        total_en_pack:   selectedPackData.stamps,
+        vehicle_id:      premioVehicle?.id  || null,
+        sorteo_id:       sorteoConfig?.id   || null,
+        estado:          'completado',
+        modo_pago:       'simulacion',
+        created_at:      new Date(ts).toISOString()
       }));
       const { error } = await sbClient.from('estampillas').insert(rows);
       if (error) console.warn('Supabase insert:', error.message);
