@@ -915,7 +915,7 @@ async function simulatePurchase() {
    ENVÍO DE EMAIL DE CONFIRMACIÓN VÍA RESEND
    ============================================================ */
 async function sendConfirmationEmail(nombre, email, estampillas) {
-  const SERVER_URL = 'https://iac-email-server.onrender.com';
+  const SERVER_URL = 'https://cflpmluvhfldewiitymh.supabase.co/functions/v1/send-stamp-email';
 
   const fechaStr = sorteoConfig?.fecha_sorteo
     ? new Date(sorteoConfig.fecha_sorteo).toLocaleDateString('es-CL', {
@@ -923,7 +923,7 @@ async function sendConfirmationEmail(nombre, email, estampillas) {
       })
     : 'Por confirmar';
 
-  const res = await fetch(`${SERVER_URL}/send-email`, {
+  const res = await fetch(SERVER_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
