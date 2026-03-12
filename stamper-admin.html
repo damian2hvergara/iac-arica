@@ -562,26 +562,39 @@ async function loadDashboard() {
     }
 
     // ── MÉTRICAS GENERALES ──
+    // Precio de referencia por pack (fuente de verdad para datos corruptos anteriores)
+    const PACK_PRECIO = { inicio: 9990, popular: 14990, coleccionista: 19990 };
+
+    // Una "compra" = la fila con orden_en_pack === 1 de cada transacción.
+    // Datos nuevos: monto_pack ya viene correcto solo en esa fila.
+    // Datos viejos (corruptos): monto_pack está repetido en todas las filas
+    //   → usamos PACK_PRECIO como fuente de verdad y filtramos por orden_en_pack=1.
     const totalStamps   = rows.length;
-    const totalCompras  = rows.filter(r => r.orden_en_pack === 1).length;
+    const filasPrimeras = rows.filter(r => r.orden_en_pack === 1);
+    const totalCompras  = filasPrimeras.length;
     const emailsUnicos  = new Set(rows.map(r => r.email)).size;
-    var   recaudacion   = 0;
-    rows.forEach(r => { if (r.orden_en_pack === 1) recaudacion += (r.monto_pack || 0); });
-    const ticketProm    = totalCompras > 0 ? Math.round(recaudacion / totalCompras) : 0;
+
+    // recaudacion: siempre usamos PACK_PRECIO para evitar conteo doble,
+    // independiente de si el dato es viejo o nuevo.
+    var recaudacion = 0;
+    filasPrimeras.forEach(r => {
+      recaudacion += PACK_PRECIO[r.pack] || (r.monto_pack || 0);
+    });
+    const ticketProm = totalCompras > 0 ? Math.round(recaudacion / totalCompras) : 0;
 
     // Meta: 25.000.000
-    const META          = 25000000;
-    const pctMeta       = Math.min(100, Math.round((recaudacion / META) * 100));
+    const META    = 25000000;
+    const pctMeta = Math.min(100, Math.round((recaudacion / META) * 100));
 
     // ── PACKS ──
     const packs = { inicio:0, popular:0, coleccionista:0 };
-    rows.filter(r => r.orden_en_pack === 1).forEach(r => {
+    filasPrimeras.forEach(r => {
       if (packs[r.pack] !== undefined) packs[r.pack]++;
     });
     const recPacks = {
-      inicio:       packs.inicio * 9990,
-      popular:      packs.popular * 14990,
-      coleccionista:packs.coleccionista * 19990
+      inicio:        packs.inicio        * PACK_PRECIO.inicio,
+      popular:       packs.popular       * PACK_PRECIO.popular,
+      coleccionista: packs.coleccionista * PACK_PRECIO.coleccionista
     };
 
     // ── VENTAS POR DÍA (últimos 14 días) ──
@@ -600,15 +613,33 @@ async function loadDashboard() {
     const maxDia = Math.max(...dias14.map(d=>d.val), 1);
 
     // ── ÚLTIMAS COMPRAS ──
+    // Para mostrar monto correcto en últimas transacciones usamos PACK_PRECIO
     const comprasMap = {};
     [...rows].reverse().forEach(r => {
       const key = r.email + '__' + (r.created_at||'').slice(0,16);
-      if (!comprasMap[key]) comprasMap[key] = { email:r.email, pack:r.pack, monto:r.monto_pack, total:r.total_en_pack, fecha:r.created_at };
+      if (!comprasMap[key]) comprasMap[key] = {
+        email: r.email, pack: r.pack,
+        monto: PACK_PRECIO[r.pack] || r.monto_pack,
+        total: r.total_en_pack, fecha: r.created_at
+      };
     });
     const ultimas = Object.values(comprasMap).slice(0,8);
 
+    // ── DETECTAR DATOS CORRUPTOS (pre-fix) ──
+    // Una fila corrupta es: orden_en_pack > 1 y monto_pack > 0
+    const corruptos = rows.filter(r => r.orden_en_pack > 1 && (r.monto_pack || 0) > 0).length;
+    const bannerCorruptos = corruptos > 0
+      ? '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--r-md);padding:14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;">' +
+          '<i class="fas fa-exclamation-triangle" style="color:var(--orange);margin-top:2px;flex-shrink:0;"></i>' +
+          '<div>' +
+            '<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:4px;">⚠️ ' + corruptos + ' registros con monto duplicado detectados</div>' +
+            '<div style="font-size:12px;color:var(--muted);line-height:1.6;">Son ventas guardadas antes del fix. El dashboard los corrige automáticamente usando el precio del pack como fuente de verdad. Para limpiar la BD ejecuta el SQL de corrección (ver README).</div>' +
+          '</div>' +
+        '</div>'
+      : '';
+
     // ── RENDER ──
-    el.innerHTML =
+    el.innerHTML = bannerCorruptos +
 
     // Barra meta + header
     '<div class="card" style="margin-bottom:12px;">' +
