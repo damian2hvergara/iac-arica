@@ -925,7 +925,10 @@ async function sendConfirmationEmail(nombre, email, estampillas) {
 
   const res = await fetch(SERVER_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SB_ANON}`,
+    },
     body: JSON.stringify({
       nombre,
       email,
