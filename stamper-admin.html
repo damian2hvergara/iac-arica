@@ -233,8 +233,23 @@ img{display:block;max-width:100%;}
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-wrap" id="loginWrap">
+<!-- PUERTA MAESTRA (primera capa) -->
+<div class="login-wrap" id="masterWrap">
+  <div class="login-card">
+    <div style="font-size:32px;margin-bottom:12px;">🔐</div>
+    <div class="login-title" style="font-size:22px;margin-bottom:6px;">Acceso restringido</div>
+    <div class="login-sub">Ingresa la clave de acceso al panel</div>
+    <input class="login-input" type="password" id="masterPass"
+           placeholder="Clave de acceso"
+           autocomplete="off"
+           onkeydown="if(event.key==='Enter') checkMaster()">
+    <button class="login-btn" onclick="checkMaster()">Continuar</button>
+    <div class="login-error" id="masterError"></div>
+  </div>
+</div>
+
+<!-- LOGIN SUPABASE (segunda capa, oculto hasta pasar la puerta maestra) -->
+<div class="login-wrap" id="loginWrap" style="display:none">
   <div class="login-card">
     <div class="login-title"><span>Import</span> American Cars</div>
     <div class="login-sub">Admin Sorteo</div>
@@ -333,6 +348,38 @@ img{display:block;max-width:100%;}
 
 <script>
 /* ============================================
+   CONTRASEÑA MAESTRA (primera capa de seguridad)
+   Cambia MASTER_KEY por tu clave real antes de subir
+   ============================================ */
+const MASTER_KEY = 'IAC2025admin!'; // ← CAMBIA ESTO
+
+function checkMaster() {
+  const val = document.getElementById('masterPass').value;
+  const err = document.getElementById('masterError');
+  if (!val) { err.textContent = 'Ingresa la clave de acceso.'; return; }
+  if (val !== MASTER_KEY) {
+    err.textContent = 'Clave incorrecta.';
+    document.getElementById('masterPass').value = '';
+    document.getElementById('masterPass').focus();
+    // Pequeño retraso para dificultar ataques de fuerza bruta
+    setTimeout(() => { err.textContent = ''; }, 2000);
+    return;
+  }
+  // Clave correcta — guardar en sessionStorage para no repetir en recarga
+  sessionStorage.setItem('iac_master', '1');
+  document.getElementById('masterWrap').style.display = 'none';
+  document.getElementById('loginWrap').style.display  = 'flex';
+}
+
+// Si ya pasó la puerta maestra en esta sesión, saltarla directo
+(function() {
+  if (sessionStorage.getItem('iac_master') === '1') {
+    document.getElementById('masterWrap').style.display = 'none';
+    document.getElementById('loginWrap').style.display  = 'flex';
+  }
+})();
+
+/* ============================================
    SUPABASE
    ============================================ */
 const SB_URL  = 'https://cflpmluvhfldewiitymh.supabase.co';
@@ -350,13 +397,22 @@ let allParts      = [];
 sb.auth.onAuthStateChange((event, session) => {
   if (session?.user) {
     currentUser = session.user;
+    // Ocultar ambas pantallas de acceso
+    document.getElementById('masterWrap').style.display = 'none';
     document.getElementById('loginWrap').style.display  = 'none';
     document.getElementById('appWrap').style.display    = 'block';
     document.getElementById('adminEmail').textContent   = session.user.email;
     initApp();
   } else {
-    document.getElementById('loginWrap').style.display  = 'flex';
-    document.getElementById('appWrap').style.display    = 'none';
+    document.getElementById('appWrap').style.display = 'none';
+    // Solo mostrar loginWrap si ya pasó la puerta maestra
+    if (sessionStorage.getItem('iac_master') === '1') {
+      document.getElementById('masterWrap').style.display = 'none';
+      document.getElementById('loginWrap').style.display  = 'flex';
+    } else {
+      document.getElementById('masterWrap').style.display = 'flex';
+      document.getElementById('loginWrap').style.display  = 'none';
+    }
   }
 });
 
@@ -369,6 +425,7 @@ async function doLogin() {
 }
 
 async function doLogout() {
+  sessionStorage.removeItem('iac_master');
   await sb.auth.signOut();
 }
 
