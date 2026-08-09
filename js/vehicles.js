@@ -126,16 +126,16 @@ function renderVehicles(vehicles) {
                     </div>
                 </div>` : ''}
 
-                <div class="vehicle-actions" style="display:grid;grid-template-columns:${hasKits ? '1fr 1fr 1fr' : '1fr 1fr'};gap:8px;margin-top:12px;">
+                <div class="vehicle-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+                    <button class="button" onclick="contactVehicle('${vehicle.id}')" style="background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);font-size:13px;padding:11px 12px;grid-column:1/-1;">
+                        <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
+                    </button>
                     ${hasKits ? `
-                    <button class="button" onclick="openCustomization('${vehicle.id}')" style="background:linear-gradient(135deg,var(--import-red) 0%,#8b0707 100%);font-size:13px;padding:10px 12px;">
+                    <button class="button button-outline" onclick="openCustomization('${vehicle.id}')" style="font-size:13px;padding:10px 12px;">
                         <i class="fas fa-magic"></i> Personalizar
                     </button>` : ''}
-                    <button class="button ${hasKits ? 'button-outline' : ''}" onclick="showVehicleDetails('${vehicle.id}')" style="font-size:13px;padding:10px 12px;">
-                        <i class="fas fa-info-circle"></i> Detalles
-                    </button>
-                    <button class="button button-outline" onclick="openConsultation('${vehicle.id}')" style="font-size:13px;padding:10px 12px;">
-                        <i class="fas fa-question-circle"></i> Consultas
+                    <button class="button button-outline" onclick="showVehicleDetails('${vehicle.id}')" style="font-size:13px;padding:10px 12px;${hasKits ? '' : 'grid-column:1/-1;'}">
+                        <i class="fas fa-info-circle"></i> Ver Detalles
                     </button>
                 </div>
             </div>
@@ -276,7 +276,7 @@ function contactVehicle(vehicleId) {
     if (!vehicle) return;
     const statusLabel = APP_CONFIG.vehicleStatuses[vehicle.status]?.label || vehicle.status;
     const message = `Hola, estoy interesado en ${vehicle.name} ($${formatPrice(vehicle.price)} CLP). Estado: ${statusLabel}. ¿Más información?`;
-    trackEvent('contact', 'WhatsApp', vehicle.name);
+    trackConversion('whatsapp_contact', vehicle.name, vehicle.price);
     window.open(`https://wa.me/${CONTACT_CONFIG.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
 }
 

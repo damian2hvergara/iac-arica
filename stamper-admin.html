@@ -3,876 +3,589 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>Admin Sorteo — IAC Arica</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --red:#9B0000;--red-deep:#6B0000;
-  --bg:#0C0C0C;--surface:#161616;--surface-2:#202020;--surface-3:#2A2A2A;
-  --border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);
-  --text:#F2F2F2;--muted:#6E6E6E;--muted-2:#3E3E3E;
-  --green:#00C566;--blue:#3B82F6;--orange:#F59E0B;--gold:#C9A84C;
-  --white:#FFF;--font-h:'Barlow Condensed',sans-serif;--font-b:'DM Sans',sans-serif;
-  --r-sm:10px;--r-md:16px;--r-lg:22px;--r-full:999px;
+  --red:#9B0000; --red-deep:#6B0000; --bg:#0C0C0C; --surface:#161616; --surface-2:#202020;
+  --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
+  --text:#F2F2F2; --muted:#8c8578; --green:#00C566; --gold:#F0D080; --orange:#F59E0B; --danger:#ff3b30;
+  --font-h:'Barlow Condensed',sans-serif; --font-b:'DM Sans',sans-serif;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-font-smoothing:antialiased}
-body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:14px;min-height:100vh;}
-button{font-family:inherit;cursor:pointer;border:none;background:none;}
-img{display:block;max-width:100%;}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:inherit}
 
-/* LOGIN */
-.login-wrap{
-  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-  background:var(--bg);z-index:999;
-}
-.login-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:40px 28px;width:90%;max-width:380px;text-align:center;
-}
-.login-title{font-family:var(--font-h);font-size:28px;font-weight:800;color:var(--white);margin-bottom:4px;}
-.login-title span{color:var(--red);}
-.login-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
-.login-input{
-  width:100%;padding:13px 14px;background:var(--surface-2);
-  border:1px solid var(--border-hi);border-radius:var(--r-sm);
-  color:var(--text);font-family:var(--font-b);font-size:14px;
-  margin-bottom:10px;-webkit-appearance:none;
-}
-.login-input::placeholder{color:var(--muted-2);}
-.login-input:focus{outline:none;border-color:var(--red);}
-.login-btn{
-  width:100%;padding:14px;background:var(--red);color:white;
-  font-size:15px;font-weight:700;border-radius:var(--r-md);margin-top:6px;
-  transition:background 0.2s;
-}
-.login-btn:hover{background:var(--red-deep);}
-.login-error{font-size:12px;color:#ff5555;margin-top:8px;}
+/* --- Gate screens --- */
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.gate-box{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 28px}
+.gate-box h1{font-family:var(--font-h);font-size:22px;text-transform:uppercase;margin-bottom:4px}
+.gate-box .sub{color:var(--muted);font-size:12.5px;margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input{width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
+.field input:focus{outline:none;border-color:var(--red)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:8px;font-weight:600;font-size:13.5px;transition:opacity .15s}
+.btn:hover{opacity:.9}
+.btn-primary{background:var(--red);color:#fff;width:100%}
+.btn-ghost{background:transparent;border:1px solid var(--border-hi);color:var(--text)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:6px}
+.err-msg{color:var(--danger);font-size:12.5px;margin-top:10px;min-height:16px}
 
-/* HEADER */
-.adm-header{
-  position:fixed;top:0;left:0;right:0;height:52px;z-index:800;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 20px;background:rgba(12,12,12,0.95);
-  backdrop-filter:blur(20px);border-bottom:1px solid var(--border);
-}
-.adm-logo{font-family:var(--font-h);font-size:17px;color:var(--white);}
-.adm-logo span{color:var(--red);}
-.adm-user-row{display:flex;align-items:center;gap:10px;}
-.adm-email{font-size:12px;color:var(--muted);}
-.adm-logout{
-  padding:7px 14px;background:var(--surface-2);color:var(--text);
-  border-radius:var(--r-full);font-size:12px;font-weight:500;
-  border:1px solid var(--border-hi);transition:background 0.2s;
-}
-.adm-logout:hover{background:var(--surface-3);}
+/* --- App shell --- */
+#appWrap{display:none;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.topbar .brand{font-family:var(--font-h);font-size:18px;text-transform:uppercase;font-weight:700}
+.topbar .brand span{color:var(--red)}
+.topbar-right{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--muted)}
 
-/* MAIN */
-.adm-main{margin-top:52px;padding:28px 20px 60px;max-width:860px;margin-left:auto;margin-right:auto;}
+.tabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--border);overflow-x:auto;background:var(--surface)}
+.tab-btn{padding:13px 16px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;background:transparent}
+.tab-btn.active{color:var(--text);border-color:var(--red)}
+.tab-btn .badge{display:inline-block;margin-left:6px;background:var(--red);color:#fff;font-size:10px;padding:1px 6px;border-radius:20px}
 
-/* TABS */
-.adm-tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:28px;}
-.adm-tab{
-  padding:10px 18px;font-size:14px;font-weight:500;color:var(--muted);
-  border-bottom:2px solid transparent;cursor:pointer;transition:all 0.2s;white-space:nowrap;
-}
-.adm-tab:hover{color:var(--text);}
-.adm-tab.active{color:var(--red);border-bottom-color:var(--red);}
-.tab-pane{display:none;}
-.tab-pane.active{display:block;animation:fadeIn 0.25s ease;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+main{padding:22px;max-width:1200px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
 
-/* CARDS */
-.card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:20px;margin-bottom:16px;
-}
-.card-title{
-  font-family:var(--font-h);font-size:20px;font-weight:700;
-  color:var(--white);margin-bottom:16px;display:flex;align-items:center;gap:8px;
-}
-.card-title i{color:var(--red);font-size:16px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.kpi .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi .val{font-family:var(--font-h);font-size:26px;font-weight:700}
+.kpi .val.gold{color:var(--gold)}
+.kpi .val.green{color:var(--green)}
 
-/* FORM */
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.form-group{margin-bottom:14px;}
-.form-label{display:block;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
-.form-input,.form-select,.form-textarea{
-  width:100%;padding:11px 13px;background:var(--surface-2);
-  border:1px solid var(--border-hi);border-radius:var(--r-sm);
-  color:var(--text);font-family:var(--font-b);font-size:14px;
-  transition:border-color 0.2s;-webkit-appearance:none;
-}
-.form-input:focus,.form-select:focus,.form-textarea:focus{
-  outline:none;border-color:var(--red);background:rgba(155,0,0,0.04);
-}
-.form-input::placeholder{color:var(--muted-2);}
-.form-select option{background:var(--surface-2);color:var(--text);}
-.form-textarea{resize:vertical;min-height:80px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px}
+.card h2{font-family:var(--font-h);font-size:18px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 
-/* Selector de vehículo */
-.vehicle-selector{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;
-}
-.vehicle-option{
-  background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r-md);overflow:hidden;cursor:pointer;
-  transition:border-color 0.2s;
-}
-.vehicle-option.selected{border-color:var(--red);background:rgba(155,0,0,0.08);}
-.vehicle-option-img{aspect-ratio:16/9;overflow:hidden;background:var(--surface-3);}
-.vehicle-option-img img{width:100%;height:100%;object-fit:cover;}
-.vehicle-option-body{padding:10px;}
-.vehicle-option-name{font-size:13px;font-weight:600;color:var(--white);margin-bottom:2px;}
-.vehicle-option-price{font-size:12px;color:var(--gold);}
-.vehicle-option-radio{
-  width:18px;height:18px;border-radius:50%;
-  border:2px solid var(--muted-2);margin-left:auto;margin-top:4px;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.2s;
-}
-.vehicle-option.selected .vehicle-option-radio{border-color:var(--red);background:var(--red);}
-.vehicle-option-radio::after{content:'';width:6px;height:6px;border-radius:50%;background:white;opacity:0;}
-.vehicle-option.selected .vehicle-option-radio::after{opacity:1;}
-.vehicle-option-footer{display:flex;align-items:center;justify-content:space-between;padding:0 10px 10px;}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 10px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border-hi)}
+td{padding:10px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+.pill-pend{background:rgba(245,158,11,0.16);color:var(--orange)}
+.pill-ok{background:rgba(0,197,102,0.16);color:var(--green)}
+.pill-rej{background:rgba(255,59,48,0.16);color:var(--danger)}
 
-/* BOTONES */
-.btn-primary{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:12px 22px;background:var(--red);color:white;
-  font-size:14px;font-weight:700;border-radius:var(--r-md);
-  transition:background 0.2s;
-}
-.btn-primary:hover{background:var(--red-deep);}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-.btn-danger{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 18px;background:rgba(255,50,50,0.15);color:#ff6060;
-  font-size:13px;font-weight:600;border-radius:var(--r-md);
-  border:1px solid rgba(255,50,50,0.25);transition:background 0.2s;
-}
-.btn-danger:hover{background:rgba(255,50,50,0.25);}
-.btn-ghost{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 18px;background:var(--surface-2);color:var(--text);
-  font-size:13px;font-weight:500;border-radius:var(--r-md);
-  border:1px solid var(--border-hi);transition:background 0.2s;
-}
-.btn-ghost:hover{background:var(--surface-3);}
+.empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:13px}
 
-/* SORTEO ACTIVO PREVIEW */
-.sorteo-active{
-  background:linear-gradient(135deg,rgba(155,0,0,0.2),rgba(107,0,0,0.1));
-  border:1px solid rgba(155,0,0,0.4);border-radius:var(--r-lg);
-  padding:20px;margin-bottom:20px;
-}
-.sorteo-active-label{font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-.sorteo-active-name{font-family:var(--font-h);font-size:24px;font-weight:800;color:var(--white);margin-bottom:4px;}
-.sorteo-active-date{font-size:13px;color:var(--muted);}
-.sorteo-active-date strong{color:var(--orange);}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.form-grid .full{grid-column:1/-1}
+textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);resize:vertical;min-height:70px}
 
-/* STATS */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
-.stat-box{
-  background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:14px;
-}
-.stat-val{font-family:var(--font-h);font-size:28px;font-weight:800;color:var(--white);line-height:1;}
-.stat-label{font-size:11px;color:var(--muted);margin-top:4px;}
+.pack-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.pack-row:last-child{border-bottom:none}
+.pack-row .name{flex:1;font-weight:600}
+.pack-row .meta{color:var(--muted);font-size:12px}
+.floor-warn{color:var(--orange);font-size:11.5px;margin-top:4px}
 
-/* TABLA PARTICIPANTES */
-.part-table{width:100%;border-collapse:collapse;}
-.part-table th{
-  text-align:left;font-size:11px;font-weight:700;color:var(--muted);
-  text-transform:uppercase;letter-spacing:0.6px;
-  padding:8px 12px;border-bottom:1px solid var(--border);
-}
-.part-table td{
-  padding:10px 12px;border-bottom:1px solid var(--border);
-  font-size:13px;color:var(--text);
-  vertical-align:middle;
-}
-.part-table tr:hover td{background:rgba(255,255,255,0.02);}
-.folio-cell{font-family:monospace;color:var(--gold);font-weight:700;}
-.pack-badge{
-  display:inline-block;padding:3px 9px;border-radius:var(--r-full);
-  font-size:11px;font-weight:600;
-}
-.pack-inicio{background:rgba(110,110,110,0.2);color:var(--muted);}
-.pack-popular{background:rgba(201,168,76,0.15);color:var(--gold);}
-.pack-coleccionista{background:rgba(59,130,246,0.15);color:#60A5FA;}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+.toggle input{width:18px;height:18px}
 
-/* SPINNER */
-.spin{width:28px;height:28px;border:3px solid var(--surface-3);border-top-color:var(--red);border-radius:50%;animation:spin 0.7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading-row{display:flex;align-items:center;gap:10px;color:var(--muted);padding:20px 0;}
-
-/* NOTIF */
-.notif{
-  position:fixed;bottom:20px;right:20px;
-  background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);
-  padding:12px 18px;border-radius:var(--r-md);font-size:13px;font-weight:500;
-  display:flex;align-items:center;gap:8px;z-index:9999;
-  box-shadow:0 8px 24px rgba(0,0,0,0.5);animation:notifIn 0.3s ease;
-}
-@keyframes notifIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.notif-success i{color:var(--green);}
-.notif-error   i{color:#ff5555;}
-
-/* EXPORT BTN */
-.export-row{display:flex;justify-content:flex-end;margin-bottom:12px;}
-
-@media(max-width:500px){
-  .form-row{grid-template-columns:1fr;}
-  .vehicle-selector{grid-template-columns:1fr;}
-  .stats-grid{grid-template-columns:1fr 1fr;}
+@media(max-width:640px){
+  main{padding:14px}
+  .kpi .val{font-size:21px}
 }
 </style>
 </head>
 <body>
 
-<!-- PUERTA MAESTRA (primera capa) -->
-<div class="login-wrap" id="masterWrap">
-  <div class="login-card">
-    <div style="font-size:32px;margin-bottom:12px;">🔐</div>
-    <div class="login-title" style="font-size:22px;margin-bottom:6px;">Acceso restringido</div>
-    <div class="login-sub">Ingresa la clave de acceso al panel</div>
-    <input class="login-input" type="password" id="masterPass"
-           placeholder="Clave de acceso"
-           autocomplete="off"
-           onkeydown="if(event.key==='Enter') checkMaster()">
-    <button class="login-btn" onclick="checkMaster()">Continuar</button>
-    <div class="login-error" id="masterError"></div>
+<!-- ============ LOGIN (solo Supabase Auth) ============ -->
+<div class="gate" id="loginWrap">
+  <div class="gate-box">
+    <h1>Admin <span style="color:var(--red)">Sorteo</span></h1>
+    <p class="sub">IAC Arica 2026 — No Sueñes, Gánatelo</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()"><i class="fas fa-lock"></i> Ingresar</button>
+    <div class="err-msg" id="loginError"></div>
   </div>
 </div>
 
-<!-- LOGIN SUPABASE (segunda capa, oculto hasta pasar la puerta maestra) -->
-<div class="login-wrap" id="loginWrap" style="display:none">
-  <div class="login-card">
-    <div class="login-title"><span>Import</span> American Cars</div>
-    <div class="login-sub">Admin Sorteo</div>
-    <input class="login-input" type="email" id="loginEmail" placeholder="tu@email.com" autocomplete="email">
-    <input class="login-input" type="password" id="loginPass" placeholder="Contraseña" autocomplete="current-password">
-    <button class="login-btn" onclick="doLogin()">Ingresar</button>
-    <div class="login-error" id="loginError"></div>
+<!-- ============ APP ============ -->
+<div id="appWrap">
+  <div class="topbar">
+    <div class="brand">IAC <span>Sorteo</span> Admin</div>
+    <div class="topbar-right">
+      <span id="adminEmail"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+    </div>
   </div>
-</div>
 
-<!-- APP (oculto hasta login) -->
-<div id="appWrap" style="display:none">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="tab-btn" data-tab="pendientes" onclick="switchTab('pendientes')">Pedidos Pendientes <span class="badge" id="pendCount" style="display:none">0</span></button>
+    <button class="tab-btn" data-tab="packs" onclick="switchTab('packs')">Packs</button>
+    <button class="tab-btn" data-tab="sorteo" onclick="switchTab('sorteo')">Configuración Sorteo</button>
+  </div>
 
-  <!-- HEADER -->
-  <header class="adm-header">
-    <div class="adm-logo"><span>Import</span> American Cars — Sorteo Admin</div>
-    <div class="adm-user-row">
-      <span class="adm-email" id="adminEmail"></span>
-      <button class="adm-logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
-    </div>
-  </header>
-
-  <!-- MAIN -->
-  <main class="adm-main">
-
-    <!-- TABS -->
-    <div class="adm-tabs">
-      <button class="adm-tab active" onclick="switchTab('sorteo')"><i class="fas fa-cog"></i> Configurar Sorteo</button>
-      <button class="adm-tab" onclick="switchTab('participantes')"><i class="fas fa-chart-bar"></i> Dashboard</button>
-    </div>
-
-    <!-- TAB: CONFIGURAR SORTEO -->
-    <div class="tab-pane active" id="tab-sorteo">
-
-      <!-- Sorteo activo actual -->
-      <div id="sorteoActivoPreview"></div>
+  <main>
+    <!-- ===== DASHBOARD ===== -->
+    <section class="tab-panel active" id="panel-dashboard">
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi"><div class="lbl">Estampillas vendidas</div><div class="val gold" id="kpiVendidas">—</div></div>
+        <div class="kpi"><div class="lbl">Órdenes completadas</div><div class="val" id="kpiOrdenes">—</div></div>
+        <div class="kpi"><div class="lbl">Recaudación</div><div class="val green" id="kpiRecaudacion">—</div></div>
+        <div class="kpi"><div class="lbl">Pendientes de confirmar</div><div class="val" id="kpiPendientes">—</div></div>
+        <div class="kpi"><div class="lbl">Progreso a meta mínima</div><div class="val" id="kpiMeta">—</div></div>
+      </div>
 
       <div class="card">
-        <div class="card-title"><i class="fas fa-trophy"></i> Configurar Nuevo Sorteo</div>
-
-        <div class="form-group">
-          <label class="form-label">Nombre del sorteo</label>
-          <input class="form-input" type="text" id="sorteoNombre" placeholder="Ej: Sorteo Ford Mustang — IAC Arica 2025">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Fecha y hora del sorteo</label>
-            <input class="form-input" type="datetime-local" id="sorteoFecha">
-          </div>
-          <div class="form-group">
-            <label class="form-label">URL Bases del sorteo (PDF)</label>
-            <input class="form-input" type="url" id="sorteoBasesUrl" placeholder="https://iac-arica.cl/bases-sorteo.pdf">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Descripción pública</label>
-          <textarea class="form-textarea" id="sorteoDesc" placeholder="Descripción visible en la página..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Vehículo Premio — Selecciona uno en stock</label>
-          <div class="loading-row" id="vehicleLoadingRow"><div class="spin"></div>Cargando vehículos en stock...</div>
-          <div class="vehicle-selector" id="vehicleSelector" style="display:none"></div>
-          <div id="vehicleError" style="display:none;font-size:13px;color:var(--muted);padding:12px 0;">No hay vehículos en stock disponibles.</div>
-        </div>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn-primary" id="saveSorteoBtn" onclick="saveSorteo()">
-            <i class="fas fa-check"></i> Guardar y Activar Sorteo
-          </button>
-          <a href="stamper.html" target="_blank" class="btn-ghost">
-            <i class="fas fa-external-link-alt"></i> Ver página pública
-          </a>
+        <h2>Packs — desglose <button class="btn btn-ghost btn-sm" onclick="exportarCSV()"><i class="fas fa-download"></i> Exportar CSV</button></h2>
+        <div class="table-wrap">
+          <table id="packsBreakdownTable"><thead><tr><th>Pack</th><th>Órdenes</th><th>Stickers</th><th>Recaudado</th></tr></thead><tbody></tbody></table>
         </div>
       </div>
 
-      <!-- Desactivar sorteo -->
-      <div class="card" id="deactivateCard" style="display:none">
-        <div class="card-title" style="font-size:17px;"><i class="fas fa-pause-circle"></i> Desactivar sorteo actual</div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Desactiva el sorteo actual. La página stamper.html dejará de mostrar contenido hasta que configures uno nuevo.</p>
-        <button class="btn-danger" onclick="deactivateSorteo()"><i class="fas fa-times-circle"></i> Desactivar sorteo activo</button>
+      <div class="card">
+        <h2>Últimas órdenes completadas</h2>
+        <div class="table-wrap">
+          <table id="ultimasTable"><thead><tr><th>Fecha</th><th>Nombre</th><th>Pack</th><th>Monto</th></tr></thead><tbody></tbody></table>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- TAB: DASHBOARD -->
-    <div class="tab-pane" id="tab-participantes">
-      <div id="dashboardContainer">
-        <div class="loading-row"><div class="spin"></div>Cargando dashboard...</div>
+    <!-- ===== PEDIDOS PENDIENTES ===== -->
+    <section class="tab-panel" id="panel-pendientes">
+      <div class="card">
+        <h2>Pedidos pendientes de confirmar pago</h2>
+        <p class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Revisa la cuenta bancaria y calza la <b>referencia</b>, el monto y el nombre antes de confirmar.
+        </p>
+        <div class="table-wrap">
+          <table id="pendientesTable">
+            <thead><tr><th>Fecha</th><th>Referencia</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>RUT/Pasaporte</th><th>Pack</th><th>Monto</th><th>Acciones</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="empty" id="pendientesEmpty" style="display:none">No hay pedidos pendientes.</div>
       </div>
-    </div>
+    </section>
 
+    <!-- ===== PACKS ===== -->
+    <section class="tab-panel" id="panel-packs">
+      <div class="card">
+        <h2>Packs de venta</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Precio base $5.500/unidad. El sistema no permite guardar un pack por debajo de $4.000/unidad (piso legal).
+        </p>
+        <div id="packsList"></div>
+      </div>
+      <div class="card">
+        <h2 id="packFormTitle">Nuevo pack</h2>
+        <div class="form-grid">
+          <input type="hidden" id="packId">
+          <div class="field"><label>Slug (único, sin espacios)</label><input id="packSlug" placeholder="popular"></div>
+          <div class="field"><label>Nombre visible</label><input id="packNombre" placeholder="Pack Popular"></div>
+          <div class="field"><label>Cantidad de estampillas</label><input type="number" id="packCantidad" min="1"></div>
+          <div class="field"><label>Precio total (CLP)</label><input type="number" id="packPrecio" min="0"></div>
+          <div class="field"><label>Orden de aparición</label><input type="number" id="packOrden" value="0"></div>
+          <div class="field"><label class="toggle"><input type="checkbox" id="packDestacado"> Destacado ("más elegido")</label></div>
+          <div class="field"><label class="toggle"><input type="checkbox" id="packActivo" checked> Activo</label></div>
+        </div>
+        <div class="floor-warn" id="packFloorWarn" style="display:none"></div>
+        <div style="margin-top:14px;display:flex;gap:10px">
+          <button class="btn btn-primary" onclick="savePackForm()"><i class="fas fa-save"></i> Guardar</button>
+          <button class="btn btn-ghost" onclick="resetPackForm()">Cancelar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CONFIGURACIÓN SORTEO ===== -->
+    <section class="tab-panel" id="panel-sorteo">
+      <div class="card">
+        <h2>Datos del sorteo activo</h2>
+        <div class="form-grid">
+          <div class="field"><label>Nombre del sorteo</label><input id="sorteoNombre"></div>
+          <div class="field"><label>Fecha del sorteo</label><input type="datetime-local" id="sorteoFecha"></div>
+          <div class="field"><label>Inicio de venta</label><input type="date" id="sorteoVentaInicio"></div>
+          <div class="field"><label>Cierre de venta</label><input type="date" id="sorteoVentaCierre"></div>
+          <div class="field"><label>URL bases legales</label><input id="sorteoBasesUrl" placeholder="/bases.html"></div>
+          <div class="field full"><label>Descripción</label><textarea id="sorteoDesc"></textarea></div>
+          <div class="field full"><label>Texto de disclosure Zona Franca (se muestra junto al premio)</label><textarea id="sorteoZonaFranca"></textarea></div>
+        </div>
+        <hr style="border-color:var(--border);margin:18px 0">
+        <div class="form-grid">
+          <div class="field"><label>Meta mínima de stickers (interno — nunca público)</label><input type="number" id="sorteoMetaMinima"></div>
+          <div class="field"><label>Total emitidos (interno — nunca público)</label><input type="number" id="sorteoTotalEmitidos"></div>
+          <div class="field"><label>Extensiones realizadas (cláusula Octavo)</label><input type="number" id="sorteoExtensiones"></div>
+          <div class="field"><label class="toggle"><input type="checkbox" id="sorteoVentanaReembolso"> Ventana de reembolso abierta (desde 2ª prórroga)</label></div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" onclick="saveSorteoConfig()"><i class="fas fa-save"></i> Guardar configuración</button>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
+<script src="js/config.js"></script>
+<script src="js/stamper-api.js"></script>
 <script>
-/* ============================================
-   CONTRASEÑA MAESTRA (primera capa de seguridad)
-   Cambia MASTER_KEY por tu clave real antes de subir
-   ============================================ */
-const MASTER_KEY = 'IAC2025admin!'; // ← CAMBIA ESTO
+let currentUser = null;
+let pendCache = [];
 
-function checkMaster() {
-  const val = document.getElementById('masterPass').value;
-  const err = document.getElementById('masterError');
-  if (!val) { err.textContent = 'Ingresa la clave de acceso.'; return; }
-  if (val !== MASTER_KEY) {
-    err.textContent = 'Clave incorrecta.';
-    document.getElementById('masterPass').value = '';
-    document.getElementById('masterPass').focus();
-    // Pequeño retraso para dificultar ataques de fuerza bruta
-    setTimeout(() => { err.textContent = ''; }, 2000);
-    return;
-  }
-  // Clave correcta — guardar en sessionStorage para no repetir en recarga
-  sessionStorage.setItem('iac_master', '1');
-  document.getElementById('masterWrap').style.display = 'none';
-  document.getElementById('loginWrap').style.display  = 'flex';
-}
-
-// Si ya pasó la puerta maestra en esta sesión, saltarla directo
-(function() {
-  if (sessionStorage.getItem('iac_master') === '1') {
-    document.getElementById('masterWrap').style.display = 'none';
-    document.getElementById('loginWrap').style.display  = 'flex';
-  }
-})();
-
-/* ============================================
-   SUPABASE
-   ============================================ */
-const SB_URL  = 'https://cflpmluvhfldewiitymh.supabase.co';
-const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmbHBtbHV2aGZsZGV3aWl0eW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTM0NzcsImV4cCI6MjA4MDk4OTQ3N30.of3ic6N1Y3U5dtSmzKzkTdvfvRnqYjqFI2fglmibaiM';
-const sb = supabase.createClient(SB_URL, SB_ANON);
-
-let currentUser   = null;
-let selectedVehicleId = null;
-let currentSorteo = null;
-let allParts      = [];
-
-/* ============================================
-   AUTH
-   ============================================ */
-sb.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    currentUser = session.user;
-    // Ocultar ambas pantallas de acceso
-    document.getElementById('masterWrap').style.display = 'none';
-    document.getElementById('loginWrap').style.display  = 'none';
-    document.getElementById('appWrap').style.display    = 'block';
-    document.getElementById('adminEmail').textContent   = session.user.email;
-    initApp();
-  } else {
-    document.getElementById('appWrap').style.display = 'none';
-    // Solo mostrar loginWrap si ya pasó la puerta maestra
-    if (sessionStorage.getItem('iac_master') === '1') {
-      document.getElementById('masterWrap').style.display = 'none';
-      document.getElementById('loginWrap').style.display  = 'flex';
+/* ---------- Auth ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  stamperAPI.init();
+  stamperAPI.client.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').style.display = 'block';
+      document.getElementById('adminEmail').textContent = session.user.email;
+      initApp();
     } else {
-      document.getElementById('masterWrap').style.display = 'flex';
-      document.getElementById('loginWrap').style.display  = 'none';
+      document.getElementById('appWrap').style.display = 'none';
+      document.getElementById('loginWrap').style.display = 'flex';
     }
-  }
+  });
 });
 
 async function doLogin() {
   const email = document.getElementById('loginEmail').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  document.getElementById('loginError').textContent = '';
-  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (error) document.getElementById('loginError').textContent = 'Credenciales incorrectas.';
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  try {
+    await stamperAPI.signIn(email, pass);
+  } catch (e) {
+    errEl.textContent = 'Credenciales incorrectas.';
+  }
 }
 
 async function doLogout() {
-  sessionStorage.removeItem('iac_master');
-  await sb.auth.signOut();
+  await stamperAPI.signOut();
 }
 
-/* ============================================
-   INIT
-   ============================================ */
-async function initApp() {
-  await Promise.all([
-    loadCurrentSorteo(),
-    loadStockVehicles()
-  ]);
-}
-
-/* ============================================
-   TABS
-   ============================================ */
+/* ---------- Tabs ---------- */
 function switchTab(name) {
-  document.querySelectorAll('.adm-tab').forEach((t,i)=>{
-    const names = ['sorteo','participantes'];
-    t.classList.toggle('active', names[i] === name);
-  });
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  if (name === 'participantes') loadDashboard();
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'pendientes') loadPendientes();
+  if (name === 'packs') loadPacks();
+  if (name === 'sorteo') loadSorteoConfig();
 }
 
-/* ============================================
-   SORTEO ACTIVO
-   ============================================ */
-async function loadCurrentSorteo() {
-  try {
-    const { data } = await sb.from('sorteo_config').select('*,vehicles(name,price,vehicle_images(image_url,is_main))').eq('activo',true).single();
-    currentSorteo = data;
-    renderSorteoActivo(data);
-  } catch(e) {
-    renderSorteoActivo(null);
-  }
+function initApp() {
+  loadDashboard();
+  loadPendientesBadge();
 }
 
-function renderSorteoActivo(sorteo) {
-  const preview = document.getElementById('sorteoActivoPreview');
-  const deact   = document.getElementById('deactivateCard');
-  if (!sorteo) {
-    preview.innerHTML = `
-      <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:16px;padding:16px;margin-bottom:16px;font-size:13px;color:var(--orange);">
-        <i class="fas fa-exclamation-triangle"></i> No hay sorteo activo. Configura uno para que la página stamper.html funcione.
-      </div>`;
-    deact.style.display = 'none';
-    return;
-  }
-  const mainImg = sorteo.vehicles?.vehicle_images?.find(i=>i.is_main)?.image_url
-                || sorteo.vehicles?.vehicle_images?.[0]?.image_url || '';
-  const fecha   = new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  preview.innerHTML = `
-    <div class="sorteo-activo" style="display:flex;gap:14px;align-items:flex-start;">
-      ${mainImg?`<img src="${mainImg}" alt="premio" style="width:80px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0;">`:''}
-      <div>
-        <div class="sorteo-active-label">✅ Sorteo activo</div>
-        <div class="sorteo-active-name">${sorteo.nombre_sorteo}</div>
-        <div class="sorteo-active-date">Vehículo: <strong>${sorteo.vehicles?.name||'—'}</strong></div>
-        <div class="sorteo-active-date">Sorteo: <strong>${fecha}</strong></div>
-      </div>
-    </div>`;
-  deact.style.display = 'block';
-}
-
-/* ============================================
-   CARGAR VEHÍCULOS EN STOCK
-   ============================================ */
-async function loadStockVehicles() {
-  try {
-    const { data, error } = await sb.from('vehicles')
-      .select('id,name,price,vehicle_images(image_url,is_main,order_index)')
-      .eq('status','stock')
-      .order('created_at',{ascending:false});
-
-    document.getElementById('vehicleLoadingRow').style.display = 'none';
-
-    if (error || !data || data.length === 0) {
-      document.getElementById('vehicleError').style.display = 'block';
-      return;
-    }
-
-    const sel = document.getElementById('vehicleSelector');
-    sel.style.display = 'grid';
-    sel.innerHTML = data.map(v => {
-      const imgs = (v.vehicle_images||[]).sort((a,b)=>(a.order_index||0)-(b.order_index||0));
-      const mainImg = imgs.find(i=>i.is_main)?.image_url || imgs[0]?.image_url || '';
-      return `
-        <div class="vehicle-option" data-id="${v.id}" onclick="selectVehicle('${v.id}',this)">
-          <div class="vehicle-option-img">
-            ${mainImg?`<img src="${mainImg}" alt="${v.name}" loading="lazy">`:''}
-          </div>
-          <div class="vehicle-option-body">
-            <div class="vehicle-option-name">${v.name}</div>
-            <div class="vehicle-option-price">$${(v.price||0).toLocaleString('es-CL')} CLP</div>
-          </div>
-          <div class="vehicle-option-footer">
-            <span style="font-size:11px;color:var(--green);">● En Stock</span>
-            <div class="vehicle-option-radio"></div>
-          </div>
-        </div>`;
-    }).join('');
-
-    // Si hay sorteo activo, preseleccionar su vehículo
-    if (currentSorteo?.vehicle_id) selectVehicle(currentSorteo.vehicle_id, null, true);
-
-  } catch(e) {
-    document.getElementById('vehicleLoadingRow').style.display = 'none';
-    document.getElementById('vehicleError').style.display = 'block';
-  }
-}
-
-function selectVehicle(id, el, silent=false) {
-  selectedVehicleId = id;
-  document.querySelectorAll('.vehicle-option').forEach(opt=>{
-    opt.classList.toggle('selected', opt.dataset.id === id);
-  });
-}
-
-/* ============================================
-   GUARDAR SORTEO
-   ============================================ */
-async function saveSorteo() {
-  const nombre = document.getElementById('sorteoNombre').value.trim();
-  const fecha  = document.getElementById('sorteoFecha').value;
-  const desc   = document.getElementById('sorteoDesc').value.trim();
-  const bases  = document.getElementById('sorteoBasesUrl').value.trim();
-
-  if (!nombre) { showNotif('Escribe el nombre del sorteo','error'); return; }
-  if (!fecha)  { showNotif('Selecciona la fecha del sorteo','error'); return; }
-  if (!selectedVehicleId) { showNotif('Selecciona el vehículo premio','error'); return; }
-
-  const btn = document.getElementById('saveSorteoBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-
-  try {
-    // Desactivar sorteos anteriores
-    await sb.from('sorteo_config').update({ activo:false }).eq('activo',true);
-
-    // Crear nuevo
-    const { error } = await sb.from('sorteo_config').insert({
-      nombre_sorteo: nombre,
-      fecha_sorteo:  new Date(fecha).toISOString(),
-      vehicle_id:    selectedVehicleId,
-      activo:        true,
-      descripcion:   desc || null,
-      bases_url:     bases || null
-    });
-
-    if (error) throw error;
-
-    showNotif('✅ Sorteo activado correctamente','success');
-    await loadCurrentSorteo();
-  } catch(e) {
-    showNotif('Error al guardar: '+e.message,'error');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fas fa-check"></i> Guardar y Activar Sorteo';
-  }
-}
-
-async function deactivateSorteo() {
-  if (!confirm('¿Desactivar el sorteo actual? La página stamper.html dejará de funcionar.')) return;
-  await sb.from('sorteo_config').update({ activo:false }).eq('activo',true);
-  showNotif('Sorteo desactivado','success');
-  loadCurrentSorteo();
-}
-
-/* ============================================
-   DASHBOARD
-   ============================================ */
+/* ---------- Dashboard ---------- */
 async function loadDashboard() {
-  const el = document.getElementById('dashboardContainer');
-  el.innerHTML = '<div class="loading-row"><div class="spin"></div>Cargando dashboard...</div>';
   try {
-    // Traer solo campos necesarios — eficiente para 10.000 filas
-    const { data, error } = await sb
-      .from('estampillas')
-      .select('email,pack,monto_pack,orden_en_pack,total_en_pack,numero_folio,created_at')
-      .eq('estado','completado')
-      .order('created_at', { ascending: true });
+    const { ordenes, sorteo, stickersVendidos } = await stamperAPI.getDashboardStats();
+    const completadas = ordenes.filter(o => o.estado === 'completado');
+    const pendientes = ordenes.filter(o => o.estado === 'pendiente_pago');
+    const recaudacion = completadas.reduce((s, o) => s + (o.monto_total || 0), 0);
 
-    if (error) throw error;
-    const rows = data || [];
+    document.getElementById('kpiVendidas').textContent = stickersVendidos.toLocaleString('es-CL');
+    document.getElementById('kpiOrdenes').textContent = completadas.length.toLocaleString('es-CL');
+    document.getElementById('kpiRecaudacion').textContent = '$' + recaudacion.toLocaleString('es-CL');
+    document.getElementById('kpiPendientes').textContent = pendientes.length.toLocaleString('es-CL');
 
-    if (!rows.length) {
-      el.innerHTML = '<div class="card"><div style="color:var(--muted);font-size:14px;padding:24px 0;text-align:center;"><i class="fas fa-inbox" style="font-size:32px;opacity:0.2;display:block;margin-bottom:12px;"></i>Aún no hay ventas registradas.</div></div>';
-      return;
-    }
-
-    // ── MÉTRICAS GENERALES ──
-    // Precio de referencia por pack (fuente de verdad para datos corruptos anteriores)
-    const PACK_PRECIO = { inicio: 9990, popular: 14990, coleccionista: 19990 };
-
-    // Una "compra" = la fila con orden_en_pack === 1 de cada transacción.
-    // Datos nuevos: monto_pack ya viene correcto solo en esa fila.
-    // Datos viejos (corruptos): monto_pack está repetido en todas las filas
-    //   → usamos PACK_PRECIO como fuente de verdad y filtramos por orden_en_pack=1.
-    const totalStamps   = rows.length;
-    const filasPrimeras = rows.filter(r => r.orden_en_pack === 1);
-    const totalCompras  = filasPrimeras.length;
-    const emailsUnicos  = new Set(rows.map(r => r.email)).size;
-
-    // recaudacion: siempre usamos PACK_PRECIO para evitar conteo doble,
-    // independiente de si el dato es viejo o nuevo.
-    var recaudacion = 0;
-    filasPrimeras.forEach(r => {
-      recaudacion += PACK_PRECIO[r.pack] || (r.monto_pack || 0);
-    });
-    const ticketProm = totalCompras > 0 ? Math.round(recaudacion / totalCompras) : 0;
-
-    // Meta: 25.000.000
-    const META    = 25000000;
-    const pctMeta = Math.min(100, Math.round((recaudacion / META) * 100));
-
-    // ── PACKS ──
-    const packs = { inicio:0, popular:0, coleccionista:0 };
-    filasPrimeras.forEach(r => {
-      if (packs[r.pack] !== undefined) packs[r.pack]++;
-    });
-    const recPacks = {
-      inicio:        packs.inicio        * PACK_PRECIO.inicio,
-      popular:       packs.popular       * PACK_PRECIO.popular,
-      coleccionista: packs.coleccionista * PACK_PRECIO.coleccionista
-    };
-
-    // ── VENTAS POR DÍA (últimos 14 días) ──
-    const diasMap = {};
-    rows.filter(r => r.orden_en_pack === 1).forEach(r => {
-      const d = (r.created_at||'').slice(0,10);
-      diasMap[d] = (diasMap[d]||0) + 1;
-    });
-    const hoy     = new Date();
-    const dias14  = [];
-    for (let i = 13; i >= 0; i--) {
-      const d  = new Date(hoy); d.setDate(d.getDate() - i);
-      const key= d.toISOString().slice(0,10);
-      dias14.push({ key, label: d.toLocaleDateString('es-CL',{day:'numeric',month:'short'}), val: diasMap[key]||0 });
-    }
-    const maxDia = Math.max(...dias14.map(d=>d.val), 1);
-
-    // ── ÚLTIMAS COMPRAS ──
-    // Para mostrar monto correcto en últimas transacciones usamos PACK_PRECIO
-    const comprasMap = {};
-    [...rows].reverse().forEach(r => {
-      const key = r.email + '__' + (r.created_at||'').slice(0,16);
-      if (!comprasMap[key]) comprasMap[key] = {
-        email: r.email, pack: r.pack,
-        monto: PACK_PRECIO[r.pack] || r.monto_pack,
-        total: r.total_en_pack, fecha: r.created_at
-      };
-    });
-    const ultimas = Object.values(comprasMap).slice(0,8);
-
-    // ── DETECTAR DATOS CORRUPTOS (pre-fix) ──
-    // Una fila corrupta es: orden_en_pack > 1 y monto_pack > 0
-    const corruptos = rows.filter(r => r.orden_en_pack > 1 && (r.monto_pack || 0) > 0).length;
-    const bannerCorruptos = corruptos > 0
-      ? '<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--r-md);padding:14px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;">' +
-          '<i class="fas fa-exclamation-triangle" style="color:var(--orange);margin-top:2px;flex-shrink:0;"></i>' +
-          '<div>' +
-            '<div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:4px;">⚠️ ' + corruptos + ' registros con monto duplicado detectados</div>' +
-            '<div style="font-size:12px;color:var(--muted);line-height:1.6;">Son ventas guardadas antes del fix. El dashboard los corrige automáticamente usando el precio del pack como fuente de verdad. Para limpiar la BD ejecuta el SQL de corrección (ver README).</div>' +
-          '</div>' +
-        '</div>'
-      : '';
-
-    // ── RENDER ──
-    el.innerHTML = bannerCorruptos +
-
-    // Barra meta + header
-    '<div class="card" style="margin-bottom:12px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
-        '<div class="card-title" style="margin:0;"><i class="fas fa-chart-bar"></i> Dashboard del Sorteo</div>' +
-        '<button class="btn-ghost" style="font-size:12px;" onclick="exportCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>' +
-      '</div>' +
-      '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Meta de recaudación · $' + META.toLocaleString('es-CL') + '</div>' +
-      '<div style="background:var(--surface-3);border-radius:999px;height:10px;overflow:hidden;margin-bottom:6px;">' +
-        '<div style="height:100%;width:' + pctMeta + '%;background:linear-gradient(90deg,var(--red),#ff4444);border-radius:999px;transition:width 0.8s;"></div>' +
-      '</div>' +
-      '<div style="display:flex;justify-content:space-between;font-size:12px;">' +
-        '<span style="color:var(--red);font-weight:700;">$' + recaudacion.toLocaleString('es-CL') + ' recaudados</span>' +
-        '<span style="color:var(--muted);">' + pctMeta + '% de la meta</span>' +
-      '</div>' +
-    '</div>' +
-
-    // KPIs grid 4 cols
-    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px;">' +
-
-      '<div class="stat-box">' +
-        '<div class="stat-val">' + totalStamps.toLocaleString('es-CL') + '</div>' +
-        '<div class="stat-label">Estampillas vendidas</div>' +
-      '</div>' +
-
-      '<div class="stat-box">' +
-        '<div class="stat-val">' + totalCompras.toLocaleString('es-CL') + '</div>' +
-        '<div class="stat-label">Transacciones</div>' +
-      '</div>' +
-
-      '<div class="stat-box">' +
-        '<div class="stat-val">' + emailsUnicos.toLocaleString('es-CL') + '</div>' +
-        '<div class="stat-label">Compradores únicos</div>' +
-      '</div>' +
-
-      '<div class="stat-box">' +
-        '<div class="stat-val" style="font-size:clamp(14px,3vw,24px);">$' + ticketProm.toLocaleString('es-CL') + '</div>' +
-        '<div class="stat-label">Ticket promedio</div>' +
-      '</div>' +
-
-    '</div>' +
+    const pct = sorteo.meta_minima_stickers > 0
+      ? Math.min(100, Math.round((stickersVendidos / sorteo.meta_minima_stickers) * 100))
+      : 0;
+    document.getElementById('kpiMeta').textContent = pct + '%';
 
     // Packs breakdown
-    '<div class="card" style="margin-bottom:12px;">' +
-      '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;">Ventas por Pack</div>' +
-      '<div style="display:flex;gap:10px;">' +
-
-        '<div style="flex:1;padding:14px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);text-align:center;">' +
-          '<div style="font-size:26px;font-weight:800;color:var(--white);">' + packs.inicio + '</div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Inicio</div>' +
-          '<div style="font-size:11px;color:var(--muted);">x2 · $9.990</div>' +
-          '<div style="font-size:12px;font-weight:600;color:var(--text);margin-top:6px;">$' + recPacks.inicio.toLocaleString('es-CL') + '</div>' +
-        '</div>' +
-
-        '<div style="flex:1;padding:14px;background:var(--surface-2);border:1px solid rgba(201,168,76,0.3);border-radius:var(--r-md);text-align:center;">' +
-          '<div style="font-size:26px;font-weight:800;color:var(--gold);">' + packs.popular + '</div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Popular</div>' +
-          '<div style="font-size:11px;color:var(--muted);">x4 · $14.990</div>' +
-          '<div style="font-size:12px;font-weight:600;color:var(--gold);margin-top:6px;">$' + recPacks.popular.toLocaleString('es-CL') + '</div>' +
-        '</div>' +
-
-        '<div style="flex:1;padding:14px;background:var(--surface-2);border:1px solid rgba(59,130,246,0.2);border-radius:var(--r-md);text-align:center;">' +
-          '<div style="font-size:26px;font-weight:800;color:#60A5FA;">' + packs.coleccionista + '</div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:2px;">Coleccionista</div>' +
-          '<div style="font-size:11px;color:var(--muted);">x6 · $19.990</div>' +
-          '<div style="font-size:12px;font-weight:600;color:#60A5FA;margin-top:6px;">$' + recPacks.coleccionista.toLocaleString('es-CL') + '</div>' +
-        '</div>' +
-
-      '</div>' +
-    '</div>' +
-
-    // Gráfico barras últimos 14 días
-    '<div class="card" style="margin-bottom:12px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
-        '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Compras por día (últimos 14 días)</div>' +
-      '</div>' +
-      '<div style="display:flex;align-items:flex-end;gap:4px;height:90px;">' +
-        dias14.map(function(d) {
-          var h = Math.round((d.val / maxDia) * 80);
-          var isHoy = d.key === hoy.toISOString().slice(0,10);
-          return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;" title="' + d.label + ': ' + d.val + ' compras">' +
-            '<div style="font-size:9px;color:' + (d.val > 0 ? 'var(--text)' : 'transparent') + ';">' + d.val + '</div>' +
-            '<div style="width:100%;height:' + (h||2) + 'px;background:' + (isHoy ? 'var(--gold)' : 'var(--red)') + ';border-radius:3px 3px 0 0;opacity:' + (d.val > 0 ? '1' : '0.15') + ';min-height:2px;"></div>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-      '<div style="display:flex;gap:4px;margin-top:4px;">' +
-        dias14.map(function(d) {
-          return '<div style="flex:1;font-size:8px;color:var(--muted);text-align:center;overflow:hidden;">' + d.label.split(' ')[0] + '</div>';
-        }).join('') +
-      '</div>' +
-    '</div>' +
-
-    // Últimas transacciones
-    '<div class="card">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
-        '<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Últimas ' + ultimas.length + ' transacciones</div>' +
-        '<span style="font-size:11px;color:var(--muted);">Total: ' + totalCompras.toLocaleString('es-CL') + ' · Exporta CSV para ver todo</span>' +
-      '</div>' +
-      '<div style="display:flex;flex-direction:column;gap:8px;">' +
-        ultimas.map(function(c) {
-          var label = { inicio:'Inicio x2', popular:'Popular x4', coleccionista:'Coleccionista x6' };
-          var color = { inicio:'var(--muted)', popular:'var(--gold)', coleccionista:'#60A5FA' };
-          return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--border);">' +
-            '<div>' +
-              '<div style="font-size:13px;font-weight:500;color:var(--text);">' + c.email + '</div>' +
-              '<div style="font-size:11px;color:var(--muted);margin-top:2px;">' + new Date(c.fecha).toLocaleDateString('es-CL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) + '</div>' +
-            '</div>' +
-            '<div style="text-align:right;">' +
-              '<div style="font-size:12px;font-weight:700;color:' + color[c.pack] + ';">' + (label[c.pack]||c.pack) + '</div>' +
-              '<div style="font-size:13px;font-weight:600;color:var(--white);">$' + (c.monto||0).toLocaleString('es-CL') + '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('') +
-      '</div>' +
-    '</div>';
-
-    // Guardar para CSV
-    allParts = rows;
-
-  } catch(e) {
-    document.getElementById('dashboardContainer').innerHTML =
-      '<div class="card"><p style="color:var(--muted);padding:16px">Error: ' + e.message + '</p></div>';
-  }
-}
-
-/* ============================================
-   EXPORTAR CSV — pagina de a 1000 para soportar 10.000+ filas
-   ============================================ */
-async function exportCSV() {
-  showNotif('Preparando CSV...','info');
-  try {
-    var allRows = [];
-    var from    = 0;
-    var PAGE    = 1000;
-    while (true) {
-      var res = await sb
-        .from('estampillas')
-        .select('numero_folio,nombre,email,telefono,pack,monto_pack,total_en_pack,orden_en_pack,hash_seguridad,created_at')
-        .eq('estado','completado')
-        .order('created_at',{ascending:true})
-        .range(from, from+PAGE-1);
-      if (res.error) throw res.error;
-      if (!res.data || res.data.length === 0) break;
-      allRows = allRows.concat(res.data);
-      if (res.data.length < PAGE) break;
-      from += PAGE;
-    }
-    if (!allRows.length) { showNotif('Sin datos para exportar','error'); return; }
-    var headers = ['Folio','Nombre','Email','Telefono','Pack','Monto Pack','Stamps en Pack','Orden en Pack','Hash Seguridad','Fecha'];
-    var csvRows = allRows.map(function(r) {
-      return [r.numero_folio, r.nombre, r.email, r.telefono||'', r.pack, r.monto_pack, r.total_en_pack, r.orden_en_pack, r.hash_seguridad, r.created_at];
+    const byPack = {};
+    completadas.forEach(o => {
+      const nombre = o.packs_config?.nombre || 'Sin pack';
+      if (!byPack[nombre]) byPack[nombre] = { ordenes: 0, stickers: 0, monto: 0 };
+      byPack[nombre].ordenes++;
+      byPack[nombre].stickers += o.cantidad_stickers || 0;
+      byPack[nombre].monto += o.monto_total || 0;
     });
-    var csv = [headers].concat(csvRows).map(function(row) {
-      return row.map(function(v){ return '"'+String(v||'').replace(/"/g,'""')+'"'; }).join(',');
-    }).join('\n');
-    var blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href=url; a.download='estampillas-sorteo-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
-    URL.revokeObjectURL(url);
-    showNotif('CSV con '+allRows.length.toLocaleString('es-CL')+' registros descargado','success');
-  } catch(e) {
-    showNotif('Error al exportar: '+e.message,'error');
+    const tbody = document.querySelector('#packsBreakdownTable tbody');
+    tbody.innerHTML = Object.entries(byPack).map(([nombre, d]) => `
+      <tr><td>${escapeHtml(nombre)}</td><td>${d.ordenes}</td><td>${d.stickers}</td><td>$${d.monto.toLocaleString('es-CL')}</td></tr>
+    `).join('') || '<tr><td colspan="4" class="empty">Sin datos aún</td></tr>';
+
+    // Últimas
+    const ultimas = completadas.slice().sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10);
+    const ub = document.querySelector('#ultimasTable tbody');
+    ub.innerHTML = ultimas.map(o => `
+      <tr>
+        <td>${new Date(o.created_at).toLocaleDateString('es-CL')}</td>
+        <td>${escapeHtml(o.nombre)}</td>
+        <td>${escapeHtml(o.packs_config?.nombre || '')}</td>
+        <td>$${(o.monto_total||0).toLocaleString('es-CL')}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="4" class="empty">Sin órdenes completadas aún</td></tr>';
+  } catch (e) {
+    console.error(e);
   }
 }
 
-/* ============================================
-   NOTIF
-   ============================================ */
-function showNotif(msg, type='info') {
-  const n=document.createElement('div');
-  n.className=`notif notif-${type}`;
-  n.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i>${msg}`;
-  document.body.appendChild(n);
-  setTimeout(()=>n.remove(),3500);
+async function loadPendientesBadge() {
+  try {
+    const pend = await stamperAPI.getOrdenesPendientes();
+    const badge = document.getElementById('pendCount');
+    if (pend.length > 0) { badge.style.display = 'inline-block'; badge.textContent = pend.length; }
+    else badge.style.display = 'none';
+  } catch (e) { console.error(e); }
+}
+
+/* ---------- Pedidos pendientes ---------- */
+async function loadPendientes() {
+  try {
+    pendCache = await stamperAPI.getOrdenesPendientes();
+    const tbody = document.querySelector('#pendientesTable tbody');
+    const empty = document.getElementById('pendientesEmpty');
+    if (pendCache.length === 0) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = pendCache.map(o => `
+      <tr>
+        <td>${new Date(o.created_at).toLocaleString('es-CL')}</td>
+        <td><code>IAC-ORD-${escapeHtml(o.id.slice(0,8).toUpperCase())}</code></td>
+        <td>${escapeHtml(o.nombre)}</td>
+        <td>${escapeHtml(o.email)}</td>
+        <td>${escapeHtml(o.telefono)}</td>
+        <td>${escapeHtml(o.rut_pasaporte)}</td>
+        <td>${escapeHtml(o.packs_config?.nombre || '')} (${o.cantidad_stickers})</td>
+        <td>$${(o.monto_total||0).toLocaleString('es-CL')}</td>
+        <td>
+          <button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Confirmar pago</button>
+          <button class="btn btn-ghost btn-sm" data-action="rechazar" data-id="${o.id}">Rechazar</button>
+        </td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll('button[data-action="confirmar"]').forEach(b =>
+      b.addEventListener('click', () => confirmarPedido(b.dataset.id)));
+    tbody.querySelectorAll('button[data-action="rechazar"]').forEach(b =>
+      b.addEventListener('click', () => rechazarPedido(b.dataset.id)));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function confirmarPedido(ordenId) {
+  const orden = pendCache.find(o => o.id === ordenId);
+  if (!orden) return;
+  if (!confirm(`¿Confirmar el pago de ${orden.nombre} por $${(orden.monto_total||0).toLocaleString('es-CL')}?`)) return;
+  try {
+    const folios = await stamperAPI.confirmarOrden(ordenId);
+    await enviarCorreoConfirmacion(orden, folios);
+    alert('Orden confirmada y correo enviado.');
+    loadPendientes();
+    loadPendientesBadge();
+  } catch (e) {
+    alert('Error al confirmar: ' + (e.message || e));
+  }
+}
+
+async function rechazarPedido(ordenId) {
+  const nota = prompt('Motivo del rechazo (opcional):') || null;
+  try {
+    await stamperAPI.rechazarOrden(ordenId, nota);
+    loadPendientes();
+    loadPendientesBadge();
+  } catch (e) {
+    alert('Error al rechazar: ' + (e.message || e));
+  }
+}
+
+async function enviarCorreoConfirmacion(orden, folios) {
+  try {
+    const sorteo = await stamperAPI.getSorteoConfigAdmin();
+    const fechaStr = sorteo?.fecha_sorteo
+      ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
+      : 'Por confirmar';
+    const vehicleName = sorteo?.vehicles?.name || 'Vehículo';
+    const vehicleImg = sorteo?.vehicles?.vehicle_images?.find(i => i.is_main)?.image_url
+      || sorteo?.vehicles?.vehicle_images?.[0]?.image_url || null;
+
+    await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+      body: JSON.stringify({
+        nombre: orden.nombre,
+        email: orden.email,
+        estampillas: folios.map(f => ({ folio: f.numero_folio, hash: f.hash_seguridad })),
+        vehicleName, vehicleImg, fechaSorteo: fechaStr,
+        pack: orden.packs_config?.nombre || '',
+        monto: orden.monto_total
+      })
+    });
+  } catch (e) {
+    console.warn('Email:', e);
+  }
+}
+
+/* ---------- Packs ---------- */
+async function loadPacks() {
+  try {
+    const packs = await stamperAPI.getPacksAdmin();
+    const list = document.getElementById('packsList');
+    list.innerHTML = packs.map(p => `
+      <div class="pack-row">
+        <div>
+          <div class="name">${escapeHtml(p.nombre)} ${p.destacado ? '<span class="pill pill-ok">Destacado</span>' : ''} ${!p.activo ? '<span class="pill pill-rej">Inactivo</span>' : ''}</div>
+          <div class="meta">${p.cantidad_stickers} estampillas · $${p.precio_total.toLocaleString('es-CL')} total · $${Math.round(p.precio_total/p.cantidad_stickers).toLocaleString('es-CL')}/u</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-edit="${p.id}">Editar</button>
+        <button class="btn btn-ghost btn-sm" data-del="${p.id}"><i class="fas fa-trash"></i></button>
+      </div>
+    `).join('') || '<div class="empty">No hay packs configurados.</div>';
+    list.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editPack(packs.find(p => p.id === b.dataset.edit))));
+    list.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => deletePackConfirm(b.dataset.del)));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function editPack(p) {
+  document.getElementById('packFormTitle').textContent = 'Editar: ' + p.nombre;
+  document.getElementById('packId').value = p.id;
+  document.getElementById('packSlug').value = p.slug;
+  document.getElementById('packNombre').value = p.nombre;
+  document.getElementById('packCantidad').value = p.cantidad_stickers;
+  document.getElementById('packPrecio').value = p.precio_total;
+  document.getElementById('packOrden').value = p.orden;
+  document.getElementById('packDestacado').checked = p.destacado;
+  document.getElementById('packActivo').checked = p.activo;
+}
+
+function resetPackForm() {
+  document.getElementById('packFormTitle').textContent = 'Nuevo pack';
+  ['packId','packSlug','packNombre','packCantidad','packPrecio'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('packOrden').value = 0;
+  document.getElementById('packDestacado').checked = false;
+  document.getElementById('packActivo').checked = true;
+  document.getElementById('packFloorWarn').style.display = 'none';
+}
+
+async function savePackForm() {
+  const cantidad = parseInt(document.getElementById('packCantidad').value, 10);
+  const precio = parseInt(document.getElementById('packPrecio').value, 10);
+  const warn = document.getElementById('packFloorWarn');
+
+  if (!cantidad || !precio) { alert('Completa cantidad y precio.'); return; }
+  if (precio < cantidad * 4000) {
+    warn.textContent = `El precio no puede ser menor a $${(cantidad*4000).toLocaleString('es-CL')} ($4.000/unidad, piso legal). La base de datos rechazará este guardado.`;
+    warn.style.display = 'block';
+    return;
+  }
+  warn.style.display = 'none';
+
+  const pack = {
+    id: document.getElementById('packId').value || undefined,
+    slug: document.getElementById('packSlug').value.trim(),
+    nombre: document.getElementById('packNombre').value.trim(),
+    cantidad_stickers: cantidad,
+    precio_total: precio,
+    orden: parseInt(document.getElementById('packOrden').value, 10) || 0,
+    destacado: document.getElementById('packDestacado').checked,
+    activo: document.getElementById('packActivo').checked
+  };
+  try {
+    await stamperAPI.savePack(pack);
+    resetPackForm();
+    loadPacks();
+  } catch (e) {
+    alert('Error al guardar: ' + (e.message || e));
+  }
+}
+
+async function deletePackConfirm(id) {
+  if (!confirm('¿Eliminar este pack?')) return;
+  try {
+    await stamperAPI.deletePack(id);
+    loadPacks();
+  } catch (e) {
+    alert('Error al eliminar: ' + (e.message || e));
+  }
+}
+
+/* ---------- Configuración sorteo ---------- */
+async function loadSorteoConfig() {
+  try {
+    const s = await stamperAPI.getSorteoConfigAdmin();
+    document.getElementById('sorteoNombre').value = s.nombre_sorteo || '';
+    document.getElementById('sorteoFecha').value = s.fecha_sorteo ? s.fecha_sorteo.slice(0,16) : '';
+    document.getElementById('sorteoVentaInicio').value = s.fecha_venta_inicio || '';
+    document.getElementById('sorteoVentaCierre').value = s.fecha_venta_cierre || '';
+    document.getElementById('sorteoBasesUrl').value = s.bases_url || '';
+    document.getElementById('sorteoDesc').value = s.descripcion || '';
+    document.getElementById('sorteoZonaFranca').value = s.zona_franca_texto || '';
+    document.getElementById('sorteoMetaMinima').value = s.meta_minima_stickers || 6500;
+    document.getElementById('sorteoTotalEmitidos').value = s.total_stickers_emitidos || 10000;
+    document.getElementById('sorteoExtensiones').value = s.extensiones_realizadas || 0;
+    document.getElementById('sorteoVentanaReembolso').checked = !!s.ventana_reembolso_abierta;
+    window.__sorteoId = s.id;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function saveSorteoConfig() {
+  if (!window.__sorteoId) { alert('No hay sorteo activo cargado.'); return; }
+  const fields = {
+    nombre_sorteo: document.getElementById('sorteoNombre').value.trim(),
+    fecha_sorteo: document.getElementById('sorteoFecha').value ? new Date(document.getElementById('sorteoFecha').value).toISOString() : null,
+    fecha_venta_inicio: document.getElementById('sorteoVentaInicio').value || null,
+    fecha_venta_cierre: document.getElementById('sorteoVentaCierre').value || null,
+    bases_url: document.getElementById('sorteoBasesUrl').value.trim() || null,
+    descripcion: document.getElementById('sorteoDesc').value.trim() || null,
+    zona_franca_texto: document.getElementById('sorteoZonaFranca').value.trim() || null,
+    meta_minima_stickers: parseInt(document.getElementById('sorteoMetaMinima').value, 10) || 6500,
+    total_stickers_emitidos: parseInt(document.getElementById('sorteoTotalEmitidos').value, 10) || 10000,
+    extensiones_realizadas: parseInt(document.getElementById('sorteoExtensiones').value, 10) || 0,
+    ventana_reembolso_abierta: document.getElementById('sorteoVentanaReembolso').checked
+  };
+  try {
+    await stamperAPI.updateSorteoConfig(window.__sorteoId, fields);
+    alert('Configuración guardada.');
+  } catch (e) {
+    alert('Error al guardar: ' + (e.message || e));
+  }
+}
+
+/* ---------- CSV export ---------- */
+async function exportarCSV() {
+  try {
+    const ordenes = await stamperAPI.getOrdenesAll();
+    const header = ['Fecha','Nombre','Email','Telefono','RUT/Pasaporte','Pack','Cantidad','Monto','Estado','Modo Pago','Referido Por','Codigo Referido','Confirmado'];
+    const rows = ordenes.map(o => [
+      new Date(o.created_at).toLocaleString('es-CL'),
+      o.nombre, o.email, o.telefono, o.rut_pasaporte,
+      o.packs_config?.nombre || '', o.cantidad_stickers, o.monto_total,
+      o.estado, o.modo_pago, o.referido_por || '', o.codigo_referido,
+      o.confirmado_at ? new Date(o.confirmado_at).toLocaleString('es-CL') : ''
+    ]);
+    const esc = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
+    const csv = '﻿' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ordenes-sorteo-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert('Error al exportar: ' + (e.message || e));
+  }
 }
 </script>
 </body>

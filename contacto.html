@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contacto | IAC Arica 2026 — No Sueñes, Gánatelo</title>
+<meta name="description" content="Escríbenos por WhatsApp o correo sobre tu Sticker Digital, tu pago o el sorteo del Dodge Challenger.">
+<link rel="canonical" href="https://iac-arica.cl/contacto.html">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--red:#9B0000;--bg:#0C0C0C;--surface:#161616;--border:rgba(255,255,255,0.08);--text:#F2F2F2;--muted:#9c9689;--gold:#F0D080;--green:#00C566;--font-h:'Barlow Condensed',sans-serif;--font-b:'DM Sans',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.6;font-size:15px}
+a{color:inherit;text-decoration:none}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:var(--font-h);font-weight:700;font-size:16px}
+.brand span{color:var(--red)}
+.back{font-size:13px;color:var(--muted)}
+.wrap{max-width:480px;margin:0 auto;padding:60px 20px 70px;text-align:center}
+h1{font-family:var(--font-h);font-size:clamp(26px,5vw,34px);text-transform:uppercase}
+.sub{color:var(--muted);font-size:14px;margin-top:8px;margin-bottom:30px}
+.contact-card{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:12px;text-align:left}
+.contact-card i{font-size:22px;width:32px;text-align:center}
+.contact-card .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.contact-card .val{font-weight:600;font-size:15px;margin-top:2px}
+.wa i{color:var(--green)}
+.mail i{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">IAC <span>Arica</span> 2026</div>
+  <a class="back" href="stamper.html"><i class="fas fa-arrow-left"></i> Volver al sorteo</a>
+</div>
+
+<div class="wrap">
+  <h1>¿Dudas con tu compra?</h1>
+  <p class="sub">Escríbenos y te respondemos lo antes posible.</p>
+
+  <a class="contact-card wa" id="waLink" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    <div><div class="lbl">WhatsApp</div><div class="val">Escribir ahora</div></div>
+  </a>
+
+  <a class="contact-card mail" id="mailLink">
+    <i class="fas fa-envelope"></i>
+    <div><div class="lbl">Correo</div><div class="val" id="mailVal">contacto@importamericancars.cl</div></div>
+  </a>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+document.getElementById('waLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}?text=${encodeURIComponent('Hola, tengo una consulta sobre el sorteo IAC Arica 2026.')}`;
+document.getElementById('mailLink').href = `mailto:${CONTACT_CONFIG.email}`;
+document.getElementById('mailVal').textContent = CONTACT_CONFIG.email;
+</script>
+</body>
+</html>

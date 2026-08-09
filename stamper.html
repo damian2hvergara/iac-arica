@@ -3,8 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="description" content="Estampillas Digitales Coleccionables — IAC Arica. Participa en el sorteo del vehículo.">
-<title>Estampillas Digitales — IAC Arica</title>
+<title>IAC Arica 2026 — No Sueñes, Gánatelo | Sorteo Dodge Challenger</title>
+<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo notariado de un Dodge Challenger 2018, valorizado en $18.500.000. Organiza Import American Cars, Arica.">
+<link rel="canonical" href="https://iac-arica.cl/stamper.html">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="IAC Arica 2026 — No Sueñes, Gánatelo">
+<meta property="og:description" content="Sorteo notariado de un Dodge Challenger 2018. Compra tu Sticker Digital desde $5.500.">
+<meta property="og:url" content="https://iac-arica.cl/stamper.html">
+<meta property="og:image" content="https://iac-arica.cl/img/challenger-og.jpg">
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -13,1159 +21,479 @@
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-83095XZ965"></script>
 <script>
-  window.dataLayer=window.dataLayer||[];
+  window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js',new Date()); gtag('config','G-83095XZ965');
+  gtag('js', new Date());
+  gtag('config', 'G-83095XZ965');
 </script>
 
 <style>
-/* ============================================================
-   VARIABLES & RESET
-   ============================================================ */
-:root {
-  --red:#9B0000; --red-deep:#6B0000;
+:root{
+  --red:#9B0000; --red-deep:#6B0000; --red-glow:rgba(155,0,0,0.22);
   --bg:#0C0C0C; --surface:#161616; --surface-2:#202020; --surface-3:#2A2A2A;
   --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
-  --text:#F2F2F2; --muted:#6E6E6E; --muted-2:#3E3E3E;
-  --green:#00C566; --blue:#3B82F6; --orange:#F59E0B;
-  --gold:#C9A84C; --gold-light:#F0D080; --white:#FFFFFF;
-  --font-h:'Barlow Condensed',sans-serif;
-  --font-b:'DM Sans',sans-serif;
+  --text:#F2F2F2; --muted:#8c8578; --green:#00C566; --gold:#F0D080; --orange:#F59E0B; --danger:#ff3b30;
+  --font-h:'Barlow Condensed',sans-serif; --font-b:'DM Sans',sans-serif;
   --r-sm:10px; --r-md:16px; --r-lg:22px; --r-full:999px;
-  --safe-b:env(safe-area-inset-bottom,0px);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
 body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:15px;line-height:1.55;overflow-x:hidden}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
-button{font-family:inherit;cursor:pointer;border:none;background:none;-webkit-tap-highlight-color:transparent}
-input{-webkit-appearance:none;appearance:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select{font-family:inherit;font-size:15px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
 
-/* TOPBAR */
-.topbar{
-  position:fixed;top:0;left:0;right:0;z-index:900;height:52px;
-  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
-  background:rgba(12,12,12,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-}
-.topbar-logo{font-family:var(--font-h);font-size:17px;letter-spacing:0.5px;color:var(--white);}
-.topbar-logo span{color:var(--red);}
-.topbar-back{
-  display:flex;align-items:center;gap:7px;padding:8px 14px;
-  background:var(--surface-2);color:var(--text);border-radius:var(--r-full);
-  font-size:13px;font-weight:500;border:1px solid var(--border-hi);
-}
+/* Topbar */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(12,12,12,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.brand{font-family:var(--font-h);font-size:16px;font-weight:700;letter-spacing:.4px}
+.brand span{color:var(--red)}
+.topbar-wa{display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-size:13px;font-weight:600}
 
-/* HERO */
-.hero{
-  position:relative;margin-top:52px;padding:48px 20px 36px;
-  background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;
-}
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(155,0,0,0.15) 0%,transparent 70%);
-  pointer-events:none;
-}
-.hero-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);
-  color:var(--gold-light);font-size:11px;font-weight:700;letter-spacing:1.2px;
-  text-transform:uppercase;padding:5px 12px;border-radius:var(--r-full);margin-bottom:14px;
-}
-.hero-title{
-  font-family:var(--font-h);font-size:clamp(34px,9vw,52px);font-weight:800;
-  line-height:1;letter-spacing:-0.5px;color:var(--white);margin-bottom:10px;
-  position:relative;z-index:1;
-}
-.hero-title em{color:var(--red);font-style:normal;}
-.hero-sub{font-size:14px;color:var(--muted);margin-bottom:28px;max-width:360px;line-height:1.65;position:relative;z-index:1;}
+main{padding-top:56px}
 
-/* COUNTDOWN */
-.countdown-wrap{
-  position:relative;z-index:1;background:var(--surface-2);
-  border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:20px;
-}
-.countdown-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
-.countdown-grid{display:flex;gap:8px;}
-.cd-unit{
-  flex:1;background:var(--surface-3);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:12px 6px;text-align:center;max-width:80px;
-}
-.cd-num{font-family:var(--font-h);font-size:32px;font-weight:800;color:var(--white);line-height:1;display:block;}
-.cd-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-top:4px;}
-.countdown-date{font-size:12px;color:var(--muted);margin-top:10px;}
-.countdown-date strong{color:var(--gold-light);}
+/* Hero */
+.hero{padding:44px 0 30px;text-align:center;background:radial-gradient(ellipse 90% 60% at 50% 0%, var(--red-glow), transparent 65%)}
+.eyebrow{font-family:var(--font-b);font-size:11.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(30px,7vw,50px);text-transform:uppercase;line-height:1;text-wrap:balance}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero p.sub{color:var(--muted);margin-top:12px;font-size:14.5px;max-width:44ch;margin-inline:auto}
 
-/* PREMIO */
-.premio-section{padding:36px 20px;border-bottom:1px solid var(--border);}
-.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
-.section-title{font-family:var(--font-h);font-size:clamp(26px,7vw,36px);font-weight:800;color:var(--white);margin-bottom:6px;}
-.section-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
-.premio-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
-.premio-img-wrap{position:relative;aspect-ratio:16/9;background:var(--surface-2);overflow:hidden;}
-.premio-img{width:100%;height:100%;object-fit:cover;}
-.premio-img-skeleton{
-  width:100%;height:100%;
-  background:linear-gradient(90deg,var(--surface-2) 0%,var(--surface-3) 50%,var(--surface-2) 100%);
-  background-size:200% 100%;animation:shimmer 1.5s infinite;
-}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.premio-badge-sorteo{
-  position:absolute;top:12px;left:12px;background:var(--red);color:white;
-  font-size:11px;font-weight:700;padding:5px 12px;border-radius:var(--r-full);
-}
-.premio-body{padding:16px;}
-.premio-name{font-family:var(--font-h);font-size:24px;font-weight:800;color:var(--white);margin-bottom:4px;}
-.premio-price{font-size:18px;font-weight:700;color:var(--gold-light);margin-bottom:12px;}
-.premio-specs{display:flex;gap:6px;flex-wrap:wrap;}
-.spec-tag{
-  display:flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);
-  padding:4px 10px;border-radius:var(--r-full);font-size:11px;color:var(--muted);
-}
-.spec-tag i{color:var(--red);font-size:10px;}
-.premio-thumbs{
-  display:flex;gap:6px;overflow-x:auto;padding:10px 16px;
-  border-top:1px solid var(--border);scrollbar-width:none;
-}
-.premio-thumbs::-webkit-scrollbar{display:none;}
-.premio-thumb{
-  flex-shrink:0;width:56px;height:40px;border-radius:6px;overflow:hidden;
-  border:2px solid transparent;cursor:pointer;transition:border-color 0.2s;
-}
-.premio-thumb.active{border-color:var(--gold);}
-.premio-thumb img{width:100%;height:100%;object-fit:cover;}
-.premio-video-btn{
-  display:flex;align-items:center;gap:8px;margin:12px 16px 16px;padding:11px 14px;
-  background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);
-  border-radius:var(--r-md);font-size:13px;color:#60A5FA;font-weight:500;cursor:pointer;
-}
+/* Countdown */
+.countdown{display:flex;justify-content:center;gap:10px;margin:26px 0 4px}
+.cd-box{background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-sm);padding:12px 14px;min-width:64px;text-align:center}
+.cd-box .n{font-family:var(--font-h);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
+.cd-box .l{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.cd-caption{text-align:center;color:var(--muted);font-size:12.5px;margin-top:10px}
 
-/* PACKS */
-.packs-section{padding:36px 20px;}
-.packs-grid{display:flex;flex-direction:column;gap:12px;}
-.pack-card{
-  position:relative;background:var(--surface);border:1px solid var(--border);
-  border-radius:var(--r-lg);padding:18px;cursor:pointer;
-  transition:border-color 0.2s,background 0.2s;user-select:none;
-}
-.pack-card.selected{border-color:var(--red);background:rgba(155,0,0,0.08);}
-.pack-card.popular{border-color:rgba(201,168,76,0.3);}
-.pack-card.popular.selected{border-color:var(--gold);}
-.pack-popular-badge{
-  position:absolute;top:-1px;right:16px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));
-  color:#1a0a00;font-size:10px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;
-  padding:4px 12px;border-radius:0 0 var(--r-sm) var(--r-sm);
-}
-.pack-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.pack-name{font-family:var(--font-h);font-size:22px;font-weight:700;color:var(--white);}
-.pack-radio{
-  width:22px;height:22px;border-radius:50%;border:2px solid var(--muted-2);
-  display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;
-}
-.pack-card.selected .pack-radio{border-color:var(--red);background:var(--red);}
-.pack-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:white;opacity:0;transition:opacity 0.2s;}
-.pack-card.selected .pack-radio::after{opacity:1;}
-.pack-body{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
-.pack-stamps-display{display:flex;gap:4px;flex-wrap:wrap;}
-.mini-stamp{
-  width:36px;height:26px;background:linear-gradient(135deg,var(--surface-3),var(--surface-2));
-  border:1px dashed rgba(255,255,255,0.15);border-radius:3px;
-  display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);
-  position:relative;overflow:hidden;
-}
-.mini-stamp::before{
-  content:'';position:absolute;inset:0;
-  background:repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(255,255,255,0.02) 3px,rgba(255,255,255,0.02) 4px);
-}
-.pack-price-block{text-align:right;}
-.pack-price{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--white);line-height:1;}
-.pack-unit{font-size:11px;color:var(--muted);margin-top:3px;}
-.pack-features{display:flex;gap:8px;flex-wrap:wrap;}
-.pack-feat{
-  display:flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--border);
-  padding:4px 10px;border-radius:var(--r-full);font-size:11px;color:var(--muted);
-}
-.pack-feat i{color:var(--red);font-size:10px;}
-.pack-card.popular .pack-feat i{color:var(--gold);}
+/* Premio */
+.premio-section{padding:28px 0}
+.premio-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.premio-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--surface-2)}
+.premio-body{padding:22px}
+.premio-name{font-family:var(--font-h);font-size:26px;font-weight:700;text-transform:uppercase}
+.premio-value{color:var(--gold);font-family:var(--font-h);font-size:20px;font-weight:700;margin-top:2px}
+.premio-specs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.premio-tag{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--r-full);padding:6px 12px;font-size:12px;color:var(--muted)}
 
-/* CHECKOUT */
-.checkout-section{padding:0 20px 48px;}
-.checkout-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;}
-.checkout-title{font-family:var(--font-h);font-size:20px;font-weight:700;color:var(--white);margin-bottom:4px;}
-.checkout-subtitle{font-size:12px;color:var(--muted);margin-bottom:18px;}
+/* Zona franca box — visible junto al premio, no nota al pie */
+.zf-box{margin-top:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:var(--r-md);padding:16px 18px;display:flex;gap:12px}
+.zf-box i{color:var(--orange);font-size:18px;margin-top:2px;flex-shrink:0}
+.zf-box .t{font-weight:700;font-size:13.5px;margin-bottom:4px;color:var(--orange)}
+.zf-box .d{font-size:13px;color:var(--text);opacity:.9;line-height:1.5}
 
-/* BANNER WHATSAPP */
-.wsp-banner{
-  display:flex;align-items:flex-start;gap:12px;
-  background:rgba(0,197,102,0.07);border:1px solid rgba(0,197,102,0.22);
-  border-radius:var(--r-md);padding:14px;margin-bottom:18px;
-}
-.wsp-banner-icon{
-  width:40px;height:40px;flex-shrink:0;border-radius:50%;
-  background:rgba(0,197,102,0.15);border:1px solid rgba(0,197,102,0.3);
-  display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--green);
-}
-.wsp-banner-text strong{display:block;color:var(--white);font-size:13px;font-weight:700;margin-bottom:3px;}
-.wsp-banner-text span{font-size:12px;color:var(--muted);line-height:1.5;}
+/* Refund banner */
+.refund-banner{display:none;margin-top:16px;background:rgba(0,197,102,0.08);border:1px solid rgba(0,197,102,0.35);border-radius:var(--r-md);padding:16px 18px}
+.refund-banner .t{font-weight:700;color:var(--green);margin-bottom:4px;font-size:13.5px}
+.refund-banner a{color:var(--green);text-decoration:underline}
 
-/* DEMO BANNER */
-.sim-banner{
-  display:flex;align-items:flex-start;gap:10px;
-  background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);
-  border-radius:var(--r-sm);padding:12px;margin-bottom:16px;
-  font-size:12px;color:var(--orange);line-height:1.55;
-}
-.sim-banner i{margin-top:2px;flex-shrink:0;}
+/* Counter */
+.counter-wrap{text-align:center;padding:22px 0 6px}
+.counter-num{font-family:var(--font-h);font-size:34px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.counter-lbl{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 
-/* FORM */
-.form-group{margin-bottom:14px;}
-.form-label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;}
-.form-label .highlight{color:var(--green);}
-.form-input{
-  width:100%;padding:14px;
-  background:var(--surface-2);border:1px solid var(--border-hi);
-  border-radius:var(--r-sm);color:var(--text);font-family:var(--font-b);
-  font-size:16px; /* 16px evita zoom automático en iOS Safari */
-  transition:border-color 0.2s;
-}
-.form-input::placeholder{color:var(--muted-2);}
-.form-input:focus{outline:none;border-color:var(--red);background:rgba(155,0,0,0.05);}
-.form-input.error{border-color:#ff4444;}
-.phone-wrap{position:relative;}
-.phone-prefix{
-  position:absolute;left:14px;top:50%;transform:translateY(-50%);
-  font-size:15px;color:var(--muted);pointer-events:none;
-  display:flex;align-items:center;gap:5px;
-}
-.phone-wrap .form-input{padding-left:72px;}
+/* Packs */
+.packs-section{padding:22px 0 40px}
+.section-title{font-family:var(--font-h);font-size:24px;font-weight:700;text-transform:uppercase;text-align:center;margin-bottom:20px}
+.packs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.pack-card{position:relative;background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-md);padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .15s,transform .15s}
+.pack-card:hover{transform:translateY(-3px)}
+.pack-card.selected{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+.pack-card .badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;padding:4px 12px;border-radius:var(--r-full);letter-spacing:.5px}
+.pack-card .qty{font-family:var(--font-h);font-size:15px;color:var(--muted);text-transform:uppercase}
+.pack-card .price{font-family:var(--font-h);font-size:28px;font-weight:800;margin:6px 0 2px}
+.pack-card .unit{color:var(--muted);font-size:11.5px}
+.buy-cta{display:block;width:100%;max-width:360px;margin:26px auto 0;padding:16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center}
+.buy-cta:disabled{opacity:.5}
 
-/* RESUMEN */
-.order-summary{
-  background:var(--surface-2);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:14px;margin-bottom:18px;
-}
-.summary-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;}
-.summary-row:not(:last-child){border-bottom:1px solid var(--border);}
-.summary-label{color:var(--muted);}
-.summary-val{color:var(--text);font-weight:500;}
-.summary-total .summary-label{font-weight:600;color:var(--text);}
-.summary-total .summary-val{font-family:var(--font-h);font-size:22px;font-weight:800;color:var(--white);}
+/* Checkout / Pending overlay */
+.overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:70px 16px 40px}
+.overlay.show{display:flex}
+.sheet{background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-lg);max-width:460px;width:100%;padding:26px 22px;position:relative}
+.sheet-close{position:absolute;top:14px;right:14px;color:var(--muted);font-size:18px}
+.sheet h2{font-family:var(--font-h);font-size:22px;text-transform:uppercase;margin-bottom:4px}
+.sheet .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
+.field input:focus{outline:none;border-color:var(--red)}
+.field-error{color:var(--danger);font-size:11.5px;margin-top:5px;min-height:14px}
+.summary-row{display:flex;justify-content:space-between;padding:10px 0;border-top:1px dashed var(--border-hi);font-size:14px}
+.summary-row.total{font-weight:700;font-family:var(--font-h);font-size:18px}
+.submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:16px}
+.submit-btn:disabled{opacity:.5}
+.form-err{color:var(--danger);font-size:12.5px;margin-top:10px;text-align:center}
 
-/* BOTÓN PAGO — grande para dedos */
-.pay-btn{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  background:var(--red);color:white;font-size:18px;font-weight:700;
-  padding:20px;border-radius:var(--r-md);min-height:62px;
-  transition:background 0.15s,transform 0.1s;touch-action:manipulation;
-}
-.pay-btn:active{background:var(--red-deep);transform:scale(0.985);}
-.pay-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
-.pay-note{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--muted);margin-top:10px;}
-.pay-note i{color:var(--green);}
+/* Pending screen content */
+.pending-icon{width:56px;height:56px;border-radius:50%;background:rgba(245,158,11,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--orange);margin:0 auto 14px}
+.ref-box{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:10px;padding:14px 16px;text-align:center;margin:16px 0}
+.ref-box .lbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.ref-box .code{font-family:'SFMono-Regular',Consolas,monospace;font-size:19px;font-weight:700;color:var(--gold);margin-top:4px;word-break:break-all}
+.bank-list{list-style:none;font-size:13.5px;line-height:2}
+.bank-list b{color:var(--muted);font-weight:600}
+.share-row{display:flex;gap:8px;margin-top:16px}
+.share-btn{flex:1;padding:11px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;font-size:12.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
 
-/* MODAL ÉXITO */
-.success-modal{display:none;position:fixed;inset:0;z-index:2000;overflow-y:auto;}
-.success-modal.active{display:block;}
-.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.93);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-.success-sheet{
-  position:relative;z-index:1;background:var(--surface);
-  border:1px solid var(--border);border-radius:var(--r-lg);
-  margin:52px 12px calc(40px + var(--safe-b));padding:28px 20px;
-  animation:sheetUp 0.4s cubic-bezier(0.22,1,0.36,1) both;
-}
-@keyframes sheetUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
-.success-icon{
-  width:64px;height:64px;border-radius:50%;margin:0 auto 16px;
-  background:rgba(0,197,102,0.15);border:2px solid rgba(0,197,102,0.4);
-  display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--green);
-}
-.success-title{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--white);margin-bottom:6px;text-align:center;}
-.success-sub{font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center;line-height:1.6;}
-.stamps-generated{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+/* Footer nav */
+footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
+.foot-links{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:13px;color:var(--muted)}
+.foot-links a:hover{color:var(--text)}
+.foot-brand{text-align:center;margin-top:18px;font-size:11.5px;color:var(--muted)}
 
-/* TARJETA DE ESTAMPILLA (HTML puro — sin canvas, sin CORS) */
-.stamp-item{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
-.stamp-item-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;border-bottom:1px solid var(--border);
-}
-.stamp-folio{font-family:monospace;font-size:13px;font-weight:700;color:var(--gold-light);letter-spacing:1px;}
-.stamp-part{font-size:11px;color:var(--green);}
-
-.stamp-card{
-  position:relative;background:linear-gradient(140deg,#1c0b03 0%,#0d0d0d 100%);
-  padding:14px 16px;overflow:hidden;
-}
-.stamp-card-border{
-  position:absolute;inset:7px;border:2px dashed rgba(201,168,76,0.35);
-  border-radius:5px;pointer-events:none;
-}
-.stamp-card-row1{
-  display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:10px;position:relative;z-index:1;
-}
-.stamp-card-country{
-  font-family:var(--font-h);font-size:10px;font-weight:700;
-  color:rgba(201,168,76,0.65);letter-spacing:2px;text-transform:uppercase;
-}
-.stamp-card-seal{
-  width:32px;height:32px;border-radius:50%;
-  border:2px solid rgba(155,0,0,0.45);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-h);font-size:10px;font-weight:800;color:rgba(155,0,0,0.7);
-}
-.stamp-card-img{
-  width:100%;aspect-ratio:16/6;object-fit:cover;border-radius:4px;
-  margin-bottom:10px;position:relative;z-index:1;display:block;
-}
-.stamp-card-img-ph{
-  width:100%;aspect-ratio:16/6;background:var(--surface-3);border-radius:4px;
-  margin-bottom:10px;display:flex;align-items:center;justify-content:center;
-  color:var(--muted-2);font-size:22px;
-}
-.stamp-card-vehicle{
-  font-family:var(--font-h);font-size:19px;font-weight:800;color:var(--white);
-  text-align:center;letter-spacing:0.5px;position:relative;z-index:1;
-}
-.stamp-card-coll{
-  font-size:9px;color:rgba(240,208,128,0.6);text-align:center;
-  letter-spacing:1.5px;text-transform:uppercase;margin:3px 0 10px;
-  position:relative;z-index:1;
-}
-.stamp-card-line{height:1px;background:rgba(201,168,76,0.2);margin-bottom:10px;position:relative;z-index:1;}
-.stamp-card-foot{
-  display:flex;justify-content:space-between;align-items:flex-end;
-  position:relative;z-index:1;
-}
-.stamp-card-fl small{font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:2px;}
-.stamp-card-fl span{font-size:11px;color:rgba(255,255,255,0.75);font-weight:600;}
-.stamp-card-fr{text-align:right;}
-.stamp-card-fr small{font-size:9px;color:rgba(240,208,128,0.45);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:2px;}
-.stamp-card-fr span{font-family:monospace;font-size:12px;color:var(--gold-light);font-weight:700;}
-.stamp-card-owner{
-  font-size:9px;color:rgba(255,255,255,0.25);text-align:center;
-  margin-top:8px;position:relative;z-index:1;
-}
-
-/* ACCIONES POR ESTAMPILLA */
-.stamp-actions{display:flex;border-top:1px solid var(--border);}
-.stamp-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
-  padding:12px 6px;font-size:11px;font-weight:600;color:var(--muted);
-  cursor:pointer;transition:background 0.15s;border-right:1px solid var(--border);
-  touch-action:manipulation;
-}
-.stamp-btn:last-child{border-right:none;}
-.stamp-btn:active{background:var(--surface-3);}
-.stamp-btn i{font-size:16px;}
-.stamp-btn.wsp i{color:#25D366;}
-.stamp-btn.screen i{color:var(--blue);}
-.stamp-btn.save i{color:var(--gold);}
-
-/* BANDA WHATSAPP POST-COMPRA */
-.wsp-send-band{
-  background:rgba(0,197,102,0.07);border:1px solid rgba(0,197,102,0.2);
-  border-radius:var(--r-md);padding:14px;text-align:center;
-}
-.wsp-send-band p{font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;}
-.wsp-send-btn{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
-  background:#25D366;color:#000;font-size:15px;font-weight:700;
-  padding:14px;border-radius:var(--r-full);border:none;cursor:pointer;
-  touch-action:manipulation;
-}
-
-/* IOS HINT */
-.ios-hint{
-  display:flex;align-items:center;gap:8px;
-  background:rgba(59,130,246,0.07);border:1px solid rgba(59,130,246,0.18);
-  border-radius:var(--r-sm);padding:10px 12px;font-size:11px;color:#60A5FA;line-height:1.5;
-}
-
-/* ACCIONES FINALES */
-.success-actions{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
-.success-btn{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
-  background:var(--red);color:white;font-size:15px;font-weight:700;
-  padding:16px;border-radius:var(--r-md);border:none;cursor:pointer;touch-action:manipulation;
-}
-.success-btn-ghost{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:9px;
-  background:var(--surface-2);color:var(--text);font-size:14px;font-weight:500;
-  padding:14px;border-radius:var(--r-md);border:1px solid var(--border);cursor:pointer;touch-action:manipulation;
-}
-
-/* PANTALLA COMPLETA DE ESTAMPILLA */
-.stamp-fullscreen{
-  position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.97);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
-}
-.stamp-fullscreen-close{
-  position:absolute;top:16px;right:16px;
-  width:36px;height:36px;border-radius:50%;background:var(--surface-2);
-  display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;cursor:pointer;
-}
-.stamp-fullscreen-hint{color:var(--muted);font-size:12px;margin-bottom:14px;text-align:center;}
-.stamp-fullscreen-card{width:100%;max-width:380px;border-radius:12px;overflow:hidden;}
-
-/* MISC */
-.loading-state{display:flex;flex-direction:column;align-items:center;padding:40px 20px;gap:12px;color:var(--muted);font-size:13px;}
-.spin{width:32px;height:32px;border:3px solid var(--surface-3);border-top-color:var(--red);border-radius:50%;animation:spin 0.75s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.notif{
-  position:fixed;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%);
-  background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);
-  padding:12px 20px;border-radius:var(--r-full);font-size:14px;font-weight:500;
-  display:flex;align-items:center;gap:8px;z-index:9999;
-  white-space:nowrap;animation:notifIn 0.3s ease;box-shadow:0 8px 24px rgba(0,0,0,0.5);
-  max-width:calc(100vw - 40px);
-}
-@keyframes notifIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
-.footer{background:var(--surface);border-top:1px solid var(--border);padding:28px 20px;text-align:center;}
-.footer-logo{font-family:var(--font-h);font-size:18px;font-weight:800;color:var(--white);margin-bottom:6px;}
-.footer-logo span{color:var(--red);}
-.footer-info{font-size:11px;color:var(--muted);line-height:1.8;}
-
-@media(min-width:600px){.packs-grid{display:grid;grid-template-columns:repeat(3,1fr);}}
-@media(min-width:768px){
-  .hero,.premio-section,.packs-section,.checkout-section{padding-left:40px;padding-right:40px;}
-}
-@media(max-width:360px){.pack-price{font-size:22px;}.cd-num{font-size:26px;}}
+.skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);background-size:400% 100%;animation:shimmer 1.4s infinite}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
 </style>
 </head>
 <body>
 
-<!-- TOPBAR -->
-<header class="topbar">
-  <div class="topbar-logo"><span>Import</span> American Cars</div>
-  <a class="topbar-back" href="index.html"><i class="fas fa-arrow-left"></i> Volver</a>
-</header>
+<div class="topbar">
+  <div class="brand">IAC <span>Arica</span> 2026</div>
+  <a class="topbar-wa" href="#" id="waTopbarLink" target="_blank"><i class="fab fa-whatsapp"></i> Contacto</a>
+</div>
 
-<!-- HERO -->
-<section class="hero">
-  <div style="position:relative;z-index:1">
-    <div class="hero-badge"><i class="fas fa-star"></i> Sorteo Oficial — Colección Chile Norte</div>
-    <h1 class="hero-title">Estampillas<br><em>Digitales</em><br>Coleccionables</h1>
-    <p class="hero-sub">Cada estampilla tiene número de folio único e irrepetible. Participa automáticamente en el sorteo del vehículo.</p>
-    <div class="countdown-wrap">
-      <div class="countdown-label">⏱ Tiempo restante para el sorteo</div>
-      <div class="countdown-grid">
-        <div class="cd-unit"><span class="cd-num" id="cdDias">--</span><div class="cd-label">Días</div></div>
-        <div class="cd-unit"><span class="cd-num" id="cdHoras">--</span><div class="cd-label">Horas</div></div>
-        <div class="cd-unit"><span class="cd-num" id="cdMin">--</span><div class="cd-label">Min</div></div>
-        <div class="cd-unit"><span class="cd-num" id="cdSeg">--</span><div class="cd-label">Seg</div></div>
-      </div>
-      <div class="countdown-date">Sorteo: <strong id="sorteoFechaTexto">cargando...</strong></div>
+<main>
+  <section class="hero wrap">
+    <div class="eyebrow">Sorteo notariado · IAC Arica</div>
+    <h1>No sueñes,<br><em>gánatelo</em></h1>
+    <p class="sub">Compra tu Sticker Digital y participa en el sorteo de un Dodge Challenger 2018, valorizado en $18.500.000 CLP.</p>
+
+    <div class="countdown" id="countdown">
+      <div class="cd-box"><div class="n" id="cdD">--</div><div class="l">Días</div></div>
+      <div class="cd-box"><div class="n" id="cdH">--</div><div class="l">Horas</div></div>
+      <div class="cd-box"><div class="n" id="cdM">--</div><div class="l">Min</div></div>
+      <div class="cd-box"><div class="n" id="cdS">--</div><div class="l">Seg</div></div>
     </div>
-  </div>
-</section>
+    <div class="cd-caption" id="cdCaption">Cargando fechas del sorteo…</div>
+  </section>
 
-<!-- PREMIO -->
-<section class="premio-section" id="premioSection">
-  <div class="section-label">Premio del sorteo</div>
-  <h2 class="section-title">El Vehículo</h2>
-  <p class="section-sub">Vehículo real en stock. El ganador se lo lleva.</p>
-  <div id="premioContainer"><div class="loading-state"><div class="spin"></div>Cargando vehículo...</div></div>
-</section>
+  <section class="premio-section wrap">
+    <div class="premio-card">
+      <img class="premio-img skeleton" id="premioImg" alt="Premio del sorteo">
+      <div class="premio-body">
+        <div class="premio-name" id="premioName">Cargando premio…</div>
+        <div class="premio-value" id="premioValue"></div>
+        <div class="premio-specs" id="premioSpecs"></div>
 
-<!-- PACKS -->
-<section class="packs-section" id="packs">
-  <div class="section-label">Colección Chile Norte</div>
-  <h2 class="section-title">Elige tu Pack</h2>
-  <p class="section-sub">Cada estampilla = 1 participación en el sorteo.</p>
-  <div class="packs-grid">
-
-    <div class="pack-card" data-pack="inicio" data-price="9990" data-stamps="2" onclick="selectPack(this)">
-      <div class="pack-top"><span class="pack-name">Inicio</span><div class="pack-radio"></div></div>
-      <div class="pack-body">
-        <div class="pack-stamps-display">
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+        <div class="zf-box">
+          <i class="fas fa-triangle-exclamation"></i>
+          <div>
+            <div class="t">Restricción de Zona Franca</div>
+            <div class="d" id="zfText">Cargando condición del premio…</div>
+          </div>
         </div>
-        <div class="pack-price-block"><div class="pack-price">$9.990</div><div class="pack-unit">$4.995 c/u</div></div>
-      </div>
-      <div class="pack-features">
-        <span class="pack-feat"><i class="fas fa-stamp"></i> 2 Estampillas</span>
-        <span class="pack-feat"><i class="fas fa-ticket-alt"></i> 2 Participaciones</span>
-      </div>
-    </div>
 
-    <div class="pack-card popular selected" data-pack="popular" data-price="14990" data-stamps="4" onclick="selectPack(this)">
-      <div class="pack-popular-badge">★ MÁS POPULAR</div>
-      <div class="pack-top"><span class="pack-name">Popular</span><div class="pack-radio"></div></div>
-      <div class="pack-body">
-        <div class="pack-stamps-display">
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
+        <div class="refund-banner" id="refundBanner">
+          <div class="t">Ventana de reembolso abierta</div>
+          <div>Si no quieres esperar una nueva fecha de sorteo, puedes solicitar la devolución del 100% de tu compra. <a href="contacto.html">Solicitar reembolso →</a></div>
         </div>
-        <div class="pack-price-block"><div class="pack-price">$14.990</div><div class="pack-unit">$3.748 c/u</div></div>
-      </div>
-      <div class="pack-features">
-        <span class="pack-feat"><i class="fas fa-stamp"></i> 4 Estampillas</span>
-        <span class="pack-feat"><i class="fas fa-ticket-alt"></i> 4 Participaciones</span>
       </div>
     </div>
+  </section>
 
-    <div class="pack-card" data-pack="coleccionista" data-price="19990" data-stamps="6" onclick="selectPack(this)">
-      <div class="pack-top"><span class="pack-name">Coleccionista</span><div class="pack-radio"></div></div>
-      <div class="pack-body">
-        <div class="pack-stamps-display">
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-          <div class="mini-stamp"><i class="fas fa-stamp"></i></div><div class="mini-stamp"><i class="fas fa-stamp"></i></div>
-        </div>
-        <div class="pack-price-block"><div class="pack-price">$19.990</div><div class="pack-unit">$3.332 c/u</div></div>
-      </div>
-      <div class="pack-features">
-        <span class="pack-feat"><i class="fas fa-stamp"></i> 6 Estampillas</span>
-        <span class="pack-feat"><i class="fas fa-ticket-alt"></i> 6 Participaciones</span>
-      </div>
+  <section class="counter-wrap wrap">
+    <div class="counter-num" id="counterNum">—</div>
+    <div class="counter-lbl">Estampillas vendidas</div>
+  </section>
+
+  <section class="packs-section wrap">
+    <h2 class="section-title">Elige tu pack</h2>
+    <div class="packs-grid" id="packsGrid">
+      <div class="pack-card skeleton" style="height:130px"></div>
+      <div class="pack-card skeleton" style="height:130px"></div>
+      <div class="pack-card skeleton" style="height:130px"></div>
     </div>
+    <button class="buy-cta" id="buyBtn" disabled>Comprar Sticker Digital</button>
+  </section>
 
+  <footer class="wrap">
+    <div class="foot-links">
+      <a href="stamper.html">Sorteo</a>
+      <a href="bases-resumen.html">Resumen de bases</a>
+      <a href="bases.html">Bases legales</a>
+      <a href="faq.html">Preguntas frecuentes</a>
+      <a href="mi-cuenta.html">Mis Stickers</a>
+      <a href="ganadores.html">Ganadores</a>
+      <a href="terminos.html">Términos</a>
+      <a href="privacidad.html">Privacidad</a>
+      <a href="contacto.html">Contacto</a>
+    </div>
+    <div class="foot-brand">CV North Capital SpA — Import American Cars / IAC Arica · iac-arica.cl</div>
+  </footer>
+</main>
+
+<!-- ===== CHECKOUT ===== -->
+<div class="overlay" id="checkoutOverlay">
+  <div class="sheet">
+    <button class="sheet-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
+    <h2>Completa tu compra</h2>
+    <p class="sub" id="checkoutPackLabel"></p>
+
+    <div class="field"><label>Nombre completo</label><input id="inNombre" placeholder="Juan Pérez"></div>
+    <div class="field"><label>RUT o pasaporte</label><input id="inRut" placeholder="12.345.678-9"></div>
+    <div class="field"><label>Correo electrónico</label><input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com"></div>
+    <div class="field"><label>WhatsApp</label><input id="inTelefono" type="tel" placeholder="+56 9 1234 5678"></div>
+
+    <div class="summary-row"><span>Pack</span><span id="sumPack">—</span></div>
+    <div class="summary-row"><span>Stickers</span><span id="sumQty">—</span></div>
+    <div class="summary-row total"><span>Total</span><span id="sumTotal">—</span></div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Generar orden de compra</button>
+    <div class="form-err" id="formErr"></div>
   </div>
-</section>
+</div>
 
-<!-- CHECKOUT -->
-<section class="checkout-section" id="checkout">
-  <div class="checkout-card">
-    <h3 class="checkout-title">Completa tu compra</h3>
-    <p class="checkout-subtitle">Tus estampillas se muestran al instante en pantalla</p>
+<!-- ===== PENDIENTE (post-checkout, transferencia) ===== -->
+<div class="overlay" id="pendingOverlay">
+  <div class="sheet">
+    <button class="sheet-close" onclick="closePending()"><i class="fas fa-times"></i></button>
+    <div class="pending-icon"><i class="fas fa-clock"></i></div>
+    <h2 style="text-align:center">Falta tu transferencia</h2>
+    <p class="sub" style="text-align:center">Tu Sticker Digital se activa apenas confirmemos el pago (máx. 24 horas hábiles).</p>
 
-    <!-- BANNER WHATSAPP -->
-    <div class="wsp-banner">
-      <div class="wsp-banner-icon"><i class="fab fa-whatsapp"></i></div>
-      <div class="wsp-banner-text">
-        <strong>📲 Guárdalas por WhatsApp</strong>
-        <span>Ingresa tu número y te las enviamos directo como mensaje. Sin apps, sin descargas.</span>
-      </div>
+    <div class="ref-box">
+      <div class="lbl">Referencia de tu pedido</div>
+      <div class="code" id="pendRef">—</div>
     </div>
 
-    <div id="simBanner" class="sim-banner">
-      <i class="fas fa-tools"></i>
-      <span><strong>Modo prueba activo.</strong> El flujo completo funciona en simulación. Para cobros reales conecta Flow.cl.</span>
+    <ul class="bank-list">
+      <li><b>Titular:</b> CV North Capital SpA</li>
+      <li><b>Banco:</b> <span data-owner-fill>[completar]</span></li>
+      <li><b>Cuenta:</b> <span data-owner-fill>[completar]</span></li>
+      <li><b>RUT:</b> 78.375.615-3</li>
+      <li><b>Monto exacto:</b> <span id="pendMonto">—</span></li>
+      <li><b>Glosa/Comentario:</b> <span id="pendRef2">—</span></li>
+      <li><b>Email:</b> contacto@importamericancars.cl</li>
+    </ul>
+
+    <div class="ref-box">
+      <div class="lbl">Tu código de referido — invita y gana 1 estampilla extra</div>
+      <div class="code" id="pendRefCode" style="font-size:15px">—</div>
     </div>
 
-    <div class="form-group">
-      <label class="form-label">Nombre completo</label>
-      <input class="form-input" type="text" id="inputNombre" placeholder="Tu nombre completo" autocomplete="name" inputmode="text">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Correo electrónico</label>
-      <input class="form-input" type="email" id="inputEmail" placeholder="tu@correo.cl" autocomplete="email" inputmode="email">
-    </div>
-    <div class="form-group">
-      <label class="form-label">WhatsApp <span class="highlight">← para recibir tus estampillas</span></label>
-      <div class="phone-wrap">
-        <span class="phone-prefix">🇨🇱 +56</span>
-        <input class="form-input" type="tel" id="inputTelefono" placeholder="9 XXXX XXXX" autocomplete="tel" inputmode="numeric" maxlength="12">
-      </div>
-    </div>
-
-    <div class="order-summary">
-      <div class="summary-row">
-        <span class="summary-label">Pack</span><span class="summary-val" id="summaryPack">Popular (x4)</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">Estampillas numeradas</span><span class="summary-val" id="summaryStamps">4</span>
-      </div>
-      <div class="summary-row">
-        <span class="summary-label">Participaciones sorteo</span><span class="summary-val" id="summaryParts">4</span>
-      </div>
-      <div class="summary-row summary-total">
-        <span class="summary-label">Total</span><span class="summary-val" id="summaryTotal">$14.990</span>
-      </div>
-    </div>
-
-    <button class="pay-btn" id="payBtn" onclick="handlePay()">
-      <i class="fas fa-stamp" id="payIcon"></i>
-      <span id="payBtnText">Obtener mis 4 estampillas</span>
-    </button>
-    <div class="pay-note" id="payNote">
-      <i class="fas fa-tools"></i> Modo prueba — sin cobro real
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer">
-  <div class="footer-logo"><span>Import</span> American Cars</div>
-  <div class="footer-info">
-    Sorteo sujeto a Bases del Sorteo publicadas.<br>
-    Promoción Comercial con Premio — IAC Arica · <a href="#" style="color:var(--red)">Ver Bases</a>
-  </div>
-</footer>
-
-<!-- MODAL ÉXITO -->
-<div class="success-modal" id="successModal">
-  <div class="success-overlay" onclick="closeSuccess()"></div>
-  <div class="success-sheet">
-    <div class="success-icon"><i class="fas fa-check"></i></div>
-    <h2 class="success-title">¡Listo!</h2>
-    <p class="success-sub" id="successSub">Tus estampillas están listas.</p>
-    <div class="stamps-generated" id="stampsGenerated"></div>
-    <div class="success-actions">
-      <button class="success-btn" onclick="compartirTodas()"><i class="fab fa-whatsapp"></i> Compartir mi participación</button>
-      <button class="success-btn-ghost" onclick="closeSuccess()">Cerrar</button>
+    <div class="share-row">
+      <a class="share-btn" id="shareWaBtn" target="_blank"><i class="fab fa-whatsapp"></i> Compartir</a>
+      <button class="share-btn" onclick="copyRefLink()"><i class="fas fa-link"></i> Copiar link</button>
     </div>
   </div>
 </div>
 
 <script src="js/config.js"></script>
-
+<script src="js/stamper-api.js"></script>
 <script>
-/* ============================================================
-   CONFIG
-   ============================================================ */
-const SB_URL  = 'https://cflpmluvhfldewiitymh.supabase.co';
-const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNmbHBtbHV2aGZsZGV3aWl0eW1oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MTM0NzcsImV4cCI6MjA4MDk4OTQ3N30.of3ic6N1Y3U5dtSmzKzkTdvfvRnqYjqFI2fglmibaiM';
-const FLOW_MODE = 'simulation'; // → cambiar a 'live' con Flow.cl activo
+let sorteo = null, vehicle = null, packs = [], selectedPack = null;
+let countdownInterval = null;
+let lastOrder = null;
 
-let sbClient = null;
-try { sbClient = supabase.createClient(SB_URL, SB_ANON); } catch(e) {}
+document.addEventListener('DOMContentLoaded', async () => {
+  stamperAPI.init();
+  document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
 
-let selectedPackData = { name:'popular', price:14990, stamps:4 };
-let sorteoConfig     = null;
-let premioVehicle    = null;
-let lastPurchase     = null;
-let countdownInterval= null;
+  storeReferralFromUrl();
 
-/* ============================================================
-   INICIO
-   ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
-  loadSorteoConfig();
-  syncPayButton();
+  try {
+    sorteo = await stamperAPI.getSorteoPublico();
+    renderZonaFranca();
+    renderRefundBanner();
+    startCountdown();
+
+    if (sorteo.vehicle_id) {
+      vehicle = await stamperAPI.getVehiclePublico(sorteo.vehicle_id);
+      renderPremio();
+    }
+  } catch (e) {
+    console.error('Error cargando sorteo:', e);
+  }
+
+  try {
+    packs = await stamperAPI.getPacks();
+    renderPacks();
+  } catch (e) {
+    console.error('Error cargando packs:', e);
+  }
+
+  try {
+    const count = await stamperAPI.getStickersVendidos(sorteo?.id || null);
+    document.getElementById('counterNum').textContent = '+' + Number(count).toLocaleString('es-CL');
+  } catch (e) {
+    console.error('Error cargando contador:', e);
+    document.getElementById('counterNum').textContent = '—';
+  }
 });
 
-/* ============================================================
-   SORTEO CONFIG
-   ============================================================ */
-async function loadSorteoConfig() {
-  if (!sbClient) { renderPremioError(); return; }
-  try {
-    const { data: cfg, error } = await sbClient
-      .from('sorteo_config').select('*').eq('activo', true).single();
-    if (error || !cfg) { renderPremioError('No hay sorteo activo configurado.'); return; }
-    sorteoConfig = cfg;
-    startCountdown(new Date(cfg.fecha_sorteo));
-    await loadPremioVehicle(cfg.vehicle_id);
-  } catch(e) {
-    console.warn('loadSorteoConfig:', e.message);
-    renderPremioError();
+/* ---------- Referido en URL ---------- */
+function storeReferralFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) sessionStorage.setItem('iac_ref', ref);
+}
+
+/* ---------- Premio + Zona Franca ---------- */
+function renderPremio() {
+  const img = vehicle.vehicle_images?.find(i => i.is_main)?.image_url || vehicle.vehicle_images?.[0]?.image_url;
+  const imgEl = document.getElementById('premioImg');
+  if (img) { imgEl.src = img; imgEl.classList.remove('skeleton'); imgEl.alt = vehicle.name; }
+  document.getElementById('premioName').textContent = vehicle.name;
+  document.getElementById('premioValue').textContent = vehicle.price
+    ? '$' + Number(vehicle.price).toLocaleString('es-CL') + ' CLP' : '';
+
+  const specs = [];
+  if (vehicle.motor) specs.push(vehicle.motor);
+  if (vehicle.potencia) specs.push(vehicle.potencia);
+  if (vehicle.transmision) specs.push(vehicle.transmision);
+  if (vehicle.traccion) specs.push(vehicle.traccion);
+  document.getElementById('premioSpecs').innerHTML = specs.map(s => `<span class="premio-tag">${escapeHtml(s)}</span>`).join('');
+}
+
+function renderZonaFranca() {
+  const el = document.getElementById('zfText');
+  el.textContent = sorteo.zona_franca_texto ||
+    'El vehículo circula libremente en Arica y Parinacota. Liberarlo para el resto de Chile corre por cuenta y costo del ganador.';
+}
+
+function renderRefundBanner() {
+  if (sorteo.ventana_reembolso_abierta) {
+    document.getElementById('refundBanner').style.display = 'block';
   }
 }
 
-/* ============================================================
-   FOLIO CRIPTOGRÁFICO — formato IAC-XXXX-XXXX
-   Alfabeto sin ambigüedades: sin O, 0, I, 1
-   ============================================================ */
-const FOLIO_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+/* ---------- Countdown ---------- */
+function startCountdown() {
+  const ahora = new Date();
+  const cierre = sorteo.fecha_venta_cierre ? new Date(sorteo.fecha_venta_cierre + 'T23:59:59') : null;
+  const sorteoFecha = sorteo.fecha_sorteo ? new Date(sorteo.fecha_sorteo) : null;
 
-function rndGroup(n) {
-  const a = new Uint8Array(n);
-  crypto.getRandomValues(a);
-  return Array.from(a).map(b => FOLIO_CHARS[b % FOLIO_CHARS.length]).join('');
-}
-
-function makeFolio() { return `IAC-${rndGroup(4)}-${rndGroup(4)}`; }
-
-const usedFolios = new Set();
-
-async function uniqueFolio() {
-  for (let i = 0; i < 20; i++) {
-    const f = makeFolio();
-    if (usedFolios.has(f)) continue;
-    if (sbClient) {
-      try {
-        const { data } = await sbClient.from('estampillas')
-          .select('numero_folio').eq('numero_folio', f).maybeSingle();
-        if (data) continue;
-      } catch(e) { /* seguir */ }
-    }
-    usedFolios.add(f);
-    return f;
+  let target, caption;
+  if (cierre && ahora < cierre) {
+    target = cierre;
+    caption = 'Cierre de venta: ' + cierre.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' });
+  } else if (sorteoFecha) {
+    target = sorteoFecha;
+    caption = 'Sorteo ante notario: ' + sorteoFecha.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  } else {
+    document.getElementById('cdCaption').textContent = 'Fecha por confirmar';
+    return;
   }
-  const fb = `IAC-${rndGroup(4)}-${performance.now().toString(36).replace('.','').slice(-4).toUpperCase()}`;
-  usedFolios.add(fb);
-  return fb;
-}
+  document.getElementById('cdCaption').textContent = caption;
 
-/* ============================================================
-   HASH SHA-256
-   ============================================================ */
-async function secHash(folio, email, ts) {
-  const raw  = `${folio}|${email}|${ts}|IAC-ARICA-2025`;
-  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(raw));
-  return Array.from(new Uint8Array(buf)).slice(0,8)
-    .map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
-}
-
-/* ============================================================
-   COUNTDOWN
-   ============================================================ */
-function startCountdown(fecha) {
-  const opts = { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' };
-  document.getElementById('sorteoFechaTexto').textContent = fecha.toLocaleDateString('es-CL', opts);
   function tick() {
-    const d = fecha - new Date();
+    const d = target - new Date();
     if (d <= 0) {
-      ['cdDias','cdHoras','cdMin','cdSeg'].forEach(id => document.getElementById(id).textContent = '00');
-      return clearInterval(countdownInterval);
+      ['cdD','cdH','cdM','cdS'].forEach(id => document.getElementById(id).textContent = '00');
+      clearInterval(countdownInterval);
+      return;
     }
-    document.getElementById('cdDias').textContent  = String(Math.floor(d/86400000)).padStart(2,'0');
-    document.getElementById('cdHoras').textContent = String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
-    document.getElementById('cdMin').textContent   = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
-    document.getElementById('cdSeg').textContent   = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+    document.getElementById('cdD').textContent = String(Math.floor(d / 86400000)).padStart(2, '0');
+    document.getElementById('cdH').textContent = String(Math.floor((d % 86400000) / 3600000)).padStart(2, '0');
+    document.getElementById('cdM').textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2, '0');
+    document.getElementById('cdS').textContent = String(Math.floor((d % 60000) / 1000)).padStart(2, '0');
   }
   tick();
   countdownInterval = setInterval(tick, 1000);
 }
 
-/* ============================================================
-   VEHÍCULO PREMIO
-   ============================================================ */
-async function loadPremioVehicle(id) {
-  try {
-    const { data, error } = await sbClient.from('vehicles')
-      .select('*, vehicle_images(image_url, is_main, order_index)')
-      .eq('id', id).single();
-    if (error || !data) { renderPremioError(); return; }
-    const imgs = (data.vehicle_images||[])
-      .sort((a,b)=>(a.order_index||0)-(b.order_index||0))
-      .map(i=>i.image_url).filter(Boolean);
-    premioVehicle = { ...data, gallery: imgs };
-    renderPremio(premioVehicle);
-  } catch(e) { renderPremioError(); }
+/* ---------- Packs ---------- */
+function renderPacks() {
+  const grid = document.getElementById('packsGrid');
+  if (!packs.length) { grid.innerHTML = '<p style="color:var(--muted);text-align:center">No hay packs disponibles por ahora.</p>'; return; }
+  grid.innerHTML = packs.map(p => `
+    <div class="pack-card" data-slug="${escapeHtml(p.slug)}">
+      ${p.destacado ? '<span class="badge">Más elegido</span>' : ''}
+      <div class="qty">${p.cantidad_stickers} ${p.cantidad_stickers === 1 ? 'sticker' : 'stickers'}</div>
+      <div class="price">$${Number(p.precio_total).toLocaleString('es-CL')}</div>
+      <div class="unit">$${Math.round(p.precio_total / p.cantidad_stickers).toLocaleString('es-CL')} c/u</div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.pack-card').forEach(card =>
+    card.addEventListener('click', () => selectPack(card.dataset.slug)));
+
+  const destacado = packs.find(p => p.destacado) || packs[0];
+  selectPack(destacado.slug);
 }
 
-function renderPremio(v) {
-  const mainImg = v.gallery[0]||'';
-  const specs = [
-    v.motor       && { icon:'fa-cog',      val:v.motor },
-    v.traccion    && { icon:'fa-road',      val:v.traccion },
-    v.transmision && { icon:'fa-sliders-h', val:v.transmision },
-    v.potencia    && { icon:'fa-bolt',      val:v.potencia },
-  ].filter(Boolean);
-
-  const thumbs = v.gallery.length > 1
-    ? `<div class="premio-thumbs">${v.gallery.map((img,i)=>`
-        <div class="premio-thumb ${i===0?'active':''}" onclick="switchImg('${img}',this)">
-          <img src="${img}" alt="" loading="lazy"></div>`).join('')}</div>` : '';
-
-  const vbtn = v.video_id
-    ? `<a href="https://youtube.com/watch?v=${v.video_id}" target="_blank" rel="noopener" class="premio-video-btn">
-        <i class="fab fa-youtube"></i> Ver video</a>` : '';
-
-  document.getElementById('premioContainer').innerHTML = `
-    <div class="premio-card">
-      <div class="premio-img-wrap">
-        ${mainImg ? `<img class="premio-img" id="pMainImg" src="${mainImg}" alt="${v.name}">` : '<div class="premio-img-skeleton"></div>'}
-        <div class="premio-badge-sorteo">🏆 Premio del sorteo</div>
-      </div>
-      ${thumbs}${vbtn}
-      <div class="premio-body">
-        <div class="premio-name">${v.name}</div>
-        <div class="premio-price">$${(v.price||0).toLocaleString('es-CL')} CLP</div>
-        ${specs.length?`<div class="premio-specs">${specs.map(s=>`<span class="spec-tag"><i class="fas ${s.icon}"></i>${s.val}</span>`).join('')}</div>`:''}
-      </div>
-    </div>`;
+function selectPack(slug) {
+  selectedPack = packs.find(p => p.slug === slug);
+  document.querySelectorAll('.pack-card').forEach(c => c.classList.toggle('selected', c.dataset.slug === slug));
+  document.getElementById('buyBtn').disabled = false;
 }
 
-function switchImg(url, el) {
-  const m = document.getElementById('pMainImg');
-  if (m) m.src = url;
-  document.querySelectorAll('.premio-thumb').forEach(t=>t.classList.remove('active'));
-  el.classList.add('active');
-}
+document.getElementById('buyBtn').addEventListener('click', openCheckout);
 
-function renderPremioError(msg) {
-  document.getElementById('premioContainer').innerHTML =
-    `<div style="padding:32px;text-align:center;color:var(--muted);font-size:14px;">
-      <i class="fas fa-car" style="font-size:36px;opacity:0.2;display:block;margin-bottom:12px;"></i>
-      ${msg||'No se pudo cargar el vehículo premio.'}</div>`;
+/* ---------- Checkout ---------- */
+function openCheckout() {
+  if (!selectedPack) return;
+  document.getElementById('checkoutPackLabel').textContent =
+    `${selectedPack.nombre} · ${selectedPack.cantidad_stickers} stickers`;
+  document.getElementById('sumPack').textContent = selectedPack.nombre;
+  document.getElementById('sumQty').textContent = selectedPack.cantidad_stickers;
+  document.getElementById('sumTotal').textContent = '$' + Number(selectedPack.precio_total).toLocaleString('es-CL');
+  document.getElementById('formErr').textContent = '';
+  document.getElementById('checkoutOverlay').classList.add('show');
 }
+function closeCheckout() { document.getElementById('checkoutOverlay').classList.remove('show'); }
+function closePending() { document.getElementById('pendingOverlay').classList.remove('show'); }
 
-/* ============================================================
-   PACK SELECTION
-   ============================================================ */
-function selectPack(el) {
-  document.querySelectorAll('.pack-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  const name   = el.dataset.pack;
-  const price  = parseInt(el.dataset.price);
-  const stamps = parseInt(el.dataset.stamps);
-  selectedPackData = { name, price, stamps };
-  const labels = { inicio:'Inicio (x2)', popular:'Popular (x4)', coleccionista:'Coleccionista (x6)' };
-  document.getElementById('summaryPack').textContent   = labels[name];
-  document.getElementById('summaryStamps').textContent = stamps;
-  document.getElementById('summaryParts').textContent  = stamps;
-  document.getElementById('summaryTotal').textContent  = `$${price.toLocaleString('es-CL')}`;
-  syncPayButton();
-  document.getElementById('checkout').scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
+async function submitOrder() {
+  const nombre = document.getElementById('inNombre').value.trim();
+  const rut = document.getElementById('inRut').value.trim();
+  const email = document.getElementById('inEmail').value.trim();
+  const telefono = document.getElementById('inTelefono').value.trim();
+  const errEl = document.getElementById('formErr');
+  errEl.textContent = '';
 
-function syncPayButton() {
-  const { price, stamps } = selectedPackData;
-  const live = FLOW_MODE === 'live';
-  document.getElementById('payBtnText').textContent = live
-    ? `Pagar $${price.toLocaleString('es-CL')} con WebPay`
-    : `Obtener mis ${stamps} estampilla${stamps>1?'s':''}`;
-  document.getElementById('payNote').innerHTML = live
-    ? '<i class="fas fa-shield-alt"></i> Pago 100% seguro · WebPay Plus · Transbank'
-    : '<i class="fas fa-tools"></i> Modo prueba — sin cobro real';
-  const sb = document.getElementById('simBanner');
-  if (sb) sb.style.display = live ? 'none' : '';
-}
+  if (nombre.length < 3) { errEl.textContent = 'Ingresa tu nombre completo.'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Ingresa un correo válido.'; return; }
+  if (telefono.length < 8) { errEl.textContent = 'Ingresa tu WhatsApp.'; return; }
+  if (rut.length < 5) { errEl.textContent = 'Ingresa tu RUT o pasaporte.'; return; }
 
-/* ============================================================
-   VALIDACIÓN
-   ============================================================ */
-function validate() {
-  const nombre = document.getElementById('inputNombre').value.trim();
-  const email  = document.getElementById('inputEmail').value.trim();
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  document.getElementById('inputNombre').classList.toggle('error', !nombre);
-  document.getElementById('inputEmail').classList.toggle('error', !emailOk);
-  if (!nombre)  { showNotif('⚠️ Ingresa tu nombre'); return false; }
-  if (!emailOk) { showNotif('⚠️ Correo inválido'); return false; }
-  return true;
-}
-
-/* ============================================================
-   MANEJO DEL PAGO
-   ============================================================ */
-async function handlePay() {
-  if (!validate()) return;
-  const btn  = document.getElementById('payBtn');
-  const icon = document.getElementById('payIcon');
+  const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  icon.className = 'fas fa-spinner fa-spin';
-  document.getElementById('payBtnText').textContent = 'Procesando...';
+  btn.textContent = 'Generando orden…';
+
   try {
-    if (FLOW_MODE === 'simulation') await simulatePurchase();
-    else await initFlowPayment();
-  } catch(e) {
-    console.error('handlePay:', e);
-    showNotif('❌ Error al procesar. Inténtalo de nuevo.');
+    const referidoPor = sessionStorage.getItem('iac_ref') || null;
+    const orden = await stamperAPI.crearOrdenPendiente({
+      nombre, email, telefono, rutPasaporte: rut, packSlug: selectedPack.slug, referidoPor
+    });
+    lastOrder = orden;
+    closeCheckout();
+    showPending(orden);
+  } catch (e) {
+    errEl.textContent = 'No pudimos generar tu orden. Intenta de nuevo o escríbenos por WhatsApp.';
+    console.error(e);
   } finally {
     btn.disabled = false;
-    icon.className = 'fas fa-stamp';
-    syncPayButton();
+    btn.textContent = 'Generar orden de compra';
   }
 }
 
-/* ============================================================
-   SIMULACIÓN DE COMPRA
-   ============================================================ */
-async function simulatePurchase() {
-  const nombre   = document.getElementById('inputNombre').value.trim();
-  const email    = document.getElementById('inputEmail').value.trim();
-  const telefono = document.getElementById('inputTelefono').value.replace(/\D/g,'');
-  const ts = Date.now();
+function showPending(orden) {
+  document.getElementById('pendRef').textContent = orden.referencia;
+  document.getElementById('pendRef2').textContent = orden.referencia;
+  document.getElementById('pendMonto').textContent = '$' + Number(orden.monto_total).toLocaleString('es-CL');
 
-  // Generar folios y hashes
-  const estampillas = [];
-  for (let i = 0; i < selectedPackData.stamps; i++) {
-    const folio = await uniqueFolio();
-    const hash  = await secHash(folio, email, ts);
-    estampillas.push({ folio, hash, index: i });
-  }
+  const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(orden.codigo_referido)}`;
+  document.getElementById('pendRefCode').textContent = orden.codigo_referido;
+  document.getElementById('shareWaBtn').href =
+    `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo del Dodge Challenger de @importamericancars! Consigue tu sticker → ' + shareUrl)}`;
+  window.__shareUrl = shareUrl;
 
-  // Guardar en Supabase
-  if (sbClient) {
-    try {
-      // IMPORTANTE: monto_pack solo en la fila 1 de cada compra.
-      // Las filas 2..N llevan monto_pack=0 para que cualquier SUM()
-      // sobre la columna dé el total real sin necesidad de filtrar.
-      // precio_unitario = precio por cada estampilla individual.
-      const precioUnitario = Math.round(selectedPackData.price / selectedPackData.stamps);
-      const rows = estampillas.map(e => ({
-        nombre, email,
-        telefono:        telefono || null,
-        pack:            selectedPackData.name,
-        monto_pack:      e.index === 0 ? selectedPackData.price : 0,
-        precio_unitario: precioUnitario,
-        numero_folio:    e.folio,
-        hash_seguridad:  e.hash,
-        orden_en_pack:   e.index + 1,
-        total_en_pack:   selectedPackData.stamps,
-        vehicle_id:      premioVehicle?.id  || null,
-        sorteo_id:       sorteoConfig?.id   || null,
-        estado:          'completado',
-        modo_pago:       'simulacion',
-        created_at:      new Date(ts).toISOString()
-      }));
-      const { error } = await sbClient.from('estampillas').insert(rows);
-      if (error) console.warn('Supabase insert:', error.message);
-    } catch(e) { console.warn(e.message); }
-  }
-
-  lastPurchase = { nombre, email, telefono, estampillas };
-
-  // Enviar email de confirmación (no bloqueante — si falla no afecta la compra)
-  sendConfirmationEmail(nombre, email, estampillas).catch(e => console.warn('Email:', e));
-
-  await showSuccessModal(nombre, email, telefono, estampillas);
-
-  if (typeof gtag !== 'undefined') {
-    gtag('event','purchase',{
-      value: selectedPackData.price, currency:'CLP',
-      transaction_id: estampillas[0]?.folio
-    });
-  }
+  document.getElementById('pendingOverlay').classList.add('show');
 }
 
-/* ============================================================
-   ENVÍO DE EMAIL DE CONFIRMACIÓN VÍA RESEND
-   ============================================================ */
-async function sendConfirmationEmail(nombre, email, estampillas) {
-  const SERVER_URL = 'https://cflpmluvhfldewiitymh.supabase.co/functions/v1/send-stamp-email';
-
-  const fechaStr = sorteoConfig?.fecha_sorteo
-    ? new Date(sorteoConfig.fecha_sorteo).toLocaleDateString('es-CL', {
-        day:'numeric', month:'long', year:'numeric'
-      })
-    : 'Por confirmar';
-
-  const res = await fetch(SERVER_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${SB_ANON}`,
-    },
-    body: JSON.stringify({
-      nombre,
-      email,
-      estampillas: estampillas.map(e => ({ folio: e.folio, hash: e.hash })),
-      vehicleName: premioVehicle?.name        || 'Vehículo',
-      vehicleImg:  premioVehicle?.gallery?.[0] || null,
-      fechaSorteo: fechaStr,
-      pack:        selectedPackData.name,
-      monto:       selectedPackData.price,
-    }),
-  });
-
-  if (!res.ok) throw new Error(`Server error ${res.status}`);
-  const data = await res.json();
-  console.log('[ok] Email enviado:', data.id);
-  return data;
+function copyRefLink() {
+  navigator.clipboard?.writeText(window.__shareUrl || window.location.href);
+  showToast('Link copiado');
 }
 
-/* ============================================================
-   FLOW.CL (pendiente)
-   ============================================================ */
-async function initFlowPayment() {
-  showNotif('🔧 Conecta tu cuenta Flow.cl para activar pagos reales.');
-}
-
-/* ============================================================
-   MODAL ÉXITO + TARJETAS HTML (SIN CANVAS, SIN CORS)
-   
-   ✅ IDEA MOBILE: Se eliminó completamente el Canvas.
-   Las estampillas son divs HTML con CSS, lo que resuelve:
-     - Problema CORS de imágenes Cloudinary
-     - Error toDataURL en iOS Safari
-     - Descarga que falla en Android Chrome
-   
-   FLUJO MÓVIL NUEVO:
-   1. Cada estampilla tiene botón "WhatsApp" → envía el folio
-   2. "Ver imagen" → pantalla completa para captura nativa
-   3. Si ingresó teléfono → botón único "Envíame las estampillas"
-      que abre WA directo a su número con todos los folios
-   ============================================================ */
-async function showSuccessModal(nombre, email, telefono, estampillas) {
-  const pl = estampillas.length > 1 ? 's' : '';
-  document.getElementById('successSub').textContent =
-    `${nombre}, tus ${estampillas.length} estampilla${pl} están registradas con folio único.`;
-
-  const container = document.getElementById('stampsGenerated');
-  container.innerHTML = '<div class="loading-state"><div class="spin"></div></div>';
-  document.getElementById('successModal').classList.add('active');
-  document.body.style.overflow = 'hidden';
-
-  const fechaStr = sorteoConfig?.fecha_sorteo
-    ? new Date(sorteoConfig.fecha_sorteo).toLocaleDateString('es-CL',{day:'numeric',month:'long',year:'numeric'})
-    : 'Por confirmar';
-  const vName = premioVehicle?.name || 'Vehículo';
-  const vImg  = premioVehicle?.gallery?.[0] || null;
-
-  container.innerHTML = '';
-
-  // Tarjetas individuales
-  for (const e of estampillas) {
-    container.appendChild(buildStampCard(e.folio, e.hash, vName, vImg, nombre, fechaStr, e.index));
-  }
-
-  // Banda de envío por WhatsApp si dejó número
-  if (telefono) {
-    const folios = estampillas.map(e => e.folio).join(', ');
-    const msg    = buildWspMsg(nombre, vName, folios, estampillas.length);
-    const phone  = '56' + telefono;
-    const band   = document.createElement('div');
-    band.className = 'wsp-send-band';
-    band.innerHTML = `
-      <p>📲 Envíate los folios a tu WhatsApp para guardarlos como respaldo</p>
-      <button class="wsp-send-btn" onclick="openWsp('${phone}','${encodeURIComponent(msg)}')">
-        <i class="fab fa-whatsapp"></i> Enviar a mi WhatsApp (+56 ${telefono})
-      </button>`;
-    container.appendChild(band);
-  }
-
-  // Hint iOS
-  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-    const hint = document.createElement('div');
-    hint.className = 'ios-hint';
-    hint.innerHTML = `<i class="fas fa-info-circle"></i>
-      <span>En iPhone: toca <strong>"Ver"</strong> → captura de pantalla para guardar en Fotos</span>`;
-    container.appendChild(hint);
-  }
-}
-
-/* ============================================================
-   CONSTRUIR TARJETA DE ESTAMPILLA (HTML puro)
-   ============================================================ */
-function buildStampCard(folio, hash, vName, vImg, ownerName, fechaStr, idx) {
-  const wrap = document.createElement('div');
-  wrap.className = 'stamp-item';
-  wrap.id = `si-${idx}`;
-
-  const imgHtml = vImg
-    ? `<img class="stamp-card-img" src="${vImg}" alt="${vName}" loading="lazy">`
-    : `<div class="stamp-card-img-ph"><i class="fas fa-car"></i></div>`;
-
-  wrap.innerHTML = `
-    <div class="stamp-item-header">
-      <span class="stamp-folio">${folio}</span>
-      <span class="stamp-part">Participación #${idx+1}</span>
-    </div>
-    <div class="stamp-card" id="sc-${idx}">
-      <div class="stamp-card-border"></div>
-      <div class="stamp-card-row1">
-        <span class="stamp-card-country">CHILE · ARICA</span>
-        <div class="stamp-card-seal">IAC</div>
-      </div>
-      ${imgHtml}
-      <div class="stamp-card-vehicle">${vName.toUpperCase()}</div>
-      <div class="stamp-card-coll">Colección Chile Norte · Edición Limitada</div>
-      <div class="stamp-card-line"></div>
-      <div class="stamp-card-foot">
-        <div class="stamp-card-fl">
-          <small>Sorteo</small>
-          <span>${fechaStr}</span>
-        </div>
-        <div class="stamp-card-fr">
-          <small>Folio</small>
-          <span>${folio}</span>
-        </div>
-      </div>
-      <div class="stamp-card-owner">Propietario: ${ownerName} · ${hash}</div>
-    </div>
-    <div class="stamp-actions">
-      <button class="stamp-btn wsp" onclick="shareStamp('${folio}','${vName}','${ownerName}')">
-        <i class="fab fa-whatsapp"></i>WhatsApp
-      </button>
-      <button class="stamp-btn screen" onclick="viewFullscreen(${idx})">
-        <i class="fas fa-expand"></i>Ver
-      </button>
-    </div>`;
-  return wrap;
-}
-
-/* ============================================================
-   ACCIONES MOBILE
-   ============================================================ */
-
-// Compartir folio individual por WhatsApp (mensaje de texto)
-function shareStamp(folio, vName, ownerName) {
-  const msg =
-    `🏆 Mi estampilla IAC\n\n` +
-    `🚗 Sorteo: *${vName}*\n` +
-    `📋 Folio: *${folio}*\n` +
-    `👤 ${ownerName}\n\n` +
-    `¡Participo en el sorteo de @importamericancars!\n` +
-    `Consigue las tuyas → iac-arica.cl/stamper.html`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-}
-
-// Abrir estampilla en pantalla completa para captura nativa
-function viewFullscreen(idx) {
-  const card = document.getElementById(`sc-${idx}`);
-  if (!card) return;
-
-  const fs = document.createElement('div');
-  fs.className = 'stamp-fullscreen';
-  fs.id = 'stampFS';
-
-  const hint = document.createElement('div');
-  hint.className = 'stamp-fullscreen-hint';
-  hint.textContent = 'Toca afuera para cerrar · Captura de pantalla para guardar';
-
-  const close = document.createElement('div');
-  close.className = 'stamp-fullscreen-close';
-  close.innerHTML = '<i class="fas fa-times"></i>';
-  close.onclick = () => fs.remove();
-
-  const clone = card.cloneNode(true);
-  clone.className = 'stamp-fullscreen-card';
-  clone.style.cssText = 'border-radius:12px;overflow:hidden;';
-  // Remover id del clone para evitar duplicados
-  clone.removeAttribute('id');
-
-  fs.appendChild(close);
-  fs.appendChild(hint);
-  fs.appendChild(clone);
-  fs.onclick = (ev) => { if (ev.target === fs) fs.remove(); };
-  document.body.appendChild(fs);
-}
-
-// Abrir WhatsApp en número específico
-function openWsp(phone, msgEnc) {
-  window.open(`https://wa.me/${phone}?text=${msgEnc}`, '_blank');
-}
-
-// Mensaje de todos los folios
-function buildWspMsg(nombre, vName, folios, count) {
-  const lines = folios.split(', ').map(f => `  · *${f}*`).join('\n');
-  return `🏆 Tus estampillas IAC — ${vName}\n\n` +
-    `Hola *${nombre}*, guardá estos folios:\n${lines}\n\n` +
-    `✅ Son tus ${count} participación${count>1?'es':''} en el sorteo.\n` +
-    `Import American Cars · iac-arica.cl`;
-}
-
-// Compartir todos los folios juntos
-function compartirTodas() {
-  if (!lastPurchase) return;
-  const { nombre, estampillas } = lastPurchase;
-  const folios = estampillas.map(e => e.folio).join(', ');
-  const msg = buildWspMsg(nombre, premioVehicle?.name||'Vehículo', folios, estampillas.length);
-  if (navigator.share) {
-    navigator.share({ text: msg, url: 'https://iac-arica.cl/stamper.html' }).catch(()=>{});
-  } else {
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-  }
-}
-
-function closeSuccess() {
-  document.getElementById('successModal').classList.remove('active');
-  document.body.style.overflow = '';
-  ['inputNombre','inputEmail','inputTelefono'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-}
-
-/* ============================================================
-   NOTIFICACIÓN
-   ============================================================ */
-function showNotif(msg, dur=3000) {
-  document.querySelectorAll('.notif').forEach(n => n.remove());
-  const n = document.createElement('div');
-  n.className = 'notif';
-  n.innerHTML = `<i class="fas fa-info-circle"></i>${msg}`;
-  document.body.appendChild(n);
-  setTimeout(() => n.remove(), dur);
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, { position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
+    background:'var(--surface-2)', color:'#fff', padding:'10px 18px', borderRadius:'999px',
+    fontSize:'13px', zIndex:2000, border:'1px solid var(--border-hi)' });
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2000);
 }
 </script>
 </body>

@@ -445,7 +445,7 @@ function contactExecutive() {
     message += `%0AQuisiera hablar con un ejecutivo para más información.`;
     
     // Tracking
-    trackEvent('contact', 'Executive', consultationVehicle.name);
+    trackConversion('whatsapp_contact', consultationVehicle.name, consultationVehicle.price);
     trackEvent('engagement', 'Consultation', engagement);
     console.log(`📞 LEAD CALIFICADO | Score: ${consultationScore} | Engagement: ${engagement}`);
     console.log('Interacciones:', consultationInteractions);

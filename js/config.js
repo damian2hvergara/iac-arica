@@ -152,11 +152,24 @@ function scrollToElement(elementId) {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function trackEvent(eventName, eventCategory, eventLabel) {
+function trackEvent(eventName, eventCategory, eventLabel, value) {
+    if (typeof gtag !== 'undefined') {
+        const params = {
+            category: eventCategory,
+            label: eventLabel
+        };
+        if (value !== undefined) params.value = value;
+        gtag('event', eventName, params);
+    }
+}
+
+function trackConversion(eventName, vehicleName, vehiclePrice) {
     if (typeof gtag !== 'undefined') {
         gtag('event', eventName, {
-            event_category: eventCategory,
-            event_label: eventLabel
+            category: 'Conversion',
+            label: vehicleName,
+            value: vehiclePrice ? Math.round(vehiclePrice / 1000) : 0,
+            currency: 'CLP'
         });
     }
 }
@@ -202,6 +215,21 @@ function showNotification(message, type = 'success') {
 
 function showError(message) {
     showNotification(message, 'error');
+}
+
+// ====================================
+// ESCAPE HTML (previene XSS al interpolar
+// texto de la BD o de formularios en innerHTML)
+// ====================================
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>"']/g, (c) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }[c]));
 }
 
 // ====================================
@@ -276,6 +304,7 @@ window.scrollToElement = scrollToElement;
 window.trackEvent = trackEvent;
 window.showNotification = showNotification;
 window.showError = showError;
+window.escapeHtml = escapeHtml;
 window.compressImage = compressImage;
 window.uploadImageToCloudinary = uploadImageToCloudinary;
 

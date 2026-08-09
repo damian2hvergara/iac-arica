@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mis Stickers | IAC Arica 2026 — No Sueñes, Gánatelo</title>
+<meta name="description" content="Consulta el estado de tu Sticker Digital y tus números de participación en el sorteo IAC Arica 2026.">
+<link rel="canonical" href="https://iac-arica.cl/mi-cuenta.html">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--red:#9B0000;--bg:#0C0C0C;--surface:#161616;--surface-2:#202020;--border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);--text:#F2F2F2;--muted:#9c9689;--gold:#F0D080;--green:#00C566;--orange:#F59E0B;--danger:#ff3b30;--font-h:'Barlow Condensed',sans-serif;--font-b:'DM Sans',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.6;font-size:15px}
+a{color:var(--gold)}
+button{font-family:inherit;cursor:pointer;border:none}
+input{font-family:inherit;font-size:15px}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:var(--font-h);font-weight:700;font-size:16px}
+.brand span{color:var(--red)}
+.back{font-size:13px;color:var(--muted);text-decoration:none}
+.wrap{max-width:480px;margin:0 auto;padding:50px 20px 70px}
+h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:uppercase;text-align:center}
+.sub{color:var(--muted);font-size:13.5px;text-align:center;margin-top:8px;margin-bottom:26px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
+.field input:focus{outline:none;border-color:var(--red)}
+.field .hint{color:var(--muted);font-size:11.5px;margin-top:5px}
+.submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:999px;font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:6px}
+.submit-btn:disabled{opacity:.5}
+.err{color:var(--danger);font-size:13px;text-align:center;margin-top:14px;display:none}
+.result{display:none;margin-top:26px}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+.pill{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.pill-pend{background:rgba(245,158,11,0.16);color:var(--orange)}
+.pill-ok{background:rgba(0,197,102,0.16);color:var(--green)}
+.pill-rej{background:rgba(255,59,48,0.16);color:var(--danger)}
+.result-name{font-family:var(--font-h);font-size:20px;margin-top:12px}
+.result-meta{color:var(--muted);font-size:13px;margin-top:4px}
+.folio-list{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.folio-item{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.folio-item .code{font-family:'SFMono-Regular',Consolas,monospace;font-weight:700;color:var(--gold)}
+.folio-item .bonus{font-size:10px;color:var(--green);text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">IAC <span>Arica</span> 2026</div>
+  <a class="back" href="stamper.html"><i class="fas fa-arrow-left"></i> Volver al sorteo</a>
+</div>
+
+<div class="wrap">
+  <h1>Mis Stickers</h1>
+  <p class="sub">Ingresa el correo con el que compraste y tu referencia de orden o el folio de tu sticker.</p>
+
+  <div class="field">
+    <label>Correo electrónico</label>
+    <input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com">
+  </div>
+  <div class="field">
+    <label>Referencia de orden o folio</label>
+    <input id="inId" placeholder="IAC-ORD-XXXXXXXX o IAC-XXXX-XXXX">
+    <div class="hint">La referencia te la mostramos al comprar; el folio te llega por correo cuando se confirma tu pago.</div>
+  </div>
+
+  <button class="submit-btn" id="searchBtn">Buscar</button>
+  <div class="err" id="errMsg"></div>
+
+  <div class="result" id="result">
+    <div class="result-card">
+      <span class="pill" id="pillEstado"></span>
+      <div class="result-name" id="resNombre"></div>
+      <div class="result-meta" id="resMeta"></div>
+      <div class="folio-list" id="folioList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+document.getElementById('searchBtn').addEventListener('click', buscar);
+
+async function buscar() {
+  const email = document.getElementById('inEmail').value.trim();
+  const identificador = document.getElementById('inId').value.trim();
+  const errEl = document.getElementById('errMsg');
+  const resultEl = document.getElementById('result');
+  errEl.style.display = 'none';
+  resultEl.style.display = 'none';
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !identificador) {
+    errEl.textContent = 'Ingresa tu correo y tu referencia o folio.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Buscando…';
+
+  try {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/lookup-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+      body: JSON.stringify({ email, identificador })
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      errEl.textContent = data.error || 'No encontramos una orden con esos datos.';
+      errEl.style.display = 'block';
+      return;
+    }
+    renderResultado(data);
+  } catch (e) {
+    console.error(e);
+    errEl.textContent = 'No pudimos hacer la búsqueda. Intenta de nuevo.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Buscar';
+  }
+}
+
+function renderResultado(data) {
+  const pill = document.getElementById('pillEstado');
+  const estados = {
+    pendiente_pago: { label: 'Pendiente de pago', cls: 'pill-pend' },
+    completado: { label: 'Confirmado', cls: 'pill-ok' },
+    rechazado: { label: 'Rechazado', cls: 'pill-rej' },
+    reembolsado: { label: 'Reembolsado', cls: 'pill-pend' }
+  };
+  const info = estados[data.estado] || { label: data.estado, cls: 'pill-pend' };
+  pill.textContent = info.label;
+  pill.className = 'pill ' + info.cls;
+
+  document.getElementById('resNombre').textContent = escapeHtml(data.nombre);
+  document.getElementById('resMeta').textContent =
+    `${escapeHtml(data.pack)} · ${data.cantidad_stickers} stickers · $${Number(data.monto_total).toLocaleString('es-CL')}`;
+
+  const list = document.getElementById('folioList');
+  if (data.folios && data.folios.length) {
+    list.innerHTML = data.folios.map(f => `
+      <div class="folio-item">
+        <span class="code">${escapeHtml(f.numero_folio)}</span>
+        ${f.es_bonus ? '<span class="bonus">Bono referido</span>' : ''}
+      </div>
+    `).join('');
+  } else {
+    list.innerHTML = '<p style="color:var(--muted);font-size:13px">Tus folios aparecerán aquí apenas se confirme tu pago.</p>';
+  }
+
+  document.getElementById('result').style.display = 'block';
+}
+</script>
+</body>
+</html>

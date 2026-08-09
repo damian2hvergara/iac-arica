@@ -73,20 +73,36 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
 }
-.topbar-logo{
-  font-family:var(--font-h);
-  font-size:19px;letter-spacing:0.5px;
-  color:var(--white);
+/* dual-brand nav */
+.topbar-brands{display:flex;align-items:center;gap:5px;}
+.brand-link{
+  font-family:var(--font-h);font-size:15px;font-weight:700;
+  letter-spacing:.4px;white-space:nowrap;text-decoration:none;
+  -webkit-tap-highlight-color:transparent;transition:color .2s;
 }
-.topbar-logo span{color:var(--red);}
+.brand-link.is-active{color:var(--white);}
+.brand-link.is-active .ba{color:var(--red);}
+.brand-link.is-dim{color:var(--muted);}
+.brand-link.is-dim .ba{color:rgba(155,0,0,.5);}
+.brand-link.is-dim:hover{color:rgba(255,255,255,.65);}
+.brand-sep{color:var(--muted-2);font-size:17px;font-weight:300;flex-shrink:0;line-height:1;}
+.brand-am{display:none;}
+.topbar-social-icons{display:none;}
+@media(min-width:560px){
+  .brand-am{display:inline;}
+  .brand-link{font-size:17px;}
+}
+@media(min-width:680px){
+  .topbar-social-icons{display:flex;align-items:center;gap:7px;}
+}
 .topbar-wa{
   display:flex;align-items:center;gap:7px;
-  padding:8px 16px;
-  background:var(--red);
-  color:var(--white);
+  padding:8px 14px;
+  background:var(--red);color:var(--white);
   border-radius:var(--r-full);
   font-size:13px;font-weight:600;
   transition:background 0.2s;
+  -webkit-tap-highlight-color:transparent;
 }
 .topbar-wa:active{background:var(--red-deep);}
 
@@ -786,16 +802,253 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   .hero-title{font-size:68px;}
   .wa-sticky{display:none !important;}
 }
+
+/* ============================================
+   SECCIÓN: VIDEO FEED
+   ============================================ */
+.video-feed-scroll{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  padding:0 20px 16px;
+  margin:0 -20px;
+}
+.video-feed-scroll::-webkit-scrollbar{display:none;}
+
+.video-feed-item{
+  flex-shrink:0;
+  width:min(320px, calc(88vw));
+  scroll-snap-align:start;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.video-badge{
+  display:flex;align-items:center;gap:6px;
+  padding:9px 14px;
+  font-size:12px;font-weight:700;letter-spacing:0.3px;
+  flex-shrink:0;
+}
+.video-badge-ig{
+  background:linear-gradient(90deg,#833ab4,#fd1d1d);
+  color:white;
+}
+.video-badge-tt{
+  background:#010101;
+  color:white;
+  border-bottom:1px solid var(--border);
+}
+.video-embed-wrap{
+  position:relative;
+  width:100%;
+  height:560px;
+  background:var(--surface-2);
+  overflow:hidden;
+}
+.video-embed-wrap iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
+}
+.video-feed-placeholder{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:40px 20px;text-align:center;
+}
+.video-feed-scroll-hint{
+  display:flex;justify-content:center;gap:6px;
+  padding:8px 0 4px;
+}
+.vf-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--surface-3);transition:background 0.2s,transform 0.2s;
+}
+.vf-dot.active{background:var(--red);transform:scale(1.3);}
+
+/* ============================================
+   WELCOME VIDEO OVERLAY
+   ============================================ */
+.welcome-overlay{
+  position:fixed;inset:0;z-index:3000;
+  background:rgba(0,0,0,0.94);
+  backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  padding:12px;
+  animation:fadeIn 0.4s ease;
+}
+.welcome-modal{
+  width:100%;max-width:400px;
+  /* height definida = flex:1 funciona en el embed */
+  height:min(700px, calc(100svh - 24px));
+  background:var(--surface);
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+  box-shadow:0 24px 64px rgba(0,0,0,0.8);
+  animation:sheetUp 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+.welcome-progress{height:3px;background:var(--surface-3);overflow:hidden;flex-shrink:0;}
+.welcome-progress-bar{
+  height:100%;width:100%;
+  background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045);
+  animation:progressShrink 15s linear forwards;
+}
+@keyframes progressShrink{to{width:0%}}
+.welcome-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:#010101;flex-shrink:0;
+}
+.welcome-brand{
+  display:flex;align-items:center;gap:7px;
+  font-size:12px;font-weight:700;color:white;letter-spacing:0.3px;
+}
+.welcome-close{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:var(--r-full);
+  background:rgba(255,255,255,0.15);color:white;
+  font-size:12px;font-weight:600;
+  border:1px solid rgba(255,255,255,0.2);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+.welcome-embed{
+  position:relative;
+  flex:1;
+  min-height:0;
+  background:#000;
+}
+.welcome-embed iframe{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  border:none;display:block;
+}
+.welcome-footer{
+  padding:12px 14px;display:flex;flex-direction:column;gap:6px;
+  background:var(--surface-2);flex-shrink:0;
+}
+.welcome-cta{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px;
+  background:var(--red);color:white;
+  font-size:14px;font-weight:700;
+  border-radius:var(--r-md);border:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.welcome-sub{
+  font-size:11px;color:var(--muted);text-align:center;
+}
+
+/* ============================================
+   AMBIENT VIDEO PANEL (desktop 900px+)
+   ============================================ */
+.ambient-panel{
+  position:fixed;bottom:24px;right:16px;z-index:700;
+  width:200px;
+  background:var(--surface);
+  border:1px solid var(--border-hi);
+  border-radius:var(--r-lg);
+  overflow:hidden;
+  box-shadow:0 12px 40px rgba(0,0,0,0.65);
+  opacity:0;transform:translateX(220px);
+  transition:opacity 0.35s,transform 0.35s cubic-bezier(0.22,1,0.36,1);
+  display:none;
+}
+.ambient-panel.visible{opacity:0.82;transform:translateX(0);}
+.ambient-panel.visible:hover{opacity:1;}
+.ambient-panel-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 10px;background:#010101;cursor:pointer;
+}
+.ambient-brand{
+  display:flex;align-items:center;gap:5px;
+  font-size:10px;font-weight:700;color:white;letter-spacing:0.3px;
+}
+.ambient-ctrls{display:flex;gap:3px;}
+.ambient-btn{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);
+  font-size:9px;display:flex;align-items:center;justify-content:center;
+  border:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.ambient-video-wrap{
+  position:relative;width:200px;height:357px;overflow:hidden;
+}
+.ambient-video-wrap iframe{
+  width:325px;height:580px;
+  transform:scale(0.615);transform-origin:top left;
+  border:none;pointer-events:none;
+}
+.ambient-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 45%);
+  display:flex;align-items:flex-end;padding:10px;
+}
+.ambient-tt-link{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;color:rgba(255,255,255,0.85);font-weight:600;
+  text-decoration:none;
+}
+.ambient-panel.minimized .ambient-video-wrap{display:none;}
+
+@media(max-width:899px){
+  .ambient-panel{display:none !important;}
+}
+
+@media(min-width:600px){
+  .video-feed-item{ width:340px; }
+}
+@media(min-width:900px){
+  .video-feed-scroll{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    overflow-x:visible;
+    scroll-snap-type:none;
+    padding:0;margin:0;
+  }
+  .video-feed-item{ width:auto; }
+}
 </style>
 </head>
 <body>
 
 <!-- ========= TOPBAR ========= -->
 <header class="topbar">
-  <div class="topbar-logo"><span>Import</span> American Cars</div>
-  <a class="topbar-wa" href="https://wa.me/56953526956?text=Hola%2C%20me%20interesa%20importar%20un%20vehículo" target="_blank" rel="noopener">
-    <i class="fab fa-whatsapp"></i> WhatsApp
-  </a>
+  <div class="topbar-brands">
+    <a href="index.html" class="brand-link is-active">
+      <span class="ba">Import</span><span class="brand-am"> American</span> Cars
+    </a>
+    <span class="brand-sep">/</span>
+    <a href="repuestos.html" class="brand-link is-dim">
+      <span class="ba">Import</span><span class="brand-am"> American</span> Repuestos
+    </a>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px">
+    <div class="topbar-social-icons">
+      <a href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener"
+         onclick="trackEvent('social_follow','TikTok','Topbar')"
+         style="width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;color:var(--text);-webkit-tap-highlight-color:transparent">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+      </a>
+      <a href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener"
+         onclick="trackEvent('social_follow','Instagram','Topbar')"
+         style="width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border-hi);display:flex;align-items:center;justify-content:center;color:var(--text);font-size:14px;-webkit-tap-highlight-color:transparent">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+    <a class="topbar-wa" href="https://wa.me/56953526956?text=Hola%2C%20me%20interesa%20importar%20un%20vehículo" target="_blank" rel="noopener">
+      <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+  </div>
 </header>
 
 <!-- ========= HERO ========= -->
@@ -877,6 +1130,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="vehicles-grid" id="vehiclesGrid" style="display:none"></div>
 </section>
 
+<!-- ========= BANNER REPUESTOS ========= -->
+<a href="repuestos.html" style="display:flex;align-items:center;gap:14px;margin:0;padding:16px 20px;background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:background .2s" onmouseenter="this.style.background='var(--surface-2)'" onmouseleave="this.style.background='var(--surface)'" onclick="trackEvent('repuestos_banner_click','Repuestos','Index Banner')">
+  <div style="width:40px;height:40px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">🔧</div>
+  <div style="flex:1;min-width:0">
+    <div style="font-size:12px;font-weight:700;color:var(--white);margin-bottom:2px">Repuestos americanos — nueva sección</div>
+    <div style="font-size:11px;color:var(--muted)">Ford · Chevrolet · RAM · Dodge · Jeep · GMC</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--red);flex-shrink:0;white-space:nowrap">Ver repuestos <i class="fas fa-chevron-right" style="font-size:10px"></i></div>
+</a>
+
 <!-- ========= PROCESO ========= -->
 <section class="proceso-section" id="proceso">
   <div class="section-label">Cómo funciona</div>
@@ -922,8 +1185,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="ig-video-sub">Importación paso a paso en nuestro Instagram</div>
     </div>
   </div>
-  <a href="https://www.instagram.com/reel/C6ymBykukrm/" target="_blank" rel="noopener" class="ig-open-btn" onclick="trackEvent('click','Process','Instagram Video')">
+  <a href="https://www.instagram.com/reel/C6ymBykukrm/" target="_blank" rel="noopener" class="ig-open-btn" onclick="trackEvent('social_click','Instagram','Process Video')">
     <i class="fab fa-instagram"></i> Ver proceso en Instagram
+  </a>
+  <a href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener"
+     onclick="trackEvent('social_follow','TikTok','Process Section')"
+     style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:13px;background:var(--surface-2);color:var(--muted);font-size:14px;font-weight:500;border-radius:var(--r-md);border:1px solid var(--border);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:opacity 0.2s"
+     onmousedown="this.style.opacity='.8'" onmouseup="this.style.opacity='1'" ontouchend="this.style.opacity='1'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+    También estamos en TikTok
   </a>
 </section>
 
@@ -959,28 +1229,97 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   </div>
 </div>
 
-<!-- ========= INSTAGRAM GRID ========= -->
-<section class="section" style="padding-top:0;padding-bottom:48px">
-  <div class="section-label">Instagram</div>
-  <h2 class="section-title" style="margin-bottom:18px">@import_american_cars</h2>
-  <div class="ig-grid">
-    <a class="ig-post" href="https://www.instagram.com/import_american_cars" target="_blank" rel="noopener">
-      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676524/ilxapvkhgoa3xboqjpdy.jpg" alt="Instagram 1" loading="lazy">
+<!-- ========= VIDEO FEED ========= -->
+<section class="section" style="padding-bottom:8px" id="videos">
+  <div class="section-label">Contenido</div>
+  <h2 class="section-title">Míranos en acción</h2>
+  <p class="section-sub">Procesos reales, entregas reales — sin editar.</p>
+</section>
+
+<div id="videoFeedContainer" style="padding:0 0 40px">
+  <!-- Skeleton mientras carga -->
+  <div id="videoFeedSkeleton" class="video-feed-scroll">
+    <div class="video-feed-item">
+      <div class="video-badge video-badge-ig"><i class="fab fa-instagram"></i> Instagram</div>
+      <div class="video-embed-wrap"><div class="video-feed-placeholder"><div class="spin"></div><span style="color:var(--muted);font-size:13px">Cargando...</span></div></div>
+    </div>
+    <div class="video-feed-item">
+      <div class="video-badge video-badge-tt"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg> TikTok</div>
+      <div class="video-embed-wrap"><div class="video-feed-placeholder"><div class="spin"></div><span style="color:var(--muted);font-size:13px">Cargando...</span></div></div>
+    </div>
+    <div class="video-feed-item">
+      <div class="video-badge video-badge-tt"><svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg> TikTok</div>
+      <div class="video-embed-wrap"><div class="video-feed-placeholder"><div class="spin"></div><span style="color:var(--muted);font-size:13px">Cargando...</span></div></div>
+    </div>
+  </div>
+  <div class="video-feed-scroll-hint" id="videoFeedDots"></div>
+</div>
+
+<!-- ========= REDES SOCIALES ========= -->
+<section class="section" style="padding-top:0;padding-bottom:48px" id="redes">
+
+  <!-- Header -->
+  <div class="section-label">Síguenos</div>
+  <h2 class="section-title" style="margin-bottom:6px">Camionetas en acción</h2>
+  <p class="section-sub" style="margin-bottom:24px">Entregas, personalizaciones y el proceso real — todo en nuestras redes.</p>
+
+  <!-- Tarjetas de red social -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+    <a href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener"
+       onclick="trackEvent('social_follow','Instagram','Header Card')"
+       style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 12px;background:linear-gradient(135deg,#833ab4 0%,#fd1d1d 50%,#fcb045 100%);border-radius:var(--r-lg);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:opacity 0.2s"
+       onmousedown="this.style.opacity='.85'" onmouseup="this.style.opacity='1'" ontouchend="this.style.opacity='1'">
+      <i class="fab fa-instagram" style="font-size:28px;color:white"></i>
+      <span style="font-size:13px;font-weight:700;color:white">Instagram</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.8)">@import_american_cars</span>
+    </a>
+    <a href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener"
+       onclick="trackEvent('social_follow','TikTok','Header Card')"
+       style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:18px 12px;background:linear-gradient(135deg,#010101 0%,#1a1a2e 100%);border:1px solid rgba(255,255,255,0.12);border-radius:var(--r-lg);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:opacity 0.2s"
+       onmousedown="this.style.opacity='.85'" onmouseup="this.style.opacity='1'" ontouchend="this.style.opacity='1'">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+      <span style="font-size:13px;font-weight:700;color:white">TikTok</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.6)">@import_american_cars</span>
+    </a>
+  </div>
+
+  <!-- Grid de fotos Instagram (van al perfil) -->
+  <div class="ig-grid" style="margin-bottom:14px">
+    <a class="ig-post" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" onclick="trackEvent('social_click','Instagram','Grid Photo 1')">
+      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676524/ilxapvkhgoa3xboqjpdy.jpg" alt="Entrega 1" loading="lazy">
       <div class="ig-post-overlay"><i class="fab fa-instagram"></i></div>
     </a>
-    <a class="ig-post" href="https://www.instagram.com/import_american_cars" target="_blank" rel="noopener">
-      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676522/iap8wm33cblfg6ofyc9r.jpg" alt="Instagram 2" loading="lazy">
+    <a class="ig-post" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" onclick="trackEvent('social_click','Instagram','Grid Photo 2')">
+      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676522/iap8wm33cblfg6ofyc9r.jpg" alt="Entrega 2" loading="lazy">
       <div class="ig-post-overlay"><i class="fab fa-instagram"></i></div>
     </a>
-    <a class="ig-post" href="https://www.instagram.com/import_american_cars" target="_blank" rel="noopener">
-      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676857/wgjdhwryqz6ji049mff3.jpg" alt="Instagram 3" loading="lazy">
-      <div class="ig-post-overlay"><i class="fab fa-instagram"></i></div>
+    <a class="ig-post" href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener" onclick="trackEvent('social_click','TikTok','Grid Promo')">
+      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676857/wgjdhwryqz6ji049mff3.jpg" alt="TikTok" loading="lazy">
+      <div class="ig-post-overlay"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg></div>
     </a>
-    <a class="ig-post" href="https://www.instagram.com/import_american_cars" target="_blank" rel="noopener">
-      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676766/c3gtahfwy3sibrpz93fg.jpg" alt="Instagram 4" loading="lazy">
+    <a class="ig-post" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" onclick="trackEvent('social_click','Instagram','Grid Photo 4')">
+      <img src="https://res.cloudinary.com/df2gprqhp/image/upload/v1768676766/c3gtahfwy3sibrpz93fg.jpg" alt="Entrega 4" loading="lazy">
       <div class="ig-post-overlay"><i class="fab fa-instagram"></i></div>
     </a>
   </div>
+
+  <!-- Botones CTA sociales -->
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <a href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener"
+       onclick="trackEvent('social_follow','Instagram','CTA Button')"
+       style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:linear-gradient(135deg,#833ab4,#fd1d1d);color:white;font-size:14px;font-weight:600;border-radius:var(--r-md);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:opacity 0.2s"
+       onmousedown="this.style.opacity='.85'" onmouseup="this.style.opacity='1'" ontouchend="this.style.opacity='1'">
+      <i class="fab fa-instagram" style="font-size:18px"></i> Seguir en Instagram
+    </a>
+    <a href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener"
+       onclick="trackEvent('social_follow','TikTok','CTA Button')"
+       style="display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;background:var(--surface-2);color:var(--text);font-size:14px;font-weight:600;border-radius:var(--r-md);border:1px solid var(--border-hi);text-decoration:none;-webkit-tap-highlight-color:transparent;transition:opacity 0.2s"
+       onmousedown="this.style.opacity='.85'" onmouseup="this.style.opacity='1'" ontouchend="this.style.opacity='1'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+      Ver TikTok — @import_american_cars
+    </a>
+  </div>
+
 </section>
 
 <!-- ========= CTA FINAL ========= -->
@@ -1001,8 +1340,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     contacto@importamericancars.cl
   </div>
   <div class="footer-social">
-    <a class="social-link" href="https://wa.me/56938654827" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i></a>
-    <a class="social-link" href="https://www.instagram.com/import_american_cars" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>
+    <a class="social-link" href="https://wa.me/56953526956" target="_blank" rel="noopener" onclick="trackEvent('social_follow','WhatsApp','Footer')" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a class="social-link" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" onclick="trackEvent('social_follow','Instagram','Footer')" title="Instagram"><i class="fab fa-instagram"></i></a>
+    <a class="social-link" href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener" onclick="trackEvent('social_follow','TikTok','Footer')" title="TikTok" style="padding:4px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+    </a>
   </div>
 </footer>
 
@@ -1036,6 +1378,57 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="gallery-dots" id="galleryDots"></div>
 </div>
 
+<!-- ========= WELCOME VIDEO ========= -->
+<div id="welcomeOverlay" class="welcome-overlay" style="display:none">
+  <div class="welcome-modal">
+    <div class="welcome-progress"><div class="welcome-progress-bar" id="welcomeBar"></div></div>
+    <div class="welcome-top">
+      <div class="welcome-brand">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+        @import_american_cars
+      </div>
+      <button class="welcome-close" onclick="closeWelcomeVideo()"><i class="fas fa-times"></i> Saltar</button>
+    </div>
+    <div class="welcome-embed">
+      <iframe id="welcomeIframe" src="" frameborder="0"
+        allow="autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture; fullscreen"
+        allowfullscreen loading="eager"></iframe>
+    </div>
+    <div class="welcome-footer">
+      <button class="welcome-cta" onclick="closeWelcomeVideo()">
+        <i class="fas fa-car"></i> Ver catálogo de vehículos
+      </button>
+      <div class="welcome-sub">El video se cierra automáticamente</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========= AMBIENT PANEL (desktop) ========= -->
+<div id="ambientPanel" class="ambient-panel">
+  <div class="ambient-panel-top" onclick="toggleAmbient()">
+    <div class="ambient-brand">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="white"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+      TikTok
+    </div>
+    <div class="ambient-ctrls">
+      <button class="ambient-btn" id="ambientToggleBtn" onclick="event.stopPropagation();toggleAmbient()" title="Minimizar"><i class="fas fa-minus" id="ambientToggleIcon"></i></button>
+      <button class="ambient-btn" onclick="event.stopPropagation();closeAmbient()" title="Cerrar"><i class="fas fa-times"></i></button>
+    </div>
+  </div>
+  <div class="ambient-video-wrap">
+    <iframe id="ambientIframe" src="" frameborder="0"
+      allow="autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture; fullscreen"
+      loading="lazy"></iframe>
+    <div class="ambient-overlay">
+      <a id="ambientLink" href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener"
+         onclick="trackEvent('social_click','TikTok','Ambient Panel')"
+         class="ambient-tt-link">
+        <i class="fas fa-external-link-alt"></i> Ver en TikTok
+      </a>
+    </div>
+  </div>
+</div>
+
 <!-- ========= SCRIPTS ========= -->
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
@@ -1057,6 +1450,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadVehicles();
   setupWaSticky();
   handleDeepLink();
+  initVideoFeed();
+  initWelcomeVideo();
   trackEvent('page_loaded','Engagement','Home');
 });
 
@@ -1373,6 +1768,192 @@ function handleDeepLink() {
     if (card) { card.scrollIntoView({behavior:'smooth', block:'center'}); }
     openDetail(id);
   }, 900);
+}
+
+/* =============================================
+   VIDEO FEED — Instagram Reels + TikTok
+   ============================================= */
+
+// ── Agrega aquí tus videos ──────────────────────
+// Instagram: copia la URL del reel y pega solo el ID (lo que va entre /reel/ y /)
+// TikTok:    copia la URL del video y pega el número largo del final
+const SOCIAL_VIDEOS = [
+  { type: 'ig', id: 'C6ymBykukrm',        label: 'Proceso de importación' },
+  { type: 'tt', id: '7614284139889560852', label: 'Bienvenida IAC' },
+  { type: 'tt', id: '7523009651244387590', label: 'Entrega de vehículo' },
+  { type: 'tt', id: '7450630982811651334', label: 'IAC Arica' },
+];
+// ────────────────────────────────────────────────
+
+const _TT_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>`;
+let _videoFeedLoaded = false;
+
+function initVideoFeed() {
+  const section = document.getElementById('videos');
+  if (!section) return;
+  const obs = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !_videoFeedLoaded) {
+      _videoFeedLoaded = true;
+      obs.disconnect();
+      renderVideoFeed();
+    }
+  }, { rootMargin: '400px' });
+  obs.observe(section);
+}
+
+function _buildVideoItem(v) {
+  if (v.type === 'ig') {
+    return `<div class="video-feed-item">
+      <div class="video-badge video-badge-ig"><i class="fab fa-instagram"></i>&nbsp;Instagram</div>
+      <div class="video-embed-wrap">
+        <iframe src="https://www.instagram.com/reel/${v.id}/embed/"
+          width="100%" height="480" frameborder="0" scrolling="no"
+          allowtransparency="true" loading="lazy" title="${v.label}"></iframe>
+      </div>
+    </div>`;
+  }
+  if (v.type === 'tt') {
+    return `<div class="video-feed-item">
+      <div class="video-badge video-badge-tt">${_TT_SVG}&nbsp;TikTok</div>
+      <div class="video-embed-wrap">
+        <iframe src="https://www.tiktok.com/embed/v2/${v.id}?autoplay=1&muted=1&loop=1"
+          width="100%" height="480" frameborder="0"
+          allow="autoplay; encrypted-media; accelerometer; gyroscope; picture-in-picture; fullscreen"
+          allowfullscreen loading="lazy" title="${v.label}"></iframe>
+      </div>
+    </div>`;
+  }
+  return '';
+}
+
+function _buildTikTokFollowCard() {
+  return `<div class="video-feed-item">
+    <div class="video-badge video-badge-tt">${_TT_SVG}&nbsp;TikTok</div>
+    <div class="video-embed-wrap">
+      <div class="video-feed-placeholder">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="white" style="opacity:.7"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.27 8.27 0 0 0 4.83 1.56V6.79a4.85 4.85 0 0 1-1.06-.1z"/></svg>
+        <div style="font-size:16px;font-weight:700;color:var(--white)">@import_american_cars</div>
+        <div style="font-size:13px;color:var(--muted);text-align:center;max-width:220px;line-height:1.55">Entregas, personalizaciones y el proceso real — todo en TikTok</div>
+        <a href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener"
+           onclick="trackEvent('social_follow','TikTok','Video Feed')"
+           style="display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--red);color:white;border-radius:var(--r-full);font-size:14px;font-weight:700;text-decoration:none;-webkit-tap-highlight-color:transparent">
+          Seguir en TikTok
+        </a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderVideoFeed() {
+  const container = document.getElementById('videoFeedContainer');
+  if (!container) return;
+
+  const hasTT = SOCIAL_VIDEOS.some(v => v.type === 'tt');
+  let items = SOCIAL_VIDEOS.map(_buildVideoItem).join('');
+  if (!hasTT) items += _buildTikTokFollowCard();
+
+  const total = SOCIAL_VIDEOS.length + (!hasTT ? 1 : 0);
+  const dots = Array.from({length: total}, (_, i) =>
+    `<div class="vf-dot${i===0?' active':''}" data-i="${i}"></div>`
+  ).join('');
+
+  container.innerHTML = `
+    <div class="video-feed-scroll" id="videoFeedScroll">${items}</div>
+    <div class="video-feed-scroll-hint" id="videoFeedDots">${dots}</div>`;
+
+  // Actualizar dots en scroll (solo mobile)
+  const scroll = document.getElementById('videoFeedScroll');
+  if (scroll && window.innerWidth < 900) {
+    scroll.addEventListener('scroll', () => {
+      const w = (scroll.querySelector('.video-feed-item')?.offsetWidth || 320) + 14;
+      const idx = Math.min(total - 1, Math.round(scroll.scrollLeft / w));
+      document.querySelectorAll('.vf-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, { passive: true });
+  }
+
+  trackEvent('video_feed_loaded', 'Videos', `${total} cards`);
+}
+
+/* =============================================
+   WELCOME VIDEO + AMBIENT PANEL
+   ============================================= */
+const _TIKTOK_BASE   = 'https://www.tiktok.com/embed/v2/';
+const _TIKTOK_PROFILE = 'https://www.tiktok.com/@import_american_cars';
+const _WELCOME_ID    = '7450630982811651334';
+const _AMBIENT_IDS   = ['7523009651244387590', '7614284139889560852'];
+
+let _ambientIdx = 0;
+let _ambientTimer = null;
+let _welcomeTimer = null;
+
+/* — Welcome video — */
+function initWelcomeVideo() {
+  setTimeout(() => {
+    const overlay = document.getElementById('welcomeOverlay');
+    const iframe  = document.getElementById('welcomeIframe');
+    if (!overlay || !iframe) return;
+    iframe.src = `${_TIKTOK_BASE}${_WELCOME_ID}?autoplay=1&muted=1`;
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    _welcomeTimer = setTimeout(closeWelcomeVideo, 215000);
+    trackEvent('welcome_video', 'Videos', 'TikTok Welcome');
+  }, 1000);
+}
+
+function closeWelcomeVideo() {
+  clearTimeout(_welcomeTimer);
+  const overlay = document.getElementById('welcomeOverlay');
+  const iframe  = document.getElementById('welcomeIframe');
+  if (!overlay) return;
+  if (iframe) iframe.src = '';   // corta audio/video al instante
+  overlay.style.opacity = '0';
+  overlay.style.transition = 'opacity 0.3s';
+  document.body.style.overflow = '';
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    overlay.style.opacity = '';
+    initAmbientPanel();
+  }, 320);
+  trackEvent('welcome_closed', 'Videos', 'TikTok Welcome');
+}
+
+/* — Ambient panel (desktop) — */
+function initAmbientPanel() {
+  const panel = document.getElementById('ambientPanel');
+  if (!panel || window.innerWidth < 900) return;
+  panel.style.display = 'block';
+  _loadAmbient(0);
+  requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.add('visible')));
+  _ambientTimer = setInterval(() => {
+    _ambientIdx = (_ambientIdx + 1) % _AMBIENT_IDS.length;
+    _loadAmbient(_ambientIdx);
+  }, 30000);
+}
+
+function _loadAmbient(idx) {
+  const iframe = document.getElementById('ambientIframe');
+  const link   = document.getElementById('ambientLink');
+  if (!iframe) return;
+  const id = _AMBIENT_IDS[idx];
+  iframe.src = `${_TIKTOK_BASE}${id}?autoplay=1&muted=1&loop=1`;
+  if (link) link.href = `${_TIKTOK_PROFILE}/video/${id}`;
+}
+
+function toggleAmbient() {
+  const panel = document.getElementById('ambientPanel');
+  const icon  = document.getElementById('ambientToggleIcon');
+  if (!panel) return;
+  const min = panel.classList.toggle('minimized');
+  if (icon) icon.className = min ? 'fas fa-plus' : 'fas fa-minus';
+}
+
+function closeAmbient() {
+  clearInterval(_ambientTimer);
+  const panel = document.getElementById('ambientPanel');
+  if (!panel) return;
+  panel.classList.remove('visible');
+  setTimeout(() => { panel.style.display = 'none'; }, 350);
+  trackEvent('ambient_closed', 'Videos', 'TikTok Ambient');
 }
 
 /* — Notificación — */
