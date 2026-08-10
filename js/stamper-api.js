@@ -20,15 +20,18 @@ class StamperAPI {
     // PÚBLICO — sin sesión
     // ====================================
 
+    // Devuelve null (no lanza error) si todavía no hay ningún sorteo activo
+    // configurado — .single() explotaba con 0 o con más de una fila.
     async getSorteoPublico() {
         try {
             const { data, error } = await this.client
                 .from('sorteo_publico')
                 .select('*')
                 .eq('activo', true)
-                .single();
+                .order('id', { ascending: false })
+                .limit(1);
             if (error) throw error;
-            return data;
+            return (data && data[0]) || null;
         } catch (error) {
             console.error('Error getSorteoPublico:', error);
             throw error;
@@ -46,6 +49,21 @@ class StamperAPI {
             return data;
         } catch (error) {
             console.error('Error getPacks:', error);
+            throw error;
+        }
+    }
+
+    async getVehiclesStock() {
+        try {
+            const { data, error } = await this.client
+                .from('vehicles')
+                .select('id, name, price, vehicle_images(image_url, is_main, order_index)')
+                .eq('status', 'stock')
+                .order('created_at', { ascending: false });
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error getVehiclesStock:', error);
             throw error;
         }
     }
@@ -188,12 +206,14 @@ class StamperAPI {
                 .select('estado, monto_total, cantidad_stickers, pack_id, created_at, packs_config(nombre)');
             if (error) throw error;
 
-            const { data: sorteo, error: errSorteo } = await this.client
+            const { data: sorteoRows, error: errSorteo } = await this.client
                 .from('sorteo_config')
                 .select('meta_minima_stickers, total_stickers_emitidos')
                 .eq('activo', true)
-                .single();
+                .order('id', { ascending: false })
+                .limit(1);
             if (errSorteo) throw errSorteo;
+            const sorteo = (sorteoRows && sorteoRows[0]) || { meta_minima_stickers: 0, total_stickers_emitidos: 0 };
 
             const { data: stickersVendidos, error: errCount } = await this.client
                 .rpc('stickers_vendidos_count', { p_sorteo_id: null });
@@ -251,16 +271,19 @@ class StamperAPI {
         }
     }
 
-    // Sorteo config — lectura/escritura admin
+    // Sorteo config — lectura/escritura admin.
+    // Devuelve null (no lanza error) si todavía no existe ningún sorteo —
+    // caso normal la primera vez que se configura el admin.
     async getSorteoConfigAdmin() {
         try {
             const { data, error } = await this.client
                 .from('sorteo_config')
                 .select('*, vehicles(name, price, vehicle_images(image_url, is_main))')
                 .eq('activo', true)
-                .single();
+                .order('id', { ascending: false })
+                .limit(1);
             if (error) throw error;
-            return data;
+            return (data && data[0]) || null;
         } catch (error) {
             console.error('Error getSorteoConfigAdmin:', error);
             throw error;
@@ -275,6 +298,21 @@ class StamperAPI {
             return data;
         } catch (error) {
             console.error('Error updateSorteoConfig:', error);
+            throw error;
+        }
+    }
+
+    // Crea el primer sorteo (no existía ninguna fila activa todavía).
+    // Desactiva cualquier fila activa vieja/huérfana por seguridad.
+    async createSorteoConfig(fields) {
+        try {
+            await this.client.from('sorteo_config').update({ activo: false }).eq('activo', true);
+            const { data, error } = await this.client
+                .from('sorteo_config').insert([{ ...fields, activo: true }]).select().single();
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error createSorteoConfig:', error);
             throw error;
         }
     }

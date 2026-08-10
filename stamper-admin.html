@@ -87,6 +87,13 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 .toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer}
 .toggle input{width:18px;height:18px}
 
+.vehicle-pick{background:var(--surface-2);border:2px solid var(--border-hi);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.vehicle-pick.selected{border-color:var(--red)}
+.vehicle-pick img{width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--border)}
+.vehicle-pick .vp-body{padding:10px 12px}
+.vehicle-pick .vp-name{font-weight:600;font-size:13px}
+.vehicle-pick .vp-price{color:var(--gold);font-size:12px;margin-top:2px}
+
 @media(max-width:640px){
   main{padding:14px}
   .kpi .val{font-size:21px}
@@ -204,6 +211,15 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 
     <!-- ===== CONFIGURACIÓN SORTEO ===== -->
     <section class="tab-panel" id="panel-sorteo">
+      <div class="card">
+        <h2>Vehículo del sorteo</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Solo se pueden elegir vehículos que estén "En Stock" en el inventario de IAC.
+          Todas sus fotos se usan para las estampillas digitales.
+        </p>
+        <div id="vehiclePickerGrid" class="form-grid"></div>
+        <div class="empty" id="vehiclePickerEmpty" style="display:none">No hay vehículos con estado "En Stock". Agrega uno desde admin.html primero.</div>
+      </div>
       <div class="card">
         <h2>Datos del sorteo activo</h2>
         <div class="form-grid">
@@ -528,29 +544,88 @@ async function deletePackConfirm(id) {
 
 /* ---------- Configuración sorteo ---------- */
 async function loadSorteoConfig() {
+  window.__sorteoId = null;
+  window.__selectedVehicleId = null;
+
   try {
     const s = await stamperAPI.getSorteoConfigAdmin();
-    document.getElementById('sorteoNombre').value = s.nombre_sorteo || '';
-    document.getElementById('sorteoFecha').value = s.fecha_sorteo ? s.fecha_sorteo.slice(0,16) : '';
-    document.getElementById('sorteoVentaInicio').value = s.fecha_venta_inicio || '';
-    document.getElementById('sorteoVentaCierre').value = s.fecha_venta_cierre || '';
-    document.getElementById('sorteoBasesUrl').value = s.bases_url || '';
-    document.getElementById('sorteoDesc').value = s.descripcion || '';
-    document.getElementById('sorteoZonaFranca').value = s.zona_franca_texto || '';
-    document.getElementById('sorteoMetaMinima').value = s.meta_minima_stickers || 6500;
-    document.getElementById('sorteoTotalEmitidos').value = s.total_stickers_emitidos || 10000;
-    document.getElementById('sorteoExtensiones').value = s.extensiones_realizadas || 0;
-    document.getElementById('sorteoVentanaReembolso').checked = !!s.ventana_reembolso_abierta;
-    window.__sorteoId = s.id;
+    if (s) {
+      document.getElementById('sorteoNombre').value = s.nombre_sorteo || '';
+      document.getElementById('sorteoFecha').value = s.fecha_sorteo ? s.fecha_sorteo.slice(0,16) : '';
+      document.getElementById('sorteoVentaInicio').value = s.fecha_venta_inicio || '';
+      document.getElementById('sorteoVentaCierre').value = s.fecha_venta_cierre || '';
+      document.getElementById('sorteoBasesUrl').value = s.bases_url || '';
+      document.getElementById('sorteoDesc').value = s.descripcion || '';
+      document.getElementById('sorteoZonaFranca').value = s.zona_franca_texto || '';
+      document.getElementById('sorteoMetaMinima').value = s.meta_minima_stickers || 6500;
+      document.getElementById('sorteoTotalEmitidos').value = s.total_stickers_emitidos || 10000;
+      document.getElementById('sorteoExtensiones').value = s.extensiones_realizadas || 0;
+      document.getElementById('sorteoVentanaReembolso').checked = !!s.ventana_reembolso_abierta;
+      window.__sorteoId = s.id;
+      window.__selectedVehicleId = s.vehicle_id || null;
+    } else {
+      // Aún no hay ningún sorteo creado — dejar el form en blanco con
+      // valores por defecto para que se pueda crear el primero.
+      ['sorteoNombre','sorteoFecha','sorteoVentaInicio','sorteoVentaCierre','sorteoBasesUrl','sorteoDesc','sorteoZonaFranca']
+        .forEach(id => document.getElementById(id).value = '');
+      document.getElementById('sorteoMetaMinima').value = 6500;
+      document.getElementById('sorteoTotalEmitidos').value = 10000;
+      document.getElementById('sorteoExtensiones').value = 0;
+      document.getElementById('sorteoVentanaReembolso').checked = false;
+    }
   } catch (e) {
     console.error(e);
+    alert('Error al cargar la configuración del sorteo: ' + (e.message || e));
+  }
+
+  await loadVehiclePicker();
+}
+
+async function loadVehiclePicker() {
+  const grid = document.getElementById('vehiclePickerGrid');
+  const empty = document.getElementById('vehiclePickerEmpty');
+  try {
+    const vehicles = await stamperAPI.getVehiclesStock();
+    if (!vehicles.length) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    grid.innerHTML = vehicles.map(v => {
+      const img = v.vehicle_images?.find(i => i.is_main)?.image_url || v.vehicle_images?.[0]?.image_url;
+      const selected = v.id === window.__selectedVehicleId;
+      return `
+      <div class="vehicle-pick ${selected ? 'selected' : ''}" data-id="${v.id}">
+        ${img ? `<img src="${img}" alt="${escapeHtml(v.name)}">` : ''}
+        <div class="vp-body">
+          <div class="vp-name">${escapeHtml(v.name)}</div>
+          <div class="vp-price">$${Number(v.price || 0).toLocaleString('es-CL')}</div>
+        </div>
+      </div>`;
+    }).join('');
+    grid.querySelectorAll('.vehicle-pick').forEach(el =>
+      el.addEventListener('click', () => selectVehicle(el.dataset.id)));
+  } catch (e) {
+    console.error(e);
+    grid.innerHTML = '<div class="empty">Error al cargar vehículos.</div>';
   }
 }
 
+function selectVehicle(id) {
+  window.__selectedVehicleId = id;
+  document.querySelectorAll('.vehicle-pick').forEach(el =>
+    el.classList.toggle('selected', el.dataset.id === id));
+}
+
 async function saveSorteoConfig() {
-  if (!window.__sorteoId) { alert('No hay sorteo activo cargado.'); return; }
+  if (!window.__selectedVehicleId) { alert('Elige el vehículo que se va a sortear.'); return; }
+  const nombre = document.getElementById('sorteoNombre').value.trim();
+  if (!nombre) { alert('Ingresa el nombre del sorteo.'); return; }
+
   const fields = {
-    nombre_sorteo: document.getElementById('sorteoNombre').value.trim(),
+    nombre_sorteo: nombre,
+    vehicle_id: window.__selectedVehicleId,
     fecha_sorteo: document.getElementById('sorteoFecha').value ? new Date(document.getElementById('sorteoFecha').value).toISOString() : null,
     fecha_venta_inicio: document.getElementById('sorteoVentaInicio').value || null,
     fecha_venta_cierre: document.getElementById('sorteoVentaCierre').value || null,
@@ -563,7 +638,12 @@ async function saveSorteoConfig() {
     ventana_reembolso_abierta: document.getElementById('sorteoVentanaReembolso').checked
   };
   try {
-    await stamperAPI.updateSorteoConfig(window.__sorteoId, fields);
+    if (window.__sorteoId) {
+      await stamperAPI.updateSorteoConfig(window.__sorteoId, fields);
+    } else {
+      const nuevo = await stamperAPI.createSorteoConfig(fields);
+      window.__sorteoId = nuevo.id;
+    }
     alert('Configuración guardada.');
   } catch (e) {
     alert('Error al guardar: ' + (e.message || e));
