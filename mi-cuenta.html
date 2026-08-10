@@ -39,7 +39,9 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
 .result-name{font-family:var(--font-h);font-size:20px;margin-top:12px}
 .result-meta{color:var(--muted);font-size:13px;margin-top:4px}
 .folio-list{margin-top:16px;display:flex;flex-direction:column;gap:8px}
-.folio-item{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center}
+.folio-item{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:12px}
+.folio-item img{width:52px;height:38px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--surface)}
+.folio-item .info{flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .folio-item .code{font-family:'SFMono-Regular',Consolas,monospace;font-weight:700;color:var(--gold)}
 .folio-item .bonus{font-size:10px;color:var(--green);text-transform:uppercase}
 </style>
@@ -78,6 +80,7 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
 </div>
 
 <script src="js/config.js"></script>
+<script src="js/stamper-api.js"></script>
 <script>
 document.getElementById('searchBtn').addEventListener('click', buscar);
 
@@ -139,13 +142,19 @@ function renderResultado(data) {
     `${escapeHtml(data.pack)} · ${data.cantidad_stickers} stickers · $${Number(data.monto_total).toLocaleString('es-CL')}`;
 
   const list = document.getElementById('folioList');
+  const images = (data.vehicleImages || []).map((url, idx) => ({ image_url: url, order_index: idx }));
   if (data.folios && data.folios.length) {
-    list.innerHTML = data.folios.map(f => `
+    list.innerHTML = data.folios.map(f => {
+      const img = images.length ? pickStickerImage(images, f.numero_folio) : null;
+      return `
       <div class="folio-item">
-        <span class="code">${escapeHtml(f.numero_folio)}</span>
-        ${f.es_bonus ? '<span class="bonus">Bono referido</span>' : ''}
-      </div>
-    `).join('');
+        ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(data.vehicleName || 'tu premio')}">` : ''}
+        <div class="info">
+          <span class="code">${escapeHtml(f.numero_folio)}</span>
+          ${f.es_bonus ? '<span class="bonus">Bono referido</span>' : ''}
+        </div>
+      </div>`;
+    }).join('');
   } else {
     list.innerHTML = '<p style="color:var(--muted);font-size:13px">Tus folios aparecerán aquí apenas se confirme tu pago.</p>';
   }

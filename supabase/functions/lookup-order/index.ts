@@ -87,7 +87,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: orden, error: errOrden } = await supabase
       .from('ordenes')
-      .select('id, nombre, estado, cantidad_stickers, monto_total, created_at, packs_config(nombre)')
+      .select('id, nombre, estado, cantidad_stickers, monto_total, created_at, vehicle_id, packs_config(nombre)')
       .eq('id', ordenId)
       .single();
     if (errOrden || !orden) return jsonResponse(NOT_FOUND, 404);
@@ -98,6 +98,23 @@ Deno.serve(async (req: Request) => {
       .eq('orden_id', ordenId)
       .order('orden_en_pack', { ascending: true });
 
+    let vehicleName = '';
+    let vehicleImages: string[] = [];
+    if (orden.vehicle_id) {
+      const { data: vehicle } = await supabase
+        .from('vehicles')
+        .select('name, vehicle_images(image_url, order_index)')
+        .eq('id', orden.vehicle_id)
+        .maybeSingle();
+      if (vehicle) {
+        vehicleName = vehicle.name || '';
+        vehicleImages = (vehicle.vehicle_images || [])
+          .slice()
+          .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+          .map((i: any) => i.image_url);
+      }
+    }
+
     return jsonResponse({
       ok: true,
       estado: orden.estado,
@@ -107,6 +124,8 @@ Deno.serve(async (req: Request) => {
       monto_total: orden.monto_total,
       fecha: orden.created_at,
       folios: folios || [],
+      vehicleName,
+      vehicleImages,
     }, 200);
   } catch (e) {
     console.error('lookup-order error:', e);

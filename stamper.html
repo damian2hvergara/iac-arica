@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>IAC Arica 2026 — No Sueñes, Gánatelo | Sorteo Dodge Challenger</title>
-<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo notariado de un Dodge Challenger 2018, valorizado en $18.500.000. Organiza Import American Cars, Arica.">
+<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo notariado de un vehículo del inventario real de IAC Arica. Packs desde $5.500.">
 <link rel="canonical" href="https://iac-arica.cl/stamper.html">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="IAC Arica 2026 — No Sueñes, Gánatelo">
-<meta property="og:description" content="Sorteo notariado de un Dodge Challenger 2018. Compra tu Sticker Digital desde $5.500.">
+<meta property="og:description" content="Sorteo notariado de un vehículo importado por IAC Arica. Compra tu Sticker Digital coleccionable desde $5.500.">
 <meta property="og:url" content="https://iac-arica.cl/stamper.html">
 <meta property="og:image" content="https://iac-arica.cl/img/challenger-og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -29,120 +29,184 @@
 
 <style>
 :root{
-  --red:#9B0000; --red-deep:#6B0000; --red-glow:rgba(155,0,0,0.22);
-  --bg:#0C0C0C; --surface:#161616; --surface-2:#202020; --surface-3:#2A2A2A;
-  --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
-  --text:#F2F2F2; --muted:#8c8578; --green:#00C566; --gold:#F0D080; --orange:#F59E0B; --danger:#ff3b30;
+  --ink:#0b0a09; --surface:#161513; --surface-2:#1e1c19; --surface-3:#262320;
+  --line:rgba(240,230,215,0.10); --line-hi:rgba(240,230,215,0.20);
+  --paper:#f3efe6; --muted:#9c9689;
+  --red:#9B0000; --red-hi:#c81e1e;
+  --gold:#e9c876; --gold-hi:#f7e2a6;
+  --silver:#c7ccd2; --silver-hi:#eef1f4;
+  --bronze:#b3763f; --bronze-hi:#dba468;
+  --green:#00C566; --orange:#F59E0B; --danger:#ff3b30;
   --font-h:'Barlow Condensed',sans-serif; --font-b:'DM Sans',sans-serif;
+  --font-mono:'SFMono-Regular',Consolas,monospace;
   --r-sm:10px; --r-md:16px; --r-lg:22px; --r-full:999px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:15px;line-height:1.55;overflow-x:hidden}
+body{
+  font-family:var(--font-b);
+  background:
+    radial-gradient(ellipse 90% 45% at 50% -8%, rgba(155,0,0,0.20), transparent 60%),
+    var(--ink);
+  color:var(--paper);font-size:15px;line-height:1.55;overflow-x:hidden;
+}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
-input,select{font-family:inherit;font-size:15px}
-.wrap{max-width:1080px;margin:0 auto;padding:0 18px}
+input{font-family:inherit;font-size:15px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 18px}
 
 /* Topbar */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(12,12,12,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.brand{font-family:var(--font-h);font-size:16px;font-weight:700;letter-spacing:.4px}
-.brand span{color:var(--red)}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(11,10,9,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--font-h);font-size:16px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.brand span{color:var(--red-hi)}
 .topbar-wa{display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-size:13px;font-weight:600}
-
 main{padding-top:56px}
 
 /* Hero */
-.hero{padding:44px 0 30px;text-align:center;background:radial-gradient(ellipse 90% 60% at 50% 0%, var(--red-glow), transparent 65%)}
-.eyebrow{font-family:var(--font-b);font-size:11.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
-.hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(30px,7vw,50px);text-transform:uppercase;line-height:1;text-wrap:balance}
-.hero h1 em{font-style:normal;color:var(--red)}
-.hero p.sub{color:var(--muted);margin-top:12px;font-size:14.5px;max-width:44ch;margin-inline:auto}
+.hero{padding:52px 0 30px;text-align:center}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-hi);margin-bottom:12px}
+.hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(32px,7vw,52px);text-transform:uppercase;line-height:0.98;text-wrap:balance}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.hero p.sub{color:var(--muted);margin-top:14px;font-size:14.5px;max-width:48ch;margin-inline:auto}
+
+/* Trust badges */
+.trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
+.trust-badge{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-full);padding:7px 14px;font-size:11.5px;color:var(--muted)}
+.trust-badge i{color:var(--gold-hi);font-size:12px}
 
 /* Countdown */
-.countdown{display:flex;justify-content:center;gap:10px;margin:26px 0 4px}
-.cd-box{background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-sm);padding:12px 14px;min-width:64px;text-align:center}
+.countdown{display:flex;justify-content:center;gap:10px;margin:28px 0 6px}
+.cd-box{background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-sm);padding:12px 15px;min-width:64px;text-align:center}
 .cd-box .n{font-family:var(--font-h);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
 .cd-box .l{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 .cd-caption{text-align:center;color:var(--muted);font-size:12.5px;margin-top:10px}
 
-/* Premio */
-.premio-section{padding:28px 0}
-.premio-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
-.premio-img{width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--surface-2)}
-.premio-body{padding:22px}
-.premio-name{font-family:var(--font-h);font-size:26px;font-weight:700;text-transform:uppercase}
-.premio-value{color:var(--gold);font-family:var(--font-h);font-size:20px;font-weight:700;margin-top:2px}
+/* Section label */
+.section-label{display:flex;align-items:baseline;gap:14px;margin:0 0 22px}
+.section-label h2{font-family:var(--font-h);font-weight:700;font-size:clamp(21px,3vw,27px);text-transform:uppercase}
+.section-label .rule{flex:1;height:1px;background:var(--line-hi)}
+.section-label .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase}
+
+/* Premio + galería */
+.premio-section{padding:40px 0 10px}
+.premio-layout{display:grid;grid-template-columns:1.15fr 0.85fr;gap:22px}
+@media(max-width:820px){.premio-layout{grid-template-columns:1fr}}
+.premio-gallery{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+.premio-main-img{width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--surface-2);cursor:zoom-in}
+.premio-thumbs{display:flex;gap:8px;padding:10px;overflow-x:auto}
+.premio-thumbs img{width:64px;height:48px;object-fit:cover;border-radius:8px;border:2px solid transparent;cursor:pointer;flex-shrink:0;opacity:.65;transition:opacity .15s,border-color .15s}
+.premio-thumbs img.active{opacity:1;border-color:var(--gold-hi)}
+.premio-thumbs img:hover{opacity:1}
+
+.premio-body{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px}
+.premio-name{font-family:var(--font-h);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1.05}
+.premio-value{color:var(--gold-hi);font-family:var(--font-h);font-size:19px;font-weight:700;margin-top:4px}
 .premio-specs{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.premio-tag{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--r-full);padding:6px 12px;font-size:12px;color:var(--muted)}
+.premio-tag{background:var(--surface-2);border:1px solid var(--line-hi);border-radius:var(--r-full);padding:6px 12px;font-size:11.5px;color:var(--muted)}
+.premio-desc{color:var(--muted);font-size:13.5px;margin-top:14px;line-height:1.6}
 
-/* Zona franca box — visible junto al premio, no nota al pie */
-.zf-box{margin-top:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:var(--r-md);padding:16px 18px;display:flex;gap:12px}
-.zf-box i{color:var(--orange);font-size:18px;margin-top:2px;flex-shrink:0}
-.zf-box .t{font-weight:700;font-size:13.5px;margin-bottom:4px;color:var(--orange)}
-.zf-box .d{font-size:13px;color:var(--text);opacity:.9;line-height:1.5}
+.zf-box{margin-top:16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:var(--r-md);padding:15px 17px;display:flex;gap:11px}
+.zf-box i{color:var(--orange);font-size:17px;margin-top:2px;flex-shrink:0}
+.zf-box .t{font-weight:700;font-size:13px;margin-bottom:3px;color:var(--orange)}
+.zf-box .d{font-size:12.5px;color:var(--paper);opacity:.9;line-height:1.5}
 
-/* Refund banner */
-.refund-banner{display:none;margin-top:16px;background:rgba(0,197,102,0.08);border:1px solid rgba(0,197,102,0.35);border-radius:var(--r-md);padding:16px 18px}
-.refund-banner .t{font-weight:700;color:var(--green);margin-bottom:4px;font-size:13.5px}
+.refund-banner{display:none;margin-top:14px;background:rgba(0,197,102,0.08);border:1px solid rgba(0,197,102,0.35);border-radius:var(--r-md);padding:15px 17px}
+.refund-banner .t{font-weight:700;color:var(--green);margin-bottom:3px;font-size:13px}
 .refund-banner a{color:var(--green);text-decoration:underline}
 
 /* Counter */
-.counter-wrap{text-align:center;padding:22px 0 6px}
-.counter-num{font-family:var(--font-h);font-size:34px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
-.counter-lbl{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.counter-wrap{text-align:center;padding:26px 0 8px}
+.counter-num{font-family:var(--font-h);font-size:36px;font-weight:800;color:var(--gold-hi);font-variant-numeric:tabular-nums}
+.counter-lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 
-/* Packs */
-.packs-section{padding:22px 0 40px}
-.section-title{font-family:var(--font-h);font-size:24px;font-weight:700;text-transform:uppercase;text-align:center;margin-bottom:20px}
-.packs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
-.pack-card{position:relative;background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-md);padding:20px 16px;text-align:center;cursor:pointer;transition:border-color .15s,transform .15s}
-.pack-card:hover{transform:translateY(-3px)}
-.pack-card.selected{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
-.pack-card .badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;padding:4px 12px;border-radius:var(--r-full);letter-spacing:.5px}
-.pack-card .qty{font-family:var(--font-h);font-size:15px;color:var(--muted);text-transform:uppercase}
-.pack-card .price{font-family:var(--font-h);font-size:28px;font-weight:800;margin:6px 0 2px}
-.pack-card .unit{color:var(--muted);font-size:11.5px}
-.buy-cta{display:block;width:100%;max-width:360px;margin:26px auto 0;padding:16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center}
-.buy-cta:disabled{opacity:.5}
+/* Packs — placas coleccionables */
+.packs-section{padding:26px 0 46px}
+.packs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;perspective:1400px}
+.plate{
+  --tilt-x:0deg;--tilt-y:0deg;--mx:50%;--my:35%;
+  position:relative;border-radius:16px;padding:1px;cursor:pointer;
+  transform:rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+  transform-style:preserve-3d;transition:transform .3s cubic-bezier(.2,.8,.2,1);
+}
+.plate[data-tier="bronce"]{background:linear-gradient(155deg,var(--bronze-hi),#5e3c1e 60%,var(--bronze))}
+.plate[data-tier="plata"]{background:linear-gradient(155deg,var(--silver-hi),#7d838a 60%,var(--silver))}
+.plate[data-tier="oro"]{background:linear-gradient(155deg,var(--gold-hi),#8a6a20 55%,var(--gold))}
+.plate.selected{box-shadow:0 0 0 2px var(--red-hi),0 8px 28px rgba(155,0,0,0.3)}
+.plate-face{position:relative;border-radius:15px;overflow:hidden;background:linear-gradient(200deg,rgba(255,255,255,0.06),transparent 40%),var(--surface);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05)}
+.plate-face::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px circle at var(--mx) var(--my),rgba(255,255,255,0.22),rgba(255,255,255,0.05) 30%,transparent 60%);mix-blend-mode:overlay;opacity:0;transition:opacity .3s}
+.plate:hover .plate-face::after,.plate.selected .plate-face::after{opacity:1}
+.plate-top{display:flex;justify-content:space-between;align-items:center;padding:13px 14px 0}
+.plate-locale{font-family:var(--font-mono);font-size:9px;letter-spacing:1.8px;color:var(--muted);text-transform:uppercase}
+.rarity{font-family:var(--font-mono);font-size:9px;letter-spacing:1.3px;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:4px}
+.plate[data-tier="bronce"] .rarity{color:var(--bronze-hi);background:rgba(179,118,63,0.16)}
+.plate[data-tier="plata"] .rarity{color:var(--silver-hi);background:rgba(199,204,210,0.14)}
+.plate[data-tier="oro"] .rarity{color:var(--gold-hi);background:rgba(233,200,118,0.16)}
+.plate-img{width:100%;aspect-ratio:16/10;object-fit:cover;margin-top:10px;background:var(--surface-2)}
+.plate-badge{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;padding:4px 9px;border-radius:var(--r-full);letter-spacing:.4px;z-index:2}
+.plate-name{text-align:center;font-family:var(--font-h);font-weight:700;font-size:16px;text-transform:uppercase;padding:12px 12px 0}
+.plate-sub{text-align:center;font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.8px;margin-top:2px;text-transform:uppercase}
+.plate-bottom{padding:12px 14px 15px;display:flex;flex-direction:column;gap:8px}
+.plate-price-row{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px dashed var(--line-hi)}
+.plate-price{font-family:var(--font-h);font-size:20px;font-weight:700}
+.plate-per{font-size:9px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase}
+
+.buy-cta{display:block;width:100%;max-width:380px;margin:26px auto 0;padding:16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;box-shadow:0 8px 24px rgba(155,0,0,0.35)}
+.buy-cta:disabled{opacity:.5;box-shadow:none}
+
+/* Invita y gana */
+.referral-strip{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;margin-top:8px}
+.referral-strip i{font-size:22px;color:var(--gold-hi);flex-shrink:0}
+.referral-strip .t{font-weight:700;font-size:13.5px;margin-bottom:2px}
+.referral-strip .d{color:var(--muted);font-size:12.5px}
 
 /* Checkout / Pending overlay */
 .overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:70px 16px 40px}
 .overlay.show{display:flex}
-.sheet{background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-lg);max-width:460px;width:100%;padding:26px 22px;position:relative}
+.sheet{background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-lg);max-width:460px;width:100%;padding:26px 22px;position:relative}
 .sheet-close{position:absolute;top:14px;right:14px;color:var(--muted);font-size:18px}
 .sheet h2{font-family:var(--font-h);font-size:22px;text-transform:uppercase;margin-bottom:4px}
 .sheet .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
 .field{margin-bottom:14px}
-.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
-.field input:focus{outline:none;border-color:var(--red)}
-.field-error{color:var(--danger);font-size:11.5px;margin-top:5px;min-height:14px}
-.summary-row{display:flex;justify-content:space-between;padding:10px 0;border-top:1px dashed var(--border-hi);font-size:14px}
+.field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:8px;color:var(--paper)}
+.field input:focus{outline:none;border-color:var(--red-hi)}
+.summary-row{display:flex;justify-content:space-between;padding:10px 0;border-top:1px dashed var(--line-hi);font-size:14px}
 .summary-row.total{font-weight:700;font-family:var(--font-h);font-size:18px}
 .submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:16px}
 .submit-btn:disabled{opacity:.5}
 .form-err{color:var(--danger);font-size:12.5px;margin-top:10px;text-align:center}
 
-/* Pending screen content */
 .pending-icon{width:56px;height:56px;border-radius:50%;background:rgba(245,158,11,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--orange);margin:0 auto 14px}
-.ref-box{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:10px;padding:14px 16px;text-align:center;margin:16px 0}
-.ref-box .lbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
-.ref-box .code{font-family:'SFMono-Regular',Consolas,monospace;font-size:19px;font-weight:700;color:var(--gold);margin-top:4px;word-break:break-all}
+.ref-box{background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;padding:14px 16px;text-align:center;margin:16px 0}
+.ref-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.ref-box .code{font-family:var(--font-mono);font-size:19px;font-weight:700;color:var(--gold-hi);margin-top:4px;word-break:break-all}
 .bank-list{list-style:none;font-size:13.5px;line-height:2}
 .bank-list b{color:var(--muted);font-weight:600}
 .share-row{display:flex;gap:8px;margin-top:16px}
-.share-btn{flex:1;padding:11px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;font-size:12.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.share-btn{flex:1;padding:11px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:8px;font-size:12.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
 
-/* Footer nav */
-footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
+/* Lightbox */
+.lightbox{display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:20px}
+.lightbox.show{display:flex}
+.lightbox img{max-width:100%;max-height:88vh;border-radius:8px}
+.lightbox-close,.lightbox-nav{position:absolute;color:#fff;font-size:26px;background:rgba(255,255,255,0.08);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.lightbox-close{top:20px;right:20px}
+.lightbox-prev{left:16px;top:50%;transform:translateY(-50%)}
+.lightbox-next{right:16px;top:50%;transform:translateY(-50%)}
+
+footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 .foot-links{display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:center;font-size:13px;color:var(--muted)}
-.foot-links a:hover{color:var(--text)}
+.foot-links a:hover{color:var(--paper)}
 .foot-brand{text-align:center;margin-top:18px;font-size:11.5px;color:var(--muted)}
 
 .skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);background-size:400% 100%;animation:shimmer 1.4s infinite}
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
+@media(prefers-reduced-motion:reduce){.plate{transition:none}}
 </style>
 </head>
 <body>
@@ -155,8 +219,15 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
 <main>
   <section class="hero wrap">
     <div class="eyebrow">Sorteo notariado · IAC Arica</div>
-    <h1>No sueñes,<br><em>gánatelo</em></h1>
-    <p class="sub">Compra tu Sticker Digital y participa en el sorteo de un Dodge Challenger 2018, valorizado en $18.500.000 CLP.</p>
+    <h1 id="heroTitle">No sueñes,<br><em>gánatelo</em></h1>
+    <p class="sub" id="heroSub">Compra tu Sticker Digital y participa en el sorteo de un vehículo de nuestro inventario real.</p>
+
+    <div class="trust-row">
+      <div class="trust-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
+      <div class="trust-badge"><i class="fas fa-video"></i> Transmisión en vivo</div>
+      <div class="trust-badge"><i class="fas fa-warehouse"></i> Vehículo real en stock IAC</div>
+      <div class="trust-badge"><i class="fas fa-shield-halved"></i> Folio verificable</div>
+    </div>
 
     <div class="countdown" id="countdown">
       <div class="cd-box"><div class="n" id="cdD">--</div><div class="l">Días</div></div>
@@ -168,12 +239,16 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
   </section>
 
   <section class="premio-section wrap">
-    <div class="premio-card">
-      <img class="premio-img skeleton" id="premioImg" alt="Premio del sorteo">
+    <div class="premio-layout">
+      <div class="premio-gallery">
+        <img class="premio-main-img skeleton" id="premioMainImg" alt="Premio del sorteo">
+        <div class="premio-thumbs" id="premioThumbs"></div>
+      </div>
       <div class="premio-body">
         <div class="premio-name" id="premioName">Cargando premio…</div>
         <div class="premio-value" id="premioValue"></div>
         <div class="premio-specs" id="premioSpecs"></div>
+        <p class="premio-desc" id="premioDesc"></p>
 
         <div class="zf-box">
           <i class="fas fa-triangle-exclamation"></i>
@@ -185,7 +260,7 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
 
         <div class="refund-banner" id="refundBanner">
           <div class="t">Ventana de reembolso abierta</div>
-          <div>Si no quieres esperar una nueva fecha de sorteo, puedes solicitar la devolución del 100% de tu compra. <a href="contacto.html">Solicitar reembolso →</a></div>
+          <div>Puedes solicitar la devolución del 100% de tu compra. <a href="contacto.html">Solicitar →</a></div>
         </div>
       </div>
     </div>
@@ -197,13 +272,25 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
   </section>
 
   <section class="packs-section wrap">
-    <h2 class="section-title">Elige tu pack</h2>
+    <div class="section-label">
+      <h2>Elige tu placa</h2>
+      <div class="rule"></div>
+      <div class="tag">Bronce · Plata · Oro</div>
+    </div>
     <div class="packs-grid" id="packsGrid">
-      <div class="pack-card skeleton" style="height:130px"></div>
-      <div class="pack-card skeleton" style="height:130px"></div>
-      <div class="pack-card skeleton" style="height:130px"></div>
+      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
+      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
+      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
     </div>
     <button class="buy-cta" id="buyBtn" disabled>Comprar Sticker Digital</button>
+
+    <div class="referral-strip">
+      <i class="fas fa-gift"></i>
+      <div>
+        <div class="t">Invita y gana</div>
+        <div class="d">Comparte tu link después de comprar y recibe 1 estampilla extra gratis por cada amigo que compre.</div>
+      </div>
+    </div>
   </section>
 
   <footer class="wrap">
@@ -221,6 +308,14 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
     <div class="foot-brand">CV North Capital SpA — Import American Cars / IAC Arica · iac-arica.cl</div>
   </footer>
 </main>
+
+<!-- ===== LIGHTBOX GALERÍA ===== -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+  <button class="lightbox-nav lightbox-prev" onclick="lightboxNav(-1)"><i class="fas fa-chevron-left"></i></button>
+  <img id="lightboxImg" alt="Foto del vehículo">
+  <button class="lightbox-nav lightbox-next" onclick="lightboxNav(1)"><i class="fas fa-chevron-right"></i></button>
+</div>
 
 <!-- ===== CHECKOUT ===== -->
 <div class="overlay" id="checkoutOverlay">
@@ -256,15 +351,7 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
       <div class="code" id="pendRef">—</div>
     </div>
 
-    <ul class="bank-list">
-      <li><b>Titular:</b> CV North Capital SpA</li>
-      <li><b>Banco:</b> <span data-owner-fill>[completar]</span></li>
-      <li><b>Cuenta:</b> <span data-owner-fill>[completar]</span></li>
-      <li><b>RUT:</b> 78.375.615-3</li>
-      <li><b>Monto exacto:</b> <span id="pendMonto">—</span></li>
-      <li><b>Glosa/Comentario:</b> <span id="pendRef2">—</span></li>
-      <li><b>Email:</b> contacto@importamericancars.cl</li>
-    </ul>
+    <ul class="bank-list" id="bankList"></ul>
 
     <div class="ref-box">
       <div class="lbl">Tu código de referido — invita y gana 1 estampilla extra</div>
@@ -283,7 +370,7 @@ footer{border-top:1px solid var(--border);padding:32px 0 40px;margin-top:20px}
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
-let lastOrder = null;
+let galleryImages = [], galleryIndex = 0;
 
 document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
@@ -293,8 +380,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   try {
     sorteo = await stamperAPI.getSorteoPublico();
+    renderHero();
     renderZonaFranca();
     renderRefundBanner();
+    renderBankDetails();
     startCountdown();
 
     if (sorteo.vehicle_id) {
@@ -328,11 +417,40 @@ function storeReferralFromUrl() {
   if (ref) sessionStorage.setItem('iac_ref', ref);
 }
 
-/* ---------- Premio + Zona Franca ---------- */
+/* ---------- Hero dinámico (editable desde el admin) ---------- */
+function renderHero() {
+  if (sorteo.nombre_sorteo) {
+    document.getElementById('heroTitle').textContent = sorteo.nombre_sorteo;
+  }
+  if (sorteo.descripcion) {
+    document.getElementById('heroSub').textContent = sorteo.descripcion;
+  }
+}
+
+/* ---------- Premio + galería (todas las fotos del vehículo) ---------- */
 function renderPremio() {
-  const img = vehicle.vehicle_images?.find(i => i.is_main)?.image_url || vehicle.vehicle_images?.[0]?.image_url;
-  const imgEl = document.getElementById('premioImg');
-  if (img) { imgEl.src = img; imgEl.classList.remove('skeleton'); imgEl.alt = vehicle.name; }
+  const images = (vehicle.vehicle_images || []).slice().sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+  galleryImages = images.map(i => i.image_url);
+
+  const mainImg = document.getElementById('premioMainImg');
+  if (galleryImages.length) {
+    mainImg.src = galleryImages[0];
+    mainImg.classList.remove('skeleton');
+    mainImg.alt = vehicle.name;
+    mainImg.addEventListener('click', () => openLightbox(0));
+  }
+
+  const thumbs = document.getElementById('premioThumbs');
+  thumbs.innerHTML = galleryImages.map((url, i) => `
+    <img src="${url}" class="${i === 0 ? 'active' : ''}" data-idx="${i}" alt="Foto ${i + 1} de ${escapeHtml(vehicle.name)}">
+  `).join('');
+  thumbs.querySelectorAll('img').forEach(img => img.addEventListener('click', () => {
+    const idx = parseInt(img.dataset.idx, 10);
+    mainImg.src = galleryImages[idx];
+    thumbs.querySelectorAll('img').forEach(t => t.classList.remove('active'));
+    img.classList.add('active');
+  }));
+
   document.getElementById('premioName').textContent = vehicle.name;
   document.getElementById('premioValue').textContent = vehicle.price
     ? '$' + Number(vehicle.price).toLocaleString('es-CL') + ' CLP' : '';
@@ -343,18 +461,42 @@ function renderPremio() {
   if (vehicle.transmision) specs.push(vehicle.transmision);
   if (vehicle.traccion) specs.push(vehicle.traccion);
   document.getElementById('premioSpecs').innerHTML = specs.map(s => `<span class="premio-tag">${escapeHtml(s)}</span>`).join('');
+
+  document.getElementById('premioDesc').textContent =
+    `Este es un vehículo real de nuestro inventario en Arica — no un premio genérico. Todas sus fotos son las mismas que usamos para tus estampillas digitales.`;
 }
 
+/* ---------- Lightbox ---------- */
+function openLightbox(idx) {
+  if (!galleryImages.length) return;
+  galleryIndex = idx;
+  document.getElementById('lightboxImg').src = galleryImages[galleryIndex];
+  document.getElementById('lightbox').classList.add('show');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('show'); }
+function lightboxNav(dir) {
+  galleryIndex = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
+  document.getElementById('lightboxImg').src = galleryImages[galleryIndex];
+}
+
+/* ---------- Zona Franca / Reembolso / Banco (editables desde el admin) ---------- */
 function renderZonaFranca() {
-  const el = document.getElementById('zfText');
-  el.textContent = sorteo.zona_franca_texto ||
+  document.getElementById('zfText').textContent = sorteo.zona_franca_texto ||
     'El vehículo circula libremente en Arica y Parinacota. Liberarlo para el resto de Chile corre por cuenta y costo del ganador.';
 }
-
 function renderRefundBanner() {
-  if (sorteo.ventana_reembolso_abierta) {
-    document.getElementById('refundBanner').style.display = 'block';
-  }
+  if (sorteo.ventana_reembolso_abierta) document.getElementById('refundBanner').style.display = 'block';
+}
+function renderBankDetails() {
+  const items = [
+    ['Titular', sorteo.banco_nombre_titular || 'CV North Capital SpA'],
+    ['Banco', sorteo.banco_nombre || 'Por confirmar'],
+    ['Tipo de cuenta', sorteo.banco_tipo_cuenta || 'Por confirmar'],
+    ['Cuenta', sorteo.banco_numero_cuenta || 'Por confirmar'],
+    ['RUT', sorteo.banco_rut_titular || '78.375.615-3'],
+    ['Email', sorteo.banco_email || CONTACT_CONFIG.email],
+  ];
+  window.__bankItems = items;
 }
 
 /* ---------- Countdown ---------- */
@@ -392,28 +534,69 @@ function startCountdown() {
   countdownInterval = setInterval(tick, 1000);
 }
 
-/* ---------- Packs ---------- */
+/* ---------- Packs — placas coleccionables (Bronce/Plata/Oro por precio) ---------- */
+function tierForIndex(i, total) {
+  if (total <= 1) return 'oro';
+  if (i === 0) return 'bronce';
+  if (i === total - 1) return 'oro';
+  return 'plata';
+}
+
 function renderPacks() {
   const grid = document.getElementById('packsGrid');
   if (!packs.length) { grid.innerHTML = '<p style="color:var(--muted);text-align:center">No hay packs disponibles por ahora.</p>'; return; }
-  grid.innerHTML = packs.map(p => `
-    <div class="pack-card" data-slug="${escapeHtml(p.slug)}">
-      ${p.destacado ? '<span class="badge">Más elegido</span>' : ''}
-      <div class="qty">${p.cantidad_stickers} ${p.cantidad_stickers === 1 ? 'sticker' : 'stickers'}</div>
-      <div class="price">$${Number(p.precio_total).toLocaleString('es-CL')}</div>
-      <div class="unit">$${Math.round(p.precio_total / p.cantidad_stickers).toLocaleString('es-CL')} c/u</div>
-    </div>
-  `).join('');
-  grid.querySelectorAll('.pack-card').forEach(card =>
-    card.addEventListener('click', () => selectPack(card.dataset.slug)));
 
-  const destacado = packs.find(p => p.destacado) || packs[0];
+  const sorted = packs.slice().sort((a, b) => (a.precio_total / a.cantidad_stickers) - (b.precio_total / b.cantidad_stickers));
+
+  grid.innerHTML = sorted.map((p, i) => {
+    const tier = tierForIndex(i, sorted.length);
+    const img = galleryImages.length ? pickStickerImage(
+      galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), p.slug
+    ) : null;
+    return `
+    <div class="plate" data-tier="${tier}" data-slug="${escapeHtml(p.slug)}">
+      <div class="plate-face">
+        ${p.destacado ? '<span class="plate-badge">Más elegido</span>' : ''}
+        <div class="plate-top">
+          <span class="plate-locale">Arica · Chile</span>
+          <span class="rarity">${tier}</span>
+        </div>
+        ${img ? `<img class="plate-img" src="${img}" alt="Vista previa">` : '<div class="plate-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="fas fa-car"></i></div>'}
+        <div class="plate-name">${escapeHtml(p.nombre)}</div>
+        <div class="plate-sub">${p.cantidad_stickers} ${p.cantidad_stickers === 1 ? 'sticker' : 'stickers'}</div>
+        <div class="plate-bottom">
+          <div class="plate-price-row">
+            <span class="plate-price">$${Number(p.precio_total).toLocaleString('es-CL')}</span>
+            <span class="plate-per">$${Math.round(p.precio_total / p.cantidad_stickers).toLocaleString('es-CL')}/u</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.plate').forEach(card => {
+    card.addEventListener('click', () => selectPack(card.dataset.slug));
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      card.style.setProperty('--tilt-y', ((px - 0.5) * 10).toFixed(2) + 'deg');
+      card.style.setProperty('--tilt-x', ((0.5 - py) * 10).toFixed(2) + 'deg');
+      card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.setProperty('--tilt-x', '0deg');
+      card.style.setProperty('--tilt-y', '0deg');
+    });
+  });
+
+  const destacado = sorted.find(p => p.destacado) || sorted[Math.floor(sorted.length / 2)];
   selectPack(destacado.slug);
 }
 
 function selectPack(slug) {
   selectedPack = packs.find(p => p.slug === slug);
-  document.querySelectorAll('.pack-card').forEach(c => c.classList.toggle('selected', c.dataset.slug === slug));
+  document.querySelectorAll('.plate').forEach(c => c.classList.toggle('selected', c.dataset.slug === slug));
   document.getElementById('buyBtn').disabled = false;
 }
 
@@ -455,7 +638,6 @@ async function submitOrder() {
     const orden = await stamperAPI.crearOrdenPendiente({
       nombre, email, telefono, rutPasaporte: rut, packSlug: selectedPack.slug, referidoPor
     });
-    lastOrder = orden;
     closeCheckout();
     showPending(orden);
   } catch (e) {
@@ -469,13 +651,20 @@ async function submitOrder() {
 
 function showPending(orden) {
   document.getElementById('pendRef').textContent = orden.referencia;
-  document.getElementById('pendRef2').textContent = orden.referencia;
-  document.getElementById('pendMonto').textContent = '$' + Number(orden.monto_total).toLocaleString('es-CL');
+
+  const items = (window.__bankItems || []).concat([
+    ['Monto exacto', '$' + Number(orden.monto_total).toLocaleString('es-CL')],
+    ['Glosa/Comentario', orden.referencia],
+  ]);
+  document.getElementById('bankList').innerHTML = items.map(([k, v]) =>
+    `<li><b>${escapeHtml(k)}:</b> ${escapeHtml(v)}</li>`
+  ).join('');
+
+  document.getElementById('pendRefCode').textContent = orden.codigo_referido;
 
   const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(orden.codigo_referido)}`;
-  document.getElementById('pendRefCode').textContent = orden.codigo_referido;
   document.getElementById('shareWaBtn').href =
-    `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo del Dodge Challenger de @importamericancars! Consigue tu sticker → ' + shareUrl)}`;
+    `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
   window.__shareUrl = shareUrl;
 
   document.getElementById('pendingOverlay').classList.add('show');
@@ -491,7 +680,7 @@ function showToast(msg) {
   t.textContent = msg;
   Object.assign(t.style, { position:'fixed', bottom:'24px', left:'50%', transform:'translateX(-50%)',
     background:'var(--surface-2)', color:'#fff', padding:'10px 18px', borderRadius:'999px',
-    fontSize:'13px', zIndex:2000, border:'1px solid var(--border-hi)' });
+    fontSize:'13px', zIndex:2000, border:'1px solid var(--line-hi)' });
   document.body.appendChild(t);
   setTimeout(() => t.remove(), 2000);
 }

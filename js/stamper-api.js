@@ -298,4 +298,21 @@ class StamperAPI {
     }
 }
 
+/**
+ * Asigna una foto del vehículo a cada estampilla de forma determinística
+ * (mismo folio → siempre la misma foto), repartiendo todas las fotos
+ * disponibles entre las estampillas en vez de usar siempre la misma.
+ * images: array de {image_url, order_index} (ya ordenado).
+ */
+function pickStickerImage(images, folio) {
+    if (!images || !images.length) return null;
+    if (!folio) return images[0].image_url;
+    let hash = 0;
+    for (let i = 0; i < folio.length; i++) {
+        hash = (hash * 31 + folio.charCodeAt(i)) >>> 0;
+    }
+    return images[hash % images.length].image_url;
+}
+
+window.pickStickerImage = pickStickerImage;
 window.stamperAPI = new StamperAPI();

@@ -58,7 +58,7 @@ Deno.serve(async (req: Request) => {
         <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${e.folio}</span>
         <span style="color:#00C566;font-size:11px;float:right;line-height:1.8;">Participación #${i + 1}</span>
       </td></tr>
-      ${vehicleImg ? `<tr><td><img src="${vehicleImg}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
+      ${(e.imagenUrl || vehicleImg) ? `<tr><td><img src="${e.imagenUrl || vehicleImg}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
       <tr><td style="padding:14px 16px;">
         <p style="font-family:monospace;font-size:10px;color:rgba(201,168,76,0.65);letter-spacing:2px;margin:0 0 8px;">CHILE · ARICA</p>
         <p style="font-family:'Arial Black',sans-serif;font-size:18px;font-weight:900;color:#fff;text-align:center;margin:0 0 3px;text-transform:uppercase;">${vehicleName}</p>
