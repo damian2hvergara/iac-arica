@@ -3,6 +3,13 @@
    "IAC Arica 2026 — No Sueñes, Gánatelo"
    Usado por stamper.html (público) y
    stamper-admin.html (autenticado).
+
+   IMPORTANTE: el sitio no tiene build step, así que los navegadores
+   cachean este archivo agresivamente. Cada vez que se edite, subir
+   también el número en "?v=" del <script src="js/stamper-api.js?v=...">
+   en TODOS los HTML que lo cargan (stamper.html, stamper-admin.html,
+   mi-cuenta.html, bases.html) — si no, algunos visitantes van a seguir
+   ejecutando la versión vieja hasta que limpien caché manualmente.
    ======================================== */
 
 class StamperAPI {

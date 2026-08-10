@@ -3,6 +3,12 @@
    Import American Cars
    VERSIÓN FUSIONADA: Combina arquitectura simple
    con todas las funciones nuevas
+
+   IMPORTANTE: el sitio no tiene build step, así que los navegadores
+   cachean este archivo agresivamente. Cada vez que se edite, subir
+   también el número en "?v=" del <script src="js/config.js?v=...">
+   en TODOS los HTML que lo cargan — si no, algunos visitantes van a
+   seguir ejecutando la versión vieja hasta que limpien caché a mano.
    ======================================== */
 
 // ====================================
