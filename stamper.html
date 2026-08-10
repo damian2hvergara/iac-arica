@@ -56,31 +56,51 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 input{font-family:inherit;font-size:15px}
 .wrap{max-width:1100px;margin:0 auto;padding:0 18px}
 
+/* Fondos alternados por sección — ritmo visual sin perder la paleta IAC */
+.band{position:relative}
+.band::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none}
+.band-warm::before{background:linear-gradient(180deg,rgba(233,200,118,0.055),rgba(155,0,0,0.03) 60%,transparent)}
+.band-panel::before{background:linear-gradient(180deg,var(--surface),var(--ink) 92%)}
+.band-red::before{background:radial-gradient(ellipse 75% 55% at 50% 0%,rgba(155,0,0,0.1),transparent 65%)}
+.band-gold::before{background:linear-gradient(180deg,rgba(233,200,118,0.07),transparent 75%)}
+
 /* Topbar */
-.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(11,10,9,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
-.brand{font-family:var(--font-h);font-size:16px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:900;height:56px;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 18px;background:rgba(11,10,9,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--font-h);font-size:16px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;flex-shrink:0}
 .brand span{color:var(--red-hi)}
+.topbar-nav{display:flex;align-items:center;gap:20px;font-size:12.5px;color:var(--muted);flex:1;justify-content:center}
+.topbar-nav a:hover{color:var(--gold-hi)}
+.topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .topbar-wa{display:flex;align-items:center;gap:7px;padding:9px 16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-size:13px;font-weight:600}
+.topbar-burger{display:none;font-size:18px;color:var(--paper);padding:6px}
+.topbar-dropdown{display:none;position:fixed;top:56px;left:0;right:0;z-index:899;background:rgba(11,10,9,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);flex-direction:column;padding:6px 18px 12px}
+.topbar-dropdown.show{display:flex}
+.topbar-dropdown a{padding:13px 2px;font-size:13.5px;color:var(--paper);border-bottom:1px solid var(--line)}
+.topbar-dropdown a:last-child{border-bottom:none}
+@media(max-width:680px){
+  .topbar-nav{display:none}
+  .topbar-burger{display:block}
+}
 main{padding-top:56px}
 
 /* Hero */
 .hero{position:relative;padding:64px 0 34px;text-align:center;overflow:hidden}
-.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 65%;opacity:0;transition:opacity .6s ease;filter:saturate(1.05)}
-.hero-bg.show{opacity:.32}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 65%;opacity:0;transition:opacity .6s ease;filter:saturate(1.1) contrast(1.05)}
+.hero-bg.show{opacity:.58}
 .hero-bg::after{content:"";position:absolute;inset:0}
 .hero::before{content:"";position:absolute;inset:0;background:
-    linear-gradient(180deg,rgba(11,10,9,0.35) 0%,rgba(11,10,9,0.55) 55%,var(--ink) 96%),
-    radial-gradient(ellipse 90% 55% at 50% -8%,rgba(155,0,0,0.25),transparent 60%);
+    linear-gradient(180deg,rgba(11,10,9,0.15) 0%,rgba(11,10,9,0.45) 55%,var(--ink) 97%),
+    radial-gradient(ellipse 90% 55% at 50% -8%,rgba(155,0,0,0.3),transparent 60%);
   pointer-events:none;z-index:1}
 .hero .wrap{position:relative;z-index:2}
-.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-hi);margin-bottom:12px}
-.hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(32px,7vw,52px);text-transform:uppercase;line-height:0.98;text-wrap:balance}
+.eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-hi);margin-bottom:12px;text-shadow:0 2px 10px rgba(0,0,0,0.6)}
+.hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(32px,7vw,52px);text-transform:uppercase;line-height:0.98;text-wrap:balance;text-shadow:0 4px 20px rgba(0,0,0,0.65)}
 .hero h1 em{
   font-style:normal;
   background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-.hero p.sub{color:var(--muted);margin-top:14px;font-size:14.5px;max-width:48ch;margin-inline:auto}
+.hero p.sub{color:var(--paper);opacity:.85;margin-top:14px;font-size:14.5px;max-width:48ch;margin-inline:auto;text-shadow:0 2px 10px rgba(0,0,0,0.6)}
 
 /* Trust badges */
 .trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
@@ -142,9 +162,15 @@ main{padding-top:56px}
 .steps-section{padding:24px 0 2px}
 .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 @media(max-width:600px){.steps-grid{grid-template-columns:repeat(2,1fr);gap:7px}}
-.step-card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 8px;text-align:center}
-.step-num{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--gold-hi);letter-spacing:1px;margin-bottom:4px}
-.step-card i{font-size:15px;color:var(--gold-hi);margin-bottom:5px;display:block}
+.step-card{position:relative;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1px solid var(--line);border-radius:13px;padding:16px 8px 12px;text-align:center;overflow:hidden;transition:border-color .2s,transform .2s}
+.step-card:hover{transform:translateY(-2px);border-color:var(--line-hi)}
+.step-num{position:absolute;top:6px;right:9px;font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1px}
+.step-icon{width:38px;height:38px;margin:0 auto 8px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;color:#0B0A09;box-shadow:0 4px 14px rgba(0,0,0,0.35)}
+.step-card:nth-child(1) .step-icon{background:linear-gradient(150deg,var(--bronze-hi),var(--bronze))}
+.step-card:nth-child(2) .step-icon{background:linear-gradient(150deg,var(--red-hi),var(--red))}
+.step-card:nth-child(2) .step-icon{color:#fff}
+.step-card:nth-child(3) .step-icon{background:linear-gradient(150deg,var(--gold-hi),var(--gold))}
+.step-card:nth-child(4) .step-icon{background:linear-gradient(150deg,var(--silver-hi),var(--silver))}
 .step-card h3{font-family:var(--font-h);font-size:11px;text-transform:uppercase;font-weight:700;line-height:1.2}
 
 /* Confianza / empresa real — mismo formato compacto */
@@ -171,6 +197,7 @@ main{padding-top:56px}
 /* Counter */
 /* Packs — placas coleccionables */
 .packs-section{padding:26px 0 46px}
+.packs-intro{text-align:center;color:var(--muted);font-size:13px;max-width:52ch;margin:-6px auto 20px;line-height:1.55}
 .packs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;perspective:1400px}
 .plate{
   --tilt-x:0deg;--tilt-y:0deg;--mx:50%;--my:35%;
@@ -199,7 +226,16 @@ main{padding-top:56px}
 .plate[data-tier="bronce"] .rarity{color:var(--bronze-hi);background:rgba(179,118,63,0.16)}
 .plate[data-tier="plata"] .rarity{color:var(--silver-hi);background:rgba(199,204,210,0.14)}
 .plate[data-tier="oro"] .rarity{color:var(--gold-hi);background:rgba(233,200,118,0.16)}
-.plate-img{width:100%;aspect-ratio:16/10;object-fit:cover;margin-top:10px;background:var(--surface-2)}
+.plate-fan{position:relative;width:100%;aspect-ratio:16/10;margin-top:10px;display:flex;align-items:center;justify-content:center}
+.fan-card{position:absolute;width:26%;aspect-ratio:3/4;border-radius:8px;overflow:hidden;background:var(--surface-2);box-shadow:0 6px 14px rgba(0,0,0,0.45);border:2px solid rgba(255,255,255,0.55);transform-origin:bottom center;transition:transform .3s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.fan-card img{width:100%;height:100%;object-fit:cover;display:block}
+.fan-card-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);background:var(--surface-2);font-size:12px}
+.plate:hover .fan-card,.plate.selected .fan-card{filter:brightness(1.08)}
+.fan-more{position:absolute;inset:0;background:rgba(11,10,9,0.72);display:flex;align-items:center;justify-content:center;font-family:var(--font-h);font-weight:800;font-size:13px;color:var(--gold-hi)}
+@media(max-width:600px){
+  .fan-card{width:28%;border-radius:6px;border-width:1.5px}
+  .fan-more{font-size:10.5px}
+}
 .plate-badge{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:9px;font-weight:700;text-transform:uppercase;padding:4px 9px;border-radius:var(--r-full);letter-spacing:.4px;z-index:2}
 .plate-name{text-align:center;font-family:var(--font-h);font-weight:700;font-size:16px;text-transform:uppercase;padding:12px 12px 0}
 .plate-sub{text-align:center;font-size:10px;color:var(--muted);font-family:var(--font-mono);letter-spacing:.8px;margin-top:2px;text-transform:uppercase}
@@ -315,8 +351,23 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 
 <div class="topbar">
   <div class="brand">IAC <span>Arica</span> 2026</div>
-  <a class="topbar-wa" href="#" id="waTopbarLink" target="_blank"><i class="fab fa-whatsapp"></i> Contacto</a>
+  <nav class="topbar-nav">
+    <a href="bases.html">Bases legales</a>
+    <a href="mi-cuenta.html">Mis stickers</a>
+    <a href="contacto.html">Contacto</a>
+    <a href="ganadores.html">Ganadores</a>
+  </nav>
+  <div class="topbar-right">
+    <a class="topbar-wa" href="#" id="waTopbarLink" target="_blank"><i class="fab fa-whatsapp"></i> Contacto</a>
+    <button class="topbar-burger" id="topbarBurger" type="button" aria-label="Abrir menú" aria-expanded="false"><i class="fas fa-bars"></i></button>
+  </div>
 </div>
+<nav class="topbar-dropdown" id="topbarDropdown">
+  <a href="bases.html">Bases legales</a>
+  <a href="mi-cuenta.html">Mis stickers</a>
+  <a href="contacto.html">Contacto</a>
+  <a href="ganadores.html">Ganadores</a>
+</nav>
 
 <main>
   <div class="wrap" style="padding-top:14px">
@@ -381,7 +432,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     </div>
   </section>
 
-  <section class="steps-section wrap needs-sorteo">
+  <section class="steps-section wrap needs-sorteo band band-warm">
     <div class="section-label">
       <h2>Cómo funciona</h2>
       <div class="rule"></div>
@@ -390,28 +441,60 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-num">01</div>
-        <i class="fas fa-hand-pointer"></i>
+        <div class="step-icon"><i class="fas fa-hand-pointer"></i></div>
         <h3>Elige tu placa</h3>
       </div>
       <div class="step-card">
         <div class="step-num">02</div>
-        <i class="fas fa-lock"></i>
+        <div class="step-icon"><i class="fas fa-lock"></i></div>
         <h3>Paga con Flow</h3>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
-        <i class="fas fa-bolt"></i>
+        <div class="step-icon"><i class="fas fa-bolt"></i></div>
         <h3>Recibe al instante</h3>
       </div>
       <div class="step-card">
         <div class="step-num">04</div>
-        <i class="fas fa-gavel"></i>
+        <div class="step-icon"><i class="fas fa-gavel"></i></div>
         <h3>Espera el sorteo</h3>
       </div>
     </div>
   </section>
 
-  <section class="trust-section wrap">
+  <section class="packs-section wrap band band-red" id="packsSection">
+    <div class="section-label">
+      <h2>Elige tu pack de ilustraciones</h2>
+      <div class="rule"></div>
+      <div class="tag">Bronce · Plata · Oro</div>
+    </div>
+    <p class="packs-intro">Cada pack trae una selección distinta de stickers digitales coleccionables de nuestro vehículo en sorteo. Al elegir tu pack, cada sticker que compras es un número más participando por el gran premio — mientras más stickers, más chances de ganar.</p>
+    <div class="packs-grid" id="packsGrid">
+      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
+      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
+      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
+    </div>
+    <button class="buy-cta" id="buyBtn" disabled>Comprar Sticker Digital</button>
+
+    <div class="referral-strip">
+      <i class="fas fa-gift"></i>
+      <div>
+        <div class="t">Invita y gana</div>
+        <div class="d">Después de comprar te damos un link personal — cada 4 estampillas que tus amigos compren con él, ganas 1 estampilla extra gratis. Es tu propio sistema de referidos.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="referidores-section wrap needs-sorteo band band-gold" id="referidoresSection" style="display:none">
+    <div class="section-label">
+      <h2>Top referidores</h2>
+      <div class="rule"></div>
+      <div class="tag">Invita y gana</div>
+    </div>
+    <div class="referidores-list" id="referidoresList"></div>
+  </section>
+
+  <section class="trust-section wrap band band-panel">
     <div class="section-label">
       <h2>Por qué confiar en IAC</h2>
       <div class="rule"></div>
@@ -456,37 +539,6 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="mf-body">Tu Sticker Digital queda como comprobante de participación — por su naturaleza digital no aplica devolución, salvo el caso de meta mínima explicado arriba.</div>
     </details>
     <p class="mini-faq-more">¿Tienes otra duda? <a href="faq.html">Ver todas las preguntas frecuentes →</a></p>
-  </section>
-
-  <section class="packs-section wrap" id="packsSection">
-    <div class="section-label">
-      <h2>Elige tu placa</h2>
-      <div class="rule"></div>
-      <div class="tag">Bronce · Plata · Oro</div>
-    </div>
-    <div class="packs-grid" id="packsGrid">
-      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
-      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
-      <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
-    </div>
-    <button class="buy-cta" id="buyBtn" disabled>Comprar Sticker Digital</button>
-
-    <div class="referral-strip">
-      <i class="fas fa-gift"></i>
-      <div>
-        <div class="t">Invita y gana</div>
-        <div class="d">Después de comprar te damos un link personal — cada 4 estampillas que tus amigos compren con él, ganas 1 estampilla extra gratis. Es tu propio sistema de referidos.</div>
-      </div>
-    </div>
-  </section>
-
-  <section class="referidores-section wrap needs-sorteo" id="referidoresSection" style="display:none">
-    <div class="section-label">
-      <h2>Top referidores</h2>
-      <div class="rule"></div>
-      <div class="tag">Invita y gana</div>
-    </div>
-    <div class="referidores-list" id="referidoresList"></div>
   </section>
 
   <footer class="wrap">
@@ -563,7 +615,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
-let galleryImages = [], galleryIndex = 0;
+let galleryImages = [], galleryIndex = 0, galleryAutoTimer = null;
 
 // Único método de pago: Flow.cl. Mientras no esté conectado, se simula
 // una confirmación instantánea (ver confirmar_orden_simulado en Supabase).
@@ -574,6 +626,19 @@ const FLOW_MODE = 'simulation';
 document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
   document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
+
+  const topbarBurger = document.getElementById('topbarBurger');
+  const topbarDropdown = document.getElementById('topbarDropdown');
+  topbarBurger.addEventListener('click', () => {
+    const isOpen = topbarDropdown.classList.toggle('show');
+    topbarBurger.setAttribute('aria-expanded', String(isOpen));
+    topbarBurger.innerHTML = isOpen ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+  });
+  topbarDropdown.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    topbarDropdown.classList.remove('show');
+    topbarBurger.setAttribute('aria-expanded', 'false');
+    topbarBurger.innerHTML = '<i class="fas fa-bars"></i>';
+  }));
 
   storeReferralFromUrl();
   renderRefBanner();
@@ -676,6 +741,11 @@ function renderHero() {
   if (sorteo.descripcion) {
     document.getElementById('heroSub').textContent = sorteo.descripcion;
   }
+  if (sorteo.hero_imagen_url) {
+    const heroBg = document.getElementById('heroBg');
+    heroBg.style.backgroundImage = `url("${sorteo.hero_imagen_url}")`;
+    heroBg.classList.add('show');
+  }
 }
 
 /* ---------- Premio + galería (todas las fotos del vehículo) ---------- */
@@ -684,15 +754,24 @@ function renderPremio() {
   galleryImages = images.map(i => i.image_url);
 
   const mainImg = document.getElementById('premioMainImg');
+  let galleryIdx = 0;
+  const showGalleryIdx = (idx) => {
+    galleryIdx = idx;
+    mainImg.src = galleryImages[idx];
+    document.querySelectorAll('#premioThumbs img').forEach((t, i) => t.classList.toggle('active', i === idx));
+  };
+
   if (galleryImages.length) {
     mainImg.src = galleryImages[0];
     mainImg.classList.remove('skeleton');
     mainImg.alt = vehicle.name;
-    mainImg.addEventListener('click', () => openLightbox(0));
+    mainImg.addEventListener('click', () => openLightbox(galleryIdx));
 
-    const heroBg = document.getElementById('heroBg');
-    heroBg.style.backgroundImage = `url("${galleryImages[0]}")`;
-    heroBg.classList.add('show');
+    if (!sorteo.hero_imagen_url) {
+      const heroBg = document.getElementById('heroBg');
+      heroBg.style.backgroundImage = `url("${galleryImages[0]}")`;
+      heroBg.classList.add('show');
+    }
   }
 
   const thumbs = document.getElementById('premioThumbs');
@@ -700,11 +779,16 @@ function renderPremio() {
     <img src="${url}" class="${i === 0 ? 'active' : ''}" data-idx="${i}" alt="Foto ${i + 1} de ${escapeHtml(vehicle.name)}">
   `).join('');
   thumbs.querySelectorAll('img').forEach(img => img.addEventListener('click', () => {
-    const idx = parseInt(img.dataset.idx, 10);
-    mainImg.src = galleryImages[idx];
-    thumbs.querySelectorAll('img').forEach(t => t.classList.remove('active'));
-    img.classList.add('active');
+    clearInterval(galleryAutoTimer);
+    showGalleryIdx(parseInt(img.dataset.idx, 10));
   }));
+
+  if (galleryImages.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    clearInterval(galleryAutoTimer);
+    galleryAutoTimer = setInterval(() => {
+      showGalleryIdx((galleryIdx + 1) % galleryImages.length);
+    }, 1500);
+  }
 
   document.getElementById('premioName').textContent = vehicle.name;
   document.getElementById('premioValue').textContent = vehicle.price
@@ -796,9 +880,23 @@ function renderPacks() {
     const tier = (p.rareza === 'bronce' || p.rareza === 'plata' || p.rareza === 'oro')
       ? p.rareza
       : tierForIndex(i, sorted.length);
-    const img = p.imagen_url || (galleryImages.length ? pickStickerImage(
-      galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), i
-    ) : null);
+    const fanCount = Math.min(p.cantidad_stickers, 5);
+    const center = (fanCount - 1) / 2;
+    const extra = p.cantidad_stickers - fanCount;
+    const fanCards = Array.from({ length: fanCount }).map((_, fi) => {
+      const off = fi - center;
+      const angle = (off * 8).toFixed(1);
+      const dx = (off * 45).toFixed(1);
+      const dy = (Math.abs(off) * 8).toFixed(1);
+      const cardImg = p.imagen_url || (galleryImages.length ? pickStickerImage(
+        galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), fi
+      ) : null);
+      const isLast = fi === fanCount - 1 && extra > 0;
+      return `<div class="fan-card" style="transform:translate(${dx}%,${dy}%) rotate(${angle}deg);z-index:${fi}">
+        ${cardImg ? `<img src="${cardImg}" alt="Vista previa">` : '<div class="fan-card-empty"><i class="fas fa-car"></i></div>'}
+        ${isLast ? `<div class="fan-more">+${extra}</div>` : ''}
+      </div>`;
+    }).join('');
     return `
     <div class="plate" data-tier="${tier}" data-slug="${escapeHtml(p.slug)}">
       <div class="plate-face">
@@ -807,7 +905,7 @@ function renderPacks() {
           <span class="plate-locale">Arica · Chile</span>
           <span class="rarity">${tier}</span>
         </div>
-        ${img ? `<img class="plate-img" src="${img}" alt="Vista previa">` : '<div class="plate-img" style="display:flex;align-items:center;justify-content:center;color:var(--muted)"><i class="fas fa-car"></i></div>'}
+        <div class="plate-fan">${fanCards}</div>
         <div class="plate-name">${escapeHtml(p.nombre)}</div>
         <div class="plate-sub">${p.cantidad_stickers} ${p.cantidad_stickers === 1 ? 'sticker' : 'stickers'}</div>
         <div class="plate-bottom">

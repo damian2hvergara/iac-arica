@@ -267,6 +267,18 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
           <div class="field full"><label>Texto de disclosure Zona Franca (se muestra junto al premio)</label><textarea id="sorteoZonaFranca"></textarea></div>
         </div>
         <hr style="border-color:var(--border);margin:18px 0">
+        <div>
+          <label style="display:block;margin-bottom:8px">Imagen de fondo del hero (independiente de las fotos del vehículo)</label>
+          <div id="heroImagePreviewWrap" style="margin-bottom:10px">
+            <img id="heroImagePreview" src="" alt="" style="display:none;width:100%;max-width:360px;height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--border-hi)">
+          </div>
+          <input type="file" id="heroImageInput" accept="image/*" style="display:none" onchange="onHeroImageSelected(event)">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('heroImageInput').click()"><i class="fas fa-upload"></i> Subir imagen</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnQuitarHeroImg" style="display:none" onclick="quitarHeroImagen()"><i class="fas fa-trash"></i> Quitar</button>
+          <span id="heroImageStatus" style="margin-left:8px;font-size:12px;color:var(--muted)"></span>
+          <p style="color:var(--muted);font-size:11.5px;margin-top:6px">Si no se sube ninguna, se usa la primera foto del vehículo como respaldo.</p>
+        </div>
+        <hr style="border-color:var(--border);margin:18px 0">
         <div class="form-grid">
           <div class="field"><label>Meta mínima de stickers (interno — nunca público)</label><input type="number" id="sorteoMetaMinima"></div>
           <div class="field"><label>Total emitidos (interno — nunca público)</label><input type="number" id="sorteoTotalEmitidos"></div>
@@ -645,6 +657,9 @@ async function deletePackConfirm(id) {
 async function loadSorteoConfig() {
   window.__sorteoId = null;
   window.__selectedVehicleId = null;
+  window.__heroImagenUrl = null;
+  document.getElementById('heroImageInput').value = '';
+  document.getElementById('heroImageStatus').textContent = '';
 
   try {
     const s = await stamperAPI.getSorteoConfigAdmin();
@@ -662,6 +677,8 @@ async function loadSorteoConfig() {
       document.getElementById('sorteoVentanaReembolso').checked = !!s.ventana_reembolso_abierta;
       window.__sorteoId = s.id;
       window.__selectedVehicleId = s.vehicle_id || null;
+      window.__heroImagenUrl = s.hero_imagen_url || null;
+      setHeroImagePreview(window.__heroImagenUrl);
     } else {
       // Aún no hay ningún sorteo creado — dejar el form en blanco con
       // valores por defecto para que se pueda crear el primero.
@@ -671,6 +688,7 @@ async function loadSorteoConfig() {
       document.getElementById('sorteoTotalEmitidos').value = 10000;
       document.getElementById('sorteoExtensiones').value = 0;
       document.getElementById('sorteoVentanaReembolso').checked = false;
+      setHeroImagePreview(null);
     }
   } catch (e) {
     console.error(e);
@@ -717,6 +735,44 @@ function selectVehicle(id) {
     el.classList.toggle('selected', el.dataset.id === id));
 }
 
+function setHeroImagePreview(url) {
+  const img = document.getElementById('heroImagePreview');
+  const btnQuitar = document.getElementById('btnQuitarHeroImg');
+  if (url) {
+    img.src = url;
+    img.style.display = 'block';
+    btnQuitar.style.display = 'inline-flex';
+  } else {
+    img.src = '';
+    img.style.display = 'none';
+    btnQuitar.style.display = 'none';
+  }
+}
+
+async function onHeroImageSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('heroImageStatus');
+  statusEl.textContent = 'Subiendo...';
+  try {
+    const url = await uploadImageToCloudinary(file);
+    window.__heroImagenUrl = url;
+    setHeroImagePreview(url);
+    statusEl.textContent = 'Imagen lista — recuerda hacer clic en "Guardar configuración".';
+  } catch (e) {
+    console.error(e);
+    statusEl.textContent = '';
+    alert('Error al subir la imagen: ' + (e.message || e));
+  }
+}
+
+function quitarHeroImagen() {
+  window.__heroImagenUrl = null;
+  setHeroImagePreview(null);
+  document.getElementById('heroImageInput').value = '';
+  document.getElementById('heroImageStatus').textContent = 'Imagen quitada — recuerda hacer clic en "Guardar configuración".';
+}
+
 async function saveSorteoConfig() {
   if (!window.__selectedVehicleId) { alert('Elige el vehículo que se va a sortear.'); return; }
   const nombre = document.getElementById('sorteoNombre').value.trim();
@@ -734,7 +790,8 @@ async function saveSorteoConfig() {
     meta_minima_stickers: parseInt(document.getElementById('sorteoMetaMinima').value, 10) || 6500,
     total_stickers_emitidos: parseInt(document.getElementById('sorteoTotalEmitidos').value, 10) || 10000,
     extensiones_realizadas: parseInt(document.getElementById('sorteoExtensiones').value, 10) || 0,
-    ventana_reembolso_abierta: document.getElementById('sorteoVentanaReembolso').checked
+    ventana_reembolso_abierta: document.getElementById('sorteoVentanaReembolso').checked,
+    hero_imagen_url: window.__heroImagenUrl || null
   };
   try {
     if (window.__sorteoId) {
