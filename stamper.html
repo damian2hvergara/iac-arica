@@ -89,9 +89,20 @@ main{padding-top:56px}
 
 /* Countdown */
 .countdown{display:flex;justify-content:center;gap:10px;margin:28px 0 6px}
-.cd-box{background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-sm);padding:12px 15px;min-width:64px;text-align:center}
-.cd-box .n{font-family:var(--font-h);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}
-.cd-box .l{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.cd-box{
+  background:linear-gradient(160deg,var(--surface-2),var(--surface));
+  border:1px solid rgba(233,200,118,0.35);
+  border-radius:var(--r-sm);padding:14px 16px;min-width:68px;text-align:center;
+  box-shadow:0 0 0 1px rgba(233,200,118,0.12),0 0 18px rgba(155,0,0,0.45),0 0 34px rgba(155,0,0,0.22),inset 0 0 12px rgba(155,0,0,0.08);
+  animation:cdGlow 2.4s ease-in-out infinite;
+}
+.cd-box .n{font-family:var(--font-h);font-size:28px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--gold-hi);text-shadow:0 0 10px rgba(233,200,118,0.5),0 0 22px rgba(155,0,0,0.35)}
+.cd-box .l{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px}
+@keyframes cdGlow{
+  0%,100%{box-shadow:0 0 0 1px rgba(233,200,118,0.12),0 0 18px rgba(155,0,0,0.45),0 0 34px rgba(155,0,0,0.22),inset 0 0 12px rgba(155,0,0,0.08)}
+  50%{box-shadow:0 0 0 1px rgba(233,200,118,0.28),0 0 26px rgba(155,0,0,0.65),0 0 48px rgba(155,0,0,0.4),inset 0 0 16px rgba(155,0,0,0.14)}
+}
+@media(prefers-reduced-motion:reduce){.cd-box{animation:none}}
 .cd-caption{text-align:center;color:var(--muted);font-size:12.5px;margin-top:10px}
 
 /* Section label */
@@ -174,7 +185,15 @@ main{padding-top:56px}
 .plate[data-tier="bronce"]{background:linear-gradient(155deg,var(--bronze-hi),#5e3c1e 60%,var(--bronze))}
 .plate[data-tier="plata"]{background:linear-gradient(155deg,var(--silver-hi),#7d838a 60%,var(--silver))}
 .plate[data-tier="oro"]{background:linear-gradient(155deg,var(--gold-hi),#8a6a20 55%,var(--gold))}
-.plate.selected{box-shadow:0 0 0 2px var(--red-hi),0 8px 28px rgba(155,0,0,0.3)}
+.plate.selected{
+  box-shadow:0 0 0 2px var(--gold-hi),0 0 20px rgba(233,200,118,0.55),0 0 40px rgba(155,0,0,0.5),0 10px 30px rgba(155,0,0,0.35);
+  animation:plateGlow 1.8s ease-in-out infinite;
+}
+@keyframes plateGlow{
+  0%,100%{box-shadow:0 0 0 2px var(--gold-hi),0 0 20px rgba(233,200,118,0.55),0 0 40px rgba(155,0,0,0.5),0 10px 30px rgba(155,0,0,0.35)}
+  50%{box-shadow:0 0 0 2px var(--red-hi),0 0 30px rgba(233,200,118,0.75),0 0 55px rgba(155,0,0,0.7),0 10px 34px rgba(155,0,0,0.45)}
+}
+@media(prefers-reduced-motion:reduce){.plate.selected{animation:none}}
 .plate-face{position:relative;border-radius:15px;overflow:hidden;background:linear-gradient(200deg,rgba(255,255,255,0.06),transparent 40%),var(--surface);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.05)}
 .plate-face::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(360px circle at var(--mx) var(--my),rgba(255,255,255,0.22),rgba(255,255,255,0.05) 30%,transparent 60%);mix-blend-mode:overlay;opacity:0;transition:opacity .3s}
 .plate:hover .plate-face::after,.plate.selected .plate-face::after{opacity:1}
