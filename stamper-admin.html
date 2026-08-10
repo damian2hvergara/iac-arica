@@ -216,17 +216,6 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
           <div class="field full"><label>Texto de disclosure Zona Franca (se muestra junto al premio)</label><textarea id="sorteoZonaFranca"></textarea></div>
         </div>
         <hr style="border-color:var(--border);margin:18px 0">
-        <h2 style="margin-bottom:10px">Datos bancarios para transferencia</h2>
-        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">Esto es lo que ve el comprador en la pantalla de "pago pendiente" — ya no hay que tocar código para cambiarlo.</p>
-        <div class="form-grid">
-          <div class="field"><label>Nombre del titular</label><input id="bancoNombreTitular" placeholder="CV North Capital SpA"></div>
-          <div class="field"><label>RUT del titular</label><input id="bancoRutTitular" placeholder="78.375.615-3"></div>
-          <div class="field"><label>Banco</label><input id="bancoNombre" placeholder="Banco Estado"></div>
-          <div class="field"><label>Tipo de cuenta</label><input id="bancoTipoCuenta" placeholder="Cuenta Corriente"></div>
-          <div class="field"><label>Número de cuenta</label><input id="bancoNumeroCuenta" placeholder="00000000"></div>
-          <div class="field"><label>Email de contacto para pagos</label><input id="bancoEmail" placeholder="contacto@importamericancars.cl"></div>
-        </div>
-        <hr style="border-color:var(--border);margin:18px 0">
         <div class="form-grid">
           <div class="field"><label>Meta mínima de stickers (interno — nunca público)</label><input type="number" id="sorteoMetaMinima"></div>
           <div class="field"><label>Total emitidos (interno — nunca público)</label><input type="number" id="sorteoTotalEmitidos"></div>
@@ -548,12 +537,6 @@ async function loadSorteoConfig() {
     document.getElementById('sorteoBasesUrl').value = s.bases_url || '';
     document.getElementById('sorteoDesc').value = s.descripcion || '';
     document.getElementById('sorteoZonaFranca').value = s.zona_franca_texto || '';
-    document.getElementById('bancoNombreTitular').value = s.banco_nombre_titular || 'CV North Capital SpA';
-    document.getElementById('bancoRutTitular').value = s.banco_rut_titular || '78.375.615-3';
-    document.getElementById('bancoNombre').value = s.banco_nombre || '';
-    document.getElementById('bancoTipoCuenta').value = s.banco_tipo_cuenta || '';
-    document.getElementById('bancoNumeroCuenta').value = s.banco_numero_cuenta || '';
-    document.getElementById('bancoEmail').value = s.banco_email || 'contacto@importamericancars.cl';
     document.getElementById('sorteoMetaMinima').value = s.meta_minima_stickers || 6500;
     document.getElementById('sorteoTotalEmitidos').value = s.total_stickers_emitidos || 10000;
     document.getElementById('sorteoExtensiones').value = s.extensiones_realizadas || 0;
@@ -574,12 +557,6 @@ async function saveSorteoConfig() {
     bases_url: document.getElementById('sorteoBasesUrl').value.trim() || null,
     descripcion: document.getElementById('sorteoDesc').value.trim() || null,
     zona_franca_texto: document.getElementById('sorteoZonaFranca').value.trim() || null,
-    banco_nombre_titular: document.getElementById('bancoNombreTitular').value.trim() || null,
-    banco_rut_titular: document.getElementById('bancoRutTitular').value.trim() || null,
-    banco_nombre: document.getElementById('bancoNombre').value.trim() || null,
-    banco_tipo_cuenta: document.getElementById('bancoTipoCuenta').value.trim() || null,
-    banco_numero_cuenta: document.getElementById('bancoNumeroCuenta').value.trim() || null,
-    banco_email: document.getElementById('bancoEmail').value.trim() || null,
     meta_minima_stickers: parseInt(document.getElementById('sorteoMetaMinima').value, 10) || 6500,
     total_stickers_emitidos: parseInt(document.getElementById('sorteoTotalEmitidos').value, 10) || 10000,
     extensiones_realizadas: parseInt(document.getElementById('sorteoExtensiones').value, 10) || 0,

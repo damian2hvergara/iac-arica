@@ -182,6 +182,7 @@ main{padding-top:56px}
 .form-err{color:var(--danger);font-size:12.5px;margin-top:10px;text-align:center}
 
 .pending-icon{width:56px;height:56px;border-radius:50%;background:rgba(245,158,11,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--orange);margin:0 auto 14px}
+.success-icon{width:56px;height:56px;border-radius:50%;background:rgba(0,197,102,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--green);margin:0 auto 14px}
 .ref-box{background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;padding:14px 16px;text-align:center;margin:16px 0}
 .ref-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .ref-box .code{font-family:var(--font-mono);font-size:19px;font-weight:700;color:var(--gold-hi);margin-top:4px;word-break:break-all}
@@ -189,6 +190,15 @@ main{padding-top:56px}
 .bank-list b{color:var(--muted);font-weight:600}
 .share-row{display:flex;gap:8px;margin-top:16px}
 .share-btn{flex:1;padding:11px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:8px;font-size:12.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+
+/* Estampillas confirmadas (pantalla de éxito) */
+.stamp-cards{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.stamp-card-mini{display:flex;gap:12px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;padding:10px;align-items:center}
+.stamp-card-mini img{width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--surface)}
+.stamp-card-mini .body{flex:1;min-width:0}
+.stamp-card-mini .folio{font-family:var(--font-mono);font-weight:700;color:var(--gold-hi);font-size:14px}
+.stamp-card-mini .part{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.stamp-card-mini .bonus-tag{font-size:9.5px;color:var(--green);text-transform:uppercase;font-weight:700;margin-left:6px}
 
 /* Lightbox */
 .lightbox{display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:20px}
@@ -333,25 +343,20 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <div class="summary-row"><span>Stickers</span><span id="sumQty">—</span></div>
     <div class="summary-row total"><span>Total</span><span id="sumTotal">—</span></div>
 
-    <button class="submit-btn" id="submitBtn" onclick="submitOrder()">Generar orden de compra</button>
+    <button class="submit-btn" id="submitBtn" onclick="submitOrder()"><i class="fas fa-lock"></i> Pagar con Flow</button>
     <div class="form-err" id="formErr"></div>
   </div>
 </div>
 
-<!-- ===== PENDIENTE (post-checkout, transferencia) ===== -->
-<div class="overlay" id="pendingOverlay">
+<!-- ===== ÉXITO (pago confirmado) ===== -->
+<div class="overlay" id="successOverlay">
   <div class="sheet">
-    <button class="sheet-close" onclick="closePending()"><i class="fas fa-times"></i></button>
-    <div class="pending-icon"><i class="fas fa-clock"></i></div>
-    <h2 style="text-align:center">Falta tu transferencia</h2>
-    <p class="sub" style="text-align:center">Tu Sticker Digital se activa apenas confirmemos el pago (máx. 24 horas hábiles).</p>
+    <button class="sheet-close" onclick="closeSuccess()"><i class="fas fa-times"></i></button>
+    <div class="success-icon"><i class="fas fa-check"></i></div>
+    <h2 style="text-align:center">¡Listo! Pago confirmado</h2>
+    <p class="sub" style="text-align:center">Te enviamos un correo con el detalle. Aquí están tus estampillas numeradas:</p>
 
-    <div class="ref-box">
-      <div class="lbl">Referencia de tu pedido</div>
-      <div class="code" id="pendRef">—</div>
-    </div>
-
-    <ul class="bank-list" id="bankList"></ul>
+    <div class="stamp-cards" id="stampCards"></div>
 
     <div class="ref-box">
       <div class="lbl">Tu código de referido — invita y gana 1 estampilla extra</div>
@@ -372,6 +377,12 @@ let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
 let galleryImages = [], galleryIndex = 0;
 
+// Único método de pago: Flow.cl. Mientras no esté conectado, se simula
+// una confirmación instantánea (ver confirmar_orden_simulado en Supabase).
+// Cuando se conecte Flow de verdad: cambiar a 'live' e implementar
+// initFlowPayment() para redirigir al checkout real de Flow.
+const FLOW_MODE = 'simulation';
+
 document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
   document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
@@ -383,7 +394,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderHero();
     renderZonaFranca();
     renderRefundBanner();
-    renderBankDetails();
     startCountdown();
 
     if (sorteo.vehicle_id) {
@@ -486,17 +496,6 @@ function renderZonaFranca() {
 }
 function renderRefundBanner() {
   if (sorteo.ventana_reembolso_abierta) document.getElementById('refundBanner').style.display = 'block';
-}
-function renderBankDetails() {
-  const items = [
-    ['Titular', sorteo.banco_nombre_titular || 'CV North Capital SpA'],
-    ['Banco', sorteo.banco_nombre || 'Por confirmar'],
-    ['Tipo de cuenta', sorteo.banco_tipo_cuenta || 'Por confirmar'],
-    ['Cuenta', sorteo.banco_numero_cuenta || 'Por confirmar'],
-    ['RUT', sorteo.banco_rut_titular || '78.375.615-3'],
-    ['Email', sorteo.banco_email || CONTACT_CONFIG.email],
-  ];
-  window.__bankItems = items;
 }
 
 /* ---------- Countdown ---------- */
@@ -614,7 +613,7 @@ function openCheckout() {
   document.getElementById('checkoutOverlay').classList.add('show');
 }
 function closeCheckout() { document.getElementById('checkoutOverlay').classList.remove('show'); }
-function closePending() { document.getElementById('pendingOverlay').classList.remove('show'); }
+function closeSuccess() { document.getElementById('successOverlay').classList.remove('show'); }
 
 async function submitOrder() {
   const nombre = document.getElementById('inNombre').value.trim();
@@ -631,34 +630,50 @@ async function submitOrder() {
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Generando orden…';
+  btn.textContent = 'Procesando pago…';
 
   try {
     const referidoPor = sessionStorage.getItem('iac_ref') || null;
     const orden = await stamperAPI.crearOrdenPendiente({
       nombre, email, telefono, rutPasaporte: rut, packSlug: selectedPack.slug, referidoPor
     });
-    closeCheckout();
-    showPending(orden);
+
+    if (FLOW_MODE === 'simulation') {
+      const folios = await stamperAPI.confirmarOrdenSimulado(orden.orden_id);
+      closeCheckout();
+      showSuccess(orden, folios, { nombre, email });
+      sendConfirmationEmailPublic(orden, folios, nombre, email).catch(e => console.warn('Email:', e));
+    } else {
+      await initFlowPayment(orden);
+    }
   } catch (e) {
-    errEl.textContent = 'No pudimos generar tu orden. Intenta de nuevo o escríbenos por WhatsApp.';
+    errEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
     console.error(e);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Generar orden de compra';
+    btn.textContent = 'Pagar con Flow';
   }
 }
 
-function showPending(orden) {
-  document.getElementById('pendRef').textContent = orden.referencia;
+// Hook para cuando se conecte Flow.cl de verdad: crear el pago en Flow,
+// redirigir al checkout de Flow, y dejar que el webhook confirme la orden.
+async function initFlowPayment(orden) {
+  showToast('🔧 Conecta tu cuenta Flow.cl para activar pagos reales.');
+}
 
-  const items = (window.__bankItems || []).concat([
-    ['Monto exacto', '$' + Number(orden.monto_total).toLocaleString('es-CL')],
-    ['Glosa/Comentario', orden.referencia],
-  ]);
-  document.getElementById('bankList').innerHTML = items.map(([k, v]) =>
-    `<li><b>${escapeHtml(k)}:</b> ${escapeHtml(v)}</li>`
-  ).join('');
+function showSuccess(orden, folios, comprador) {
+  const images = galleryImages.map((url, idx) => ({ image_url: url, order_index: idx }));
+  document.getElementById('stampCards').innerHTML = folios.map((f, i) => {
+    const img = images.length ? pickStickerImage(images, f.numero_folio) : null;
+    return `
+    <div class="stamp-card-mini">
+      ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(vehicle?.name || 'tu premio')}">` : ''}
+      <div class="body">
+        <div class="folio">${escapeHtml(f.numero_folio)}</div>
+        <div class="part">Participación #${i + 1}${f.es_bonus ? '<span class="bonus-tag">Bono referido</span>' : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
 
   document.getElementById('pendRefCode').textContent = orden.codigo_referido;
 
@@ -667,7 +682,34 @@ function showPending(orden) {
     `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
   window.__shareUrl = shareUrl;
 
-  document.getElementById('pendingOverlay').classList.add('show');
+  document.getElementById('successOverlay').classList.add('show');
+}
+
+async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
+  const fechaStr = sorteo?.fecha_sorteo
+    ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
+    : 'Por confirmar';
+  const images = galleryImages.map((url, idx) => ({ image_url: url, order_index: idx }));
+  const vehicleImg = galleryImages[0] || null;
+
+  const estampillasConFoto = folios.map(f => ({
+    folio: f.numero_folio,
+    hash: f.hash_seguridad,
+    imagenUrl: images.length ? pickStickerImage(images, f.numero_folio) : vehicleImg
+  }));
+
+  await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+    body: JSON.stringify({
+      nombre, email,
+      estampillas: estampillasConFoto,
+      vehicleName: vehicle?.name || 'Vehículo',
+      vehicleImg, fechaSorteo: fechaStr,
+      pack: selectedPack?.nombre || '',
+      monto: orden.monto_total
+    })
+  });
 }
 
 function copyRefLink() {

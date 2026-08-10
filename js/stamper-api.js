@@ -95,6 +95,20 @@ class StamperAPI {
         }
     }
 
+    // Confirmación simulada de pago Flow — solo mientras Flow.cl no está
+    // conectado de verdad (ver supabase/migrations/2026_sorteo_rebuild_part3.sql).
+    async confirmarOrdenSimulado(ordenId) {
+        try {
+            const { data, error } = await this.client
+                .rpc('confirmar_orden_simulado', { p_orden_id: ordenId });
+            if (error) throw error;
+            return data; // [{numero_folio, hash_seguridad, orden_en_pack}, ...]
+        } catch (error) {
+            console.error('Error confirmarOrdenSimulado:', error);
+            throw error;
+        }
+    }
+
     // ====================================
     // ADMIN — requiere sesión autenticada
     // ====================================
