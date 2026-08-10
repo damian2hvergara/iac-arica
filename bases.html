@@ -22,6 +22,8 @@ h1{font-family:var(--font-h);font-size:clamp(26px,5vw,36px);text-transform:upper
 .subtitle{text-align:center;color:var(--muted);font-size:13.5px;margin-top:10px}
 .comparecencia{margin-top:28px;padding:18px 20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;font-size:14px;color:var(--muted)}
 .comparecencia b{color:var(--text)}
+.pdf-download{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:16px;padding:13px 18px;background:rgba(233,200,118,0.1);border:1px solid rgba(233,200,118,0.35);border-radius:12px;color:var(--gold);font-size:13.5px;font-weight:600}
+.pdf-download:hover{background:rgba(233,200,118,0.16)}
 article section{margin-top:34px;scroll-margin-top:70px}
 h2{font-family:var(--font-h);font-size:19px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;letter-spacing:.3px}
 p{margin-bottom:12px}
@@ -53,6 +55,10 @@ p{margin-bottom:12px}
     persona natural que adquiera uno o más Stickers Digitales en el sitio web iac-arica.cl, y que por
     ese solo hecho declara conocer y aceptar íntegramente las presentes bases.
   </div>
+
+  <a class="pdf-download" id="pdfDownloadLink" href="#" target="_blank" style="display:none">
+    <i class="fas fa-file-pdf"></i> Descargar el documento original firmado (PDF)
+  </a>
 
   <div class="jump">
     <a href="#primero">1. Definiciones</a>
@@ -176,5 +182,23 @@ p{margin-bottom:12px}
     Organizador
   </div>
 </div>
+
+<script src="js/config.js"></script>
+<script src="js/stamper-api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    stamperAPI.init();
+    const sorteo = await stamperAPI.getSorteoPublico();
+    if (sorteo && sorteo.bases_url) {
+      const link = document.getElementById('pdfDownloadLink');
+      link.href = sorteo.bases_url;
+      link.style.display = 'flex';
+    }
+  } catch (e) {
+    console.error('Error cargando link de bases:', e);
+  }
+});
+</script>
 </body>
 </html>
