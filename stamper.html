@@ -578,7 +578,9 @@ function renderPacks() {
   const sorted = packs.slice().sort((a, b) => (a.precio_total / a.cantidad_stickers) - (b.precio_total / b.cantidad_stickers));
 
   grid.innerHTML = sorted.map((p, i) => {
-    const tier = tierForIndex(i, sorted.length);
+    const tier = (p.rareza === 'bronce' || p.rareza === 'plata' || p.rareza === 'oro')
+      ? p.rareza
+      : tierForIndex(i, sorted.length);
     const img = galleryImages.length ? pickStickerImage(
       galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), p.slug
     ) : null;

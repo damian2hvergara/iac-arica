@@ -198,6 +198,15 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
           <div class="field"><label>Cantidad de estampillas</label><input type="number" id="packCantidad" min="1"></div>
           <div class="field"><label>Precio total (CLP)</label><input type="number" id="packPrecio" min="0"></div>
           <div class="field"><label>Orden de aparición</label><input type="number" id="packOrden" value="0"></div>
+          <div class="field">
+            <label>Rareza (placa)</label>
+            <select id="packRareza" style="width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)">
+              <option value="">Automático (por precio)</option>
+              <option value="bronce">Bronce</option>
+              <option value="plata">Plata</option>
+              <option value="oro">Oro</option>
+            </select>
+          </div>
           <div class="field"><label class="toggle"><input type="checkbox" id="packDestacado"> Destacado ("más elegido")</label></div>
           <div class="field"><label class="toggle"><input type="checkbox" id="packActivo" checked> Activo</label></div>
         </div>
@@ -465,7 +474,7 @@ async function loadPacks() {
     list.innerHTML = packs.map(p => `
       <div class="pack-row">
         <div>
-          <div class="name">${escapeHtml(p.nombre)} ${p.destacado ? '<span class="pill pill-ok">Destacado</span>' : ''} ${!p.activo ? '<span class="pill pill-rej">Inactivo</span>' : ''}</div>
+          <div class="name">${escapeHtml(p.nombre)} ${p.rareza ? `<span class="pill pill-pend">${escapeHtml(p.rareza)}</span>` : ''} ${p.destacado ? '<span class="pill pill-ok">Destacado</span>' : ''} ${!p.activo ? '<span class="pill pill-rej">Inactivo</span>' : ''}</div>
           <div class="meta">${p.cantidad_stickers} estampillas · $${p.precio_total.toLocaleString('es-CL')} total · $${Math.round(p.precio_total/p.cantidad_stickers).toLocaleString('es-CL')}/u</div>
         </div>
         <button class="btn btn-ghost btn-sm" data-edit="${p.id}">Editar</button>
@@ -487,6 +496,7 @@ function editPack(p) {
   document.getElementById('packCantidad').value = p.cantidad_stickers;
   document.getElementById('packPrecio').value = p.precio_total;
   document.getElementById('packOrden').value = p.orden;
+  document.getElementById('packRareza').value = p.rareza || '';
   document.getElementById('packDestacado').checked = p.destacado;
   document.getElementById('packActivo').checked = p.activo;
 }
@@ -495,6 +505,7 @@ function resetPackForm() {
   document.getElementById('packFormTitle').textContent = 'Nuevo pack';
   ['packId','packSlug','packNombre','packCantidad','packPrecio'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('packOrden').value = 0;
+  document.getElementById('packRareza').value = '';
   document.getElementById('packDestacado').checked = false;
   document.getElementById('packActivo').checked = true;
   document.getElementById('packFloorWarn').style.display = 'none';
@@ -520,6 +531,7 @@ async function savePackForm() {
     cantidad_stickers: cantidad,
     precio_total: precio,
     orden: parseInt(document.getElementById('packOrden').value, 10) || 0,
+    rareza: document.getElementById('packRareza').value || null,
     destacado: document.getElementById('packDestacado').checked,
     activo: document.getElementById('packActivo').checked
   };
