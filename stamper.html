@@ -565,9 +565,9 @@ function renderPacks() {
     const tier = (p.rareza === 'bronce' || p.rareza === 'plata' || p.rareza === 'oro')
       ? p.rareza
       : tierForIndex(i, sorted.length);
-    const img = galleryImages.length ? pickStickerImage(
+    const img = p.imagen_url || (galleryImages.length ? pickStickerImage(
       galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), i
-    ) : null;
+    ) : null);
     return `
     <div class="plate" data-tier="${tier}" data-slug="${escapeHtml(p.slug)}">
       <div class="plate-face">

@@ -94,6 +94,10 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 .vehicle-pick .vp-name{font-weight:600;font-size:13px}
 .vehicle-pick .vp-price{color:var(--gold);font-size:12px;margin-top:2px}
 
+.img-pick{border-radius:10px;overflow:hidden;border:3px solid var(--border-hi);cursor:pointer;transition:border-color .15s}
+.img-pick.selected{border-color:var(--red)}
+.img-pick img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+
 @media(max-width:640px){
   main{padding:14px}
   .kpi .val{font-size:21px}
@@ -210,6 +214,16 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
           <div class="field"><label class="toggle"><input type="checkbox" id="packDestacado"> Destacado ("más elegido")</label></div>
           <div class="field"><label class="toggle"><input type="checkbox" id="packActivo" checked> Activo</label></div>
         </div>
+
+        <div style="margin-top:16px">
+          <label style="display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">
+            Foto de portada (opcional — si no eliges ninguna, se asigna automático)
+          </label>
+          <div id="packImagePicker" class="form-grid"></div>
+          <div class="empty" id="packImagePickerEmpty" style="display:none">Elige primero el vehículo del sorteo en "Configuración Sorteo".</div>
+          <button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="selectPackImage(null)">Quitar selección (automático)</button>
+        </div>
+
         <div class="floor-warn" id="packFloorWarn" style="display:none"></div>
         <div style="margin-top:14px;display:flex;gap:10px">
           <button class="btn btn-primary" onclick="savePackForm()"><i class="fas fa-save"></i> Guardar</button>
@@ -473,6 +487,7 @@ async function loadPacks() {
     const list = document.getElementById('packsList');
     list.innerHTML = packs.map(p => `
       <div class="pack-row">
+        ${p.imagen_url ? `<img src="${p.imagen_url}" alt="" style="width:52px;height:38px;object-fit:cover;border-radius:6px;flex-shrink:0">` : ''}
         <div>
           <div class="name">${escapeHtml(p.nombre)} ${p.rareza ? `<span class="pill pill-pend">${escapeHtml(p.rareza)}</span>` : ''} ${p.destacado ? '<span class="pill pill-ok">Destacado</span>' : ''} ${!p.activo ? '<span class="pill pill-rej">Inactivo</span>' : ''}</div>
           <div class="meta">${p.cantidad_stickers} estampillas · $${p.precio_total.toLocaleString('es-CL')} total · $${Math.round(p.precio_total/p.cantidad_stickers).toLocaleString('es-CL')}/u</div>
@@ -486,6 +501,39 @@ async function loadPacks() {
   } catch (e) {
     console.error(e);
   }
+  await loadPackImagePicker();
+}
+
+async function loadPackImagePicker() {
+  const grid = document.getElementById('packImagePicker');
+  const empty = document.getElementById('packImagePickerEmpty');
+  try {
+    const sorteo = await stamperAPI.getSorteoConfigAdmin();
+    const images = (sorteo?.vehicles?.vehicle_images || []).slice().sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+    if (!images.length) {
+      grid.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    grid.innerHTML = images.map(img => `
+      <div class="img-pick ${img.image_url === window.__packImagenUrl ? 'selected' : ''}" data-url="${escapeHtml(img.image_url)}">
+        <img src="${img.image_url}" alt="">
+      </div>
+    `).join('');
+    grid.querySelectorAll('.img-pick').forEach(el =>
+      el.addEventListener('click', () => selectPackImage(el.dataset.url)));
+  } catch (e) {
+    console.error(e);
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+  }
+}
+
+function selectPackImage(url) {
+  window.__packImagenUrl = url || null;
+  document.querySelectorAll('.img-pick').forEach(el =>
+    el.classList.toggle('selected', el.dataset.url === url));
 }
 
 function editPack(p) {
@@ -499,6 +547,7 @@ function editPack(p) {
   document.getElementById('packRareza').value = p.rareza || '';
   document.getElementById('packDestacado').checked = p.destacado;
   document.getElementById('packActivo').checked = p.activo;
+  selectPackImage(p.imagen_url || null);
 }
 
 function resetPackForm() {
@@ -509,6 +558,7 @@ function resetPackForm() {
   document.getElementById('packDestacado').checked = false;
   document.getElementById('packActivo').checked = true;
   document.getElementById('packFloorWarn').style.display = 'none';
+  selectPackImage(null);
 }
 
 async function savePackForm() {
@@ -532,6 +582,7 @@ async function savePackForm() {
     precio_total: precio,
     orden: parseInt(document.getElementById('packOrden').value, 10) || 0,
     rareza: document.getElementById('packRareza').value || null,
+    imagen_url: window.__packImagenUrl || null,
     destacado: document.getElementById('packDestacado').checked,
     activo: document.getElementById('packActivo').checked
   };
