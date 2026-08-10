@@ -193,6 +193,28 @@ main{padding-top:56px}
 .plate-price{font-family:var(--font-h);font-size:20px;font-weight:700}
 .plate-per{font-size:9px;color:var(--muted);font-family:var(--font-mono);text-transform:uppercase}
 
+/* En celular: grilla 2x2 en vez de una placa por fila, para que se
+   vea como una colección completa de un vistazo. */
+@media(max-width:600px){
+  .packs-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .plate{border-radius:13px}
+  .plate-face{border-radius:12px}
+  .plate-top{padding:9px 9px 0}
+  .plate-locale{font-size:7.5px;letter-spacing:1.2px}
+  .rarity{font-size:7.5px;padding:2px 6px;letter-spacing:.8px}
+  .plate-badge{font-size:7.5px;padding:3px 7px;top:7px;right:7px;letter-spacing:.2px}
+  .plate-name{font-size:12.5px;padding:8px 8px 0;line-height:1.15}
+  .plate-sub{font-size:8.5px;margin-top:1px}
+  .plate-bottom{padding:8px 9px 10px;gap:5px}
+  .plate-price-row{padding-top:6px}
+  .plate-price{font-size:15px}
+  .plate-per{font-size:7px}
+}
+@media(max-width:360px){
+  .packs-grid{gap:8px}
+  .plate-price{font-size:13.5px}
+}
+
 .buy-cta{display:block;width:100%;max-width:380px;margin:26px auto 0;padding:16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;box-shadow:0 8px 24px rgba(155,0,0,0.35)}
 .buy-cta:disabled{opacity:.5;box-shadow:none}
 
