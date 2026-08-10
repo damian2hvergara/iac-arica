@@ -35,7 +35,7 @@ Deno.serve(async (req: Request) => {
     return new Response('Invalid JSON', { status: 400, headers: corsHeaders });
   }
 
-  const { nombre, email, estampillas, vehicleName, vehicleImg, fechaSorteo, pack, monto } = body;
+  const { nombre, email, estampillas, vehicleName, vehicleImg, fechaSorteo, pack, monto, codigoReferido } = body;
 
   if (!email || !nombre || !estampillas?.length) {
     return new Response('Faltan datos', { status: 400, headers: corsHeaders });
@@ -45,11 +45,12 @@ Deno.serve(async (req: Request) => {
   const RESEND_FROM    = Deno.env.get('RESEND_FROM') ?? 'noreply@iac-arica.cl';
   const packLabel      = PACK_LABELS[pack] ?? pack;
   const montoStr       = Number(monto).toLocaleString('es-CL');
+  const refLink         = codigoReferido ? `https://iac-arica.cl/stamper.html?ref=${encodeURIComponent(codigoReferido)}` : null;
 
   const wspMsg = encodeURIComponent(
     `🏆 ¡Estoy participando en el sorteo del ${vehicleName} de @importamericancars!\n\n` +
     `Mis folios:\n${estampillas.map((e: any) => `  · ${e.folio}`).join('\n')}\n\n` +
-    `¡Consigue los tuyos → iac-arica.cl/stamper.html 🚗`
+    `¡Consigue los tuyos → ${refLink || 'iac-arica.cl/stamper.html'} 🚗`
   );
 
   const stampCards = estampillas.map((e: any, i: number) => `
@@ -120,6 +121,16 @@ Deno.serve(async (req: Request) => {
     <p style="font-size:13px;color:#6E6E6E;margin:0 0 14px;">Comparte tu participación con tus amigos 👇</p>
     <a href="https://wa.me/?text=${wspMsg}" style="display:inline-block;background:#25D366;color:#000;font-family:'Arial Black',sans-serif;font-size:15px;font-weight:900;padding:14px 28px;border-radius:999px;text-decoration:none;">💬 Compartir en WhatsApp</a>
   </td></tr>
+  ${refLink ? `
+  <tr><td style="background:#161616;border-left:1px solid #2a2a2a;border-right:1px solid #2a2a2a;padding:0 20px 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(233,200,118,0.08);border:1px solid rgba(233,200,118,0.3);border-radius:10px;padding:16px;">
+      <tr><td style="text-align:center;">
+        <p style="font-family:'Arial Black',sans-serif;font-size:13px;font-weight:900;color:#F0D080;margin:0 0 6px;text-transform:uppercase;">🎁 Invita y gana</p>
+        <p style="font-size:12.5px;color:#F2F2F2;margin:0 0 12px;line-height:1.5;">Cada 4 estampillas que tus amigos compren con tu link, ganas 1 estampilla gratis. Guarda este correo — tu link para referir siempre es este:</p>
+        <a href="${refLink}" style="display:inline-block;background:#202020;border:1px solid #2a2a2a;border-radius:8px;padding:10px 16px;font-family:monospace;font-size:12px;color:#F0D080;text-decoration:none;word-break:break-all;">${refLink}</a>
+      </td></tr>
+    </table>
+  </td></tr>` : ''}
   <tr><td style="background:#161616;border:1px solid #2a2a2a;border-radius:0 0 16px 16px;padding:20px 28px;text-align:center;">
     <p style="font-family:'Arial Black',sans-serif;font-size:16px;font-weight:900;color:#fff;margin:0 0 6px;"><span style="color:#9B0000;">Import</span> American Cars</p>
     <p style="font-size:11px;color:#3E3E3E;margin:0;line-height:1.8;">

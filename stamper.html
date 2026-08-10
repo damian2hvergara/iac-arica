@@ -726,7 +726,8 @@ async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
       vehicleName: vehicle?.name || 'Vehículo',
       vehicleImg, fechaSorteo: fechaStr,
       pack: selectedPack?.nombre || '',
-      monto: orden.monto_total
+      monto: orden.monto_total,
+      codigoReferido: orden.codigo_referido
     })
   });
 }

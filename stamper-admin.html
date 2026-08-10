@@ -495,7 +495,8 @@ async function enviarCorreoConfirmacion(orden, folios) {
         estampillas: estampillasConFoto,
         vehicleName, vehicleImg, fechaSorteo: fechaStr,
         pack: orden.packs_config?.nombre || '',
-        monto: orden.monto_total
+        monto: orden.monto_total,
+        codigoReferido: orden.codigo_referido
       })
     });
   } catch (e) {
