@@ -390,6 +390,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
 
   storeReferralFromUrl();
+  checkFlowReturn();
 
   try {
     sorteo = await stamperAPI.getSorteoPublico();
@@ -677,7 +678,60 @@ async function submitOrder() {
 // Hook para cuando se conecte Flow.cl de verdad: crear el pago en Flow,
 // redirigir al checkout de Flow, y dejar que el webhook confirme la orden.
 async function initFlowPayment(orden) {
-  showToast('🔧 Conecta tu cuenta Flow.cl para activar pagos reales.');
+  try {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/flow-create-payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+      body: JSON.stringify({ ordenId: orden.orden_id })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.redirectUrl) {
+      throw new Error(data.error || 'No se pudo iniciar el pago con Flow.');
+    }
+    window.location.href = data.redirectUrl;
+  } catch (e) {
+    console.error(e);
+    document.getElementById('formErr').textContent = 'No se pudo conectar con Flow. Intenta de nuevo o escríbenos por WhatsApp.';
+  }
+}
+
+// El comprador vuelve aquí después de pagar en Flow (urlReturn).
+// Como el webhook de Flow puede tardar unos segundos más que la
+// redirección, se consulta el estado cada 2s hasta confirmar.
+async function checkFlowReturn() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('flow_return') !== '1') return;
+  const ordenId = params.get('orden');
+  if (!ordenId) return;
+
+  document.getElementById('noSorteoCard').style.display = 'none';
+  const overlay = document.getElementById('successOverlay');
+  document.getElementById('stampCards').innerHTML = '<p style="text-align:center;color:var(--muted)">Verificando tu pago con Flow…</p>';
+  document.getElementById('pendRefCode').textContent = '—';
+  overlay.classList.add('show');
+
+  const maxIntentos = 20; // ~40 segundos
+  for (let i = 0; i < maxIntentos; i++) {
+    try {
+      const estado = await stamperAPI.estadoOrdenPublico(ordenId);
+      if (estado?.estado === 'completado') {
+        document.getElementById('stampCards').innerHTML =
+          '<p style="text-align:center;color:var(--green);font-weight:700">✅ ¡Pago confirmado! Revisa tu correo para ver tus estampillas numeradas.</p>' +
+          '<p style="text-align:center;color:var(--muted);font-size:12.5px;margin-top:8px">También puedes verlas en <a href="mi-cuenta.html" style="color:var(--gold-hi)">Mis Stickers</a>.</p>';
+        return;
+      }
+      if (estado?.estado === 'rechazado') {
+        document.getElementById('stampCards').innerHTML =
+          '<p style="text-align:center;color:var(--danger)">Tu pago no se pudo confirmar. Si crees que es un error, escríbenos por WhatsApp.</p>';
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  document.getElementById('stampCards').innerHTML =
+    '<p style="text-align:center;color:var(--muted)">Tu pago está tomando más de lo normal en confirmarse. Te avisaremos por correo apenas esté listo — o revisa <a href="mi-cuenta.html" style="color:var(--gold-hi)">Mis Stickers</a> más tarde.</p>';
 }
 
 function showSuccess(orden, folios, comprador) {

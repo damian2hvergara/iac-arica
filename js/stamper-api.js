@@ -90,6 +90,21 @@ class StamperAPI {
         }
     }
 
+    // Estado mínimo de una orden por su UUID — usado en la pantalla de
+    // "verificando tu pago" al volver desde Flow. No requiere email
+    // porque el UUID de la orden no es adivinable.
+    async estadoOrdenPublico(ordenId) {
+        try {
+            const { data, error } = await this.client
+                .rpc('estado_orden_publico', { p_orden_id: ordenId });
+            if (error) throw error;
+            return data && data[0];
+        } catch (error) {
+            console.error('Error estadoOrdenPublico:', error);
+            throw error;
+        }
+    }
+
     async getStickersVendidos(sorteoId = null) {
         try {
             const { data, error } = await this.client
