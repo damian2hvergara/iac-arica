@@ -294,6 +294,18 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 .no-sorteo-card h2{font-family:var(--font-h);font-size:19px;text-transform:uppercase;margin-bottom:8px}
 .no-sorteo-card p{color:var(--muted);font-size:13.5px}
 
+/* Banner de referido personalizado */
+.ref-banner{display:none;max-width:560px;margin:0 auto 18px;background:rgba(233,200,118,0.1);border:1px solid rgba(233,200,118,0.35);border-radius:var(--r-full);padding:9px 18px;text-align:center;font-size:12.5px;color:var(--paper)}
+.ref-banner b{color:var(--gold-hi)}
+
+/* Top referidores */
+.referidores-section{padding:18px 0 2px}
+.referidores-list{display:flex;flex-direction:column;gap:6px;max-width:420px;margin:0 auto}
+.ref-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 14px}
+.ref-row .pos{font-family:var(--font-h);font-weight:800;color:var(--gold-hi);width:20px;text-align:center;font-size:14px}
+.ref-row .nm{flex:1;font-size:12.5px;font-weight:600}
+.ref-row .ct{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+
 .skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);background-size:400% 100%;animation:shimmer 1.4s infinite}
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
 @media(prefers-reduced-motion:reduce){.plate{transition:none}}
@@ -307,6 +319,10 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 </div>
 
 <main>
+  <div class="wrap" style="padding-top:14px">
+    <div class="ref-banner" id="refBanner"></div>
+  </div>
+
   <section class="hero">
     <div class="hero-bg" id="heroBg"></div>
     <div class="wrap">
@@ -459,9 +475,18 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <i class="fas fa-gift"></i>
       <div>
         <div class="t">Invita y gana</div>
-        <div class="d">Comparte tu link después de comprar: por cada 4 estampillas que tus amigos compren con tu código, ganas 1 estampilla extra gratis.</div>
+        <div class="d">Después de comprar te damos un link personal — cada 4 estampillas que tus amigos compren con él, ganas 1 estampilla extra gratis. Es tu propio sistema de referidos.</div>
       </div>
     </div>
+  </section>
+
+  <section class="referidores-section wrap needs-sorteo" id="referidoresSection" style="display:none">
+    <div class="section-label">
+      <h2>Top referidores</h2>
+      <div class="rule"></div>
+      <div class="tag">Invita y gana</div>
+    </div>
+    <div class="referidores-list" id="referidoresList"></div>
   </section>
 
   <footer class="wrap">
@@ -520,13 +545,15 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <div class="stamp-cards" id="stampCards"></div>
 
     <div class="ref-box">
-      <div class="lbl">Tu código de referido — cada 4 estampillas que compren tus amigos, ganas 1 gratis</div>
+      <div class="lbl">👉 Este es tu link personal de referidos</div>
       <div class="code" id="pendRefCode" style="font-size:15px">—</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Compártelo: cada 4 estampillas que tus amigos compren usando este link, ganas 1 estampilla gratis para ti.</div>
     </div>
 
     <div class="share-row">
-      <a class="share-btn" id="shareWaBtn" target="_blank"><i class="fab fa-whatsapp"></i> Compartir</a>
+      <a class="share-btn" id="shareWaBtn" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
       <button class="share-btn" onclick="copyRefLink()"><i class="fas fa-link"></i> Copiar link</button>
+      <button class="share-btn" onclick="shareImage()"><i class="fas fa-image"></i> Imagen</button>
     </div>
   </div>
 </div>
@@ -549,6 +576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
 
   storeReferralFromUrl();
+  renderRefBanner();
   checkFlowReturn();
 
   try {
@@ -582,6 +610,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (e) {
     console.error('Error cargando packs:', e);
   }
+
+  loadTopReferidores();
 });
 
 // La urgencia se comunica solo por tiempo (countdown), nunca mostrando
@@ -600,6 +630,42 @@ function storeReferralFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('ref');
   if (ref) sessionStorage.setItem('iac_ref', ref);
+}
+
+// Si alguien llega por un link de referido, se personaliza el mensaje
+// con el nombre real de quien invitó — aumenta la conversión de ese
+// link y deja claro que comprar ahí también ayuda a esa persona.
+async function renderRefBanner() {
+  const codigo = sessionStorage.getItem('iac_ref');
+  if (!codigo) return;
+  try {
+    const info = await stamperAPI.infoReferido(codigo);
+    if (!info || !info.referente_nombre) return;
+    const primerNombre = info.referente_nombre.trim().split(' ')[0];
+    const banner = document.getElementById('refBanner');
+    banner.innerHTML = `🎉 <b>${escapeHtml(primerNombre)}</b> te invitó a este sorteo — al comprar aquí, también le ayudas a ganar una estampilla gratis.`;
+    banner.style.display = 'block';
+  } catch (e) {
+    console.error('Error cargando banner de referido:', e);
+  }
+}
+
+/* ---------- Top referidores ---------- */
+async function loadTopReferidores() {
+  try {
+    const top = await stamperAPI.topReferidores(5);
+    if (!top.length) return;
+    document.getElementById('referidoresList').innerHTML = top.map((r, i) => `
+      <div class="ref-row">
+        <div class="pos">${i + 1}</div>
+        <div class="nm">${escapeHtml(r.nombre_publico)}</div>
+        <div class="ct">${r.total_referido} referidas</div>
+      </div>
+    `).join('');
+    document.getElementById('referidoresSection').style.display = 'block';
+  } catch (e) {
+    console.error('Error cargando top referidores:', e);
+  }
 }
 
 /* ---------- Hero dinámico (editable desde el admin) ---------- */
@@ -918,8 +984,121 @@ function showSuccess(orden, folios, comprador) {
   document.getElementById('shareWaBtn').href =
     `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
   window.__shareUrl = shareUrl;
+  window.__codigoReferido = orden.codigo_referido;
 
   document.getElementById('successOverlay').classList.add('show');
+}
+
+/* ---------- Imagen para compartir (canvas) ---------- */
+function loadImageEl(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+function drawCover(ctx, img, x, y, w, h) {
+  const ir = img.width / img.height, tr = w / h;
+  let sw, sh, sx, sy;
+  if (ir > tr) { sh = img.height; sw = sh * tr; sy = 0; sx = (img.width - sw) / 2; }
+  else { sw = img.width; sh = sw / tr; sx = 0; sy = (img.height - sh) / 2; }
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h);
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+async function shareImage() {
+  const codigo = window.__codigoReferido;
+  if (!codigo) return;
+  const shareUrl = window.__shareUrl || `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(codigo)}`;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080; canvas.height = 1080;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#0b0a09';
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  if (galleryImages[0]) {
+    try {
+      const img = await loadImageEl(galleryImages[0]);
+      drawCover(ctx, img, 0, 0, 1080, 1080);
+    } catch (e) { console.warn('No se pudo cargar la foto para la imagen:', e); }
+  }
+
+  const overlay = ctx.createLinearGradient(0, 0, 0, 1080);
+  overlay.addColorStop(0, 'rgba(11,10,9,0.55)');
+  overlay.addColorStop(0.55, 'rgba(11,10,9,0.75)');
+  overlay.addColorStop(1, 'rgba(11,10,9,0.96)');
+  ctx.fillStyle = overlay;
+  ctx.fillRect(0, 0, 1080, 1080);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#e9c876';
+  ctx.font = '700 30px "DM Sans",sans-serif';
+  ctx.fillText('SORTEO NOTARIADO · IAC ARICA', 540, 150);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 84px "Barlow Condensed",sans-serif';
+  ctx.fillText('¡PARTICIPA', 540, 400);
+  ctx.fillText('Y GANA!', 540, 490);
+
+  ctx.fillStyle = '#f3efe6';
+  ctx.font = '400 28px "DM Sans",sans-serif';
+  const premioTxt = vehicle?.name || 'un vehículo IAC';
+  ctx.fillText(premioTxt, 540, 550);
+
+  roundRect(ctx, 165, 720, 750, 150, 18);
+  ctx.fillStyle = 'rgba(233,200,118,0.12)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(233,200,118,0.5)';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 165, 720, 750, 150, 18);
+  ctx.stroke();
+
+  ctx.fillStyle = '#9c9689';
+  ctx.font = '600 20px monospace';
+  ctx.fillText('MI CÓDIGO DE REFERIDO', 540, 775);
+  ctx.fillStyle = '#e9c876';
+  ctx.font = '800 42px monospace';
+  ctx.fillText(codigo, 540, 830);
+  ctx.fillStyle = '#9c9689';
+  ctx.font = '400 18px monospace';
+  ctx.fillText('iac-arica.cl/stamper.html', 540, 858);
+
+  ctx.fillStyle = '#6E6E6E';
+  ctx.font = '400 22px "DM Sans",sans-serif';
+  ctx.fillText('Import American Cars · Arica, Chile', 540, 1000);
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) { showToast('No se pudo generar la imagen.'); return; }
+    const file = new File([blob], 'iac-sorteo.png', { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: 'Sorteo IAC Arica', text: 'Participa conmigo en el sorteo de IAC Arica → ' + shareUrl });
+        return;
+      } catch (e) {
+        if (e?.name === 'AbortError') return; // el usuario canceló, no mostrar error
+      }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'iac-sorteo.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Imagen descargada — súbela a tu Instagram o WhatsApp');
+  }, 'image/png');
 }
 
 async function sendConfirmationEmailPublic(orden, folios, nombre, email) {

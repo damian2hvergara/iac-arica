@@ -163,9 +163,34 @@ class StamperAPI {
         }
     }
 
+    // Ranking público de referidores (nombre + inicial, sin cifras
+    // globales del sorteo).
+    async topReferidores(limite = 5) {
+        try {
+            const { data, error } = await this.client
+                .rpc('top_referidores', { p_limit: limite });
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error topReferidores:', error);
+            throw error;
+        }
+    }
+
     // ====================================
     // ADMIN — requiere sesión autenticada
     // ====================================
+
+    async compradoresSinReferir() {
+        try {
+            const { data, error } = await this.client.rpc('compradores_sin_referir');
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error compradoresSinReferir:', error);
+            throw error;
+        }
+    }
 
     async getOrdenesPendientes() {
         try {
