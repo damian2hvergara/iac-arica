@@ -659,6 +659,9 @@ async function submitOrder() {
       closeCheckout();
       showSuccess(orden, folios, { nombre, email });
       sendConfirmationEmailPublic(orden, folios, nombre, email).catch(e => console.warn('Email:', e));
+      if (referidoPor) {
+        notifyReferrer(referidoPor, nombre, folios.length).catch(e => console.warn('Email referente:', e));
+      }
     } else {
       await initFlowPayment(orden);
     }
@@ -724,6 +727,26 @@ async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
       vehicleImg, fechaSorteo: fechaStr,
       pack: selectedPack?.nombre || '',
       monto: orden.monto_total
+    })
+  });
+}
+
+async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada) {
+  const info = await stamperAPI.infoReferido(codigoReferido);
+  if (!info || !info.referente_email) return;
+
+  await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-referral-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+    body: JSON.stringify({
+      referenteEmail: info.referente_email,
+      referenteNombre: info.referente_nombre,
+      referidoNombre,
+      cantidadComprada,
+      totalAcumulado: info.total_comprado,
+      bonosGanados: info.bonos_ganados,
+      faltanParaProximo: info.faltan_para_proximo,
+      codigoReferido
     })
   });
 }

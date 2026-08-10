@@ -134,6 +134,20 @@ class StamperAPI {
         }
     }
 
+    // Progreso del referente hacia su próxima estampilla bonus
+    // (1 cada 4 compradas con su código) — se usa para avisarle por correo.
+    async infoReferido(codigoReferido) {
+        try {
+            const { data, error } = await this.client
+                .rpc('info_referido', { p_codigo_referido: codigoReferido });
+            if (error) throw error;
+            return data && data[0];
+        } catch (error) {
+            console.error('Error infoReferido:', error);
+            throw error;
+        }
+    }
+
     // ====================================
     // ADMIN — requiere sesión autenticada
     // ====================================
