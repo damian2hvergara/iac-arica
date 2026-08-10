@@ -64,7 +64,15 @@ input{font-family:inherit;font-size:15px}
 main{padding-top:56px}
 
 /* Hero */
-.hero{padding:52px 0 30px;text-align:center}
+.hero{position:relative;padding:64px 0 34px;text-align:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center 65%;opacity:0;transition:opacity .6s ease;filter:saturate(1.05)}
+.hero-bg.show{opacity:.32}
+.hero-bg::after{content:"";position:absolute;inset:0}
+.hero::before{content:"";position:absolute;inset:0;background:
+    linear-gradient(180deg,rgba(11,10,9,0.35) 0%,rgba(11,10,9,0.55) 55%,var(--ink) 96%),
+    radial-gradient(ellipse 90% 55% at 50% -8%,rgba(155,0,0,0.25),transparent 60%);
+  pointer-events:none;z-index:1}
+.hero .wrap{position:relative;z-index:2}
 .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-hi);margin-bottom:12px}
 .hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(32px,7vw,52px);text-transform:uppercase;line-height:0.98;text-wrap:balance}
 .hero h1 em{
@@ -118,6 +126,40 @@ main{padding-top:56px}
 .refund-banner{display:none;margin-top:14px;background:rgba(0,197,102,0.08);border:1px solid rgba(0,197,102,0.35);border-radius:var(--r-md);padding:15px 17px}
 .refund-banner .t{font-weight:700;color:var(--green);margin-bottom:3px;font-size:13px}
 .refund-banner a{color:var(--green);text-decoration:underline}
+
+/* Cómo funciona */
+.steps-section{padding:36px 0 8px}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:760px){.steps-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:460px){.steps-grid{grid-template-columns:1fr}}
+.step-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 16px;position:relative}
+.step-num{font-family:var(--font-h);font-size:13px;font-weight:800;color:var(--gold-hi);letter-spacing:1px;margin-bottom:10px}
+.step-card i{font-size:20px;color:var(--gold-hi);margin-bottom:10px;display:block}
+.step-card h3{font-family:var(--font-h);font-size:15px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.step-card p{color:var(--muted);font-size:12.5px;line-height:1.5}
+
+/* Confianza / empresa real */
+.trust-section{padding:36px 0 8px}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.trust-grid{grid-template-columns:1fr}}
+.trust-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px}
+.trust-card i{font-size:19px;color:var(--gold-hi);margin-bottom:8px;display:block}
+.trust-card h3{font-family:var(--font-h);font-size:14.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.trust-card p{color:var(--muted);font-size:12.5px;line-height:1.55}
+.trust-card a{color:var(--gold-hi);text-decoration:underline}
+
+/* Mini FAQ */
+.mini-faq{padding:36px 0 8px}
+.mf-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:9px;overflow:hidden}
+.mf-item summary{padding:15px 16px;cursor:pointer;font-size:13.5px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mf-item summary::-webkit-details-marker{display:none}
+.mf-item summary::after{content:'+';font-size:19px;color:var(--muted);flex-shrink:0}
+.mf-item[open] summary::after{content:'–'}
+.mf-item[open] summary{border-bottom:1px solid var(--line)}
+.mf-body{padding:12px 16px 16px;color:var(--muted);font-size:12.5px;line-height:1.6}
+.mf-body a{color:var(--gold-hi)}
+.mini-faq-more{text-align:center;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.mini-faq-more a{color:var(--gold-hi);text-decoration:underline}
 
 /* Counter */
 /* Packs — placas coleccionables */
@@ -228,25 +270,28 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 </div>
 
 <main>
-  <section class="hero wrap">
-    <div class="eyebrow">Sorteo notariado · IAC Arica</div>
-    <h1 id="heroTitle">No sueñes,<br><em>gánatelo</em></h1>
-    <p class="sub" id="heroSub">Compra tu Sticker Digital y participa en el sorteo de un vehículo de nuestro inventario real.</p>
+  <section class="hero">
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="wrap">
+      <div class="eyebrow">Sorteo notariado · IAC Arica</div>
+      <h1 id="heroTitle">No sueñes,<br><em>gánatelo</em></h1>
+      <p class="sub" id="heroSub">Compra tu Sticker Digital y participa en el sorteo de un vehículo de nuestro inventario real.</p>
 
-    <div class="trust-row">
-      <div class="trust-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
-      <div class="trust-badge"><i class="fas fa-video"></i> Transmisión en vivo</div>
-      <div class="trust-badge"><i class="fas fa-warehouse"></i> Vehículo real en stock IAC</div>
-      <div class="trust-badge"><i class="fas fa-shield-halved"></i> Folio verificable</div>
-    </div>
+      <div class="trust-row">
+        <div class="trust-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
+        <div class="trust-badge"><i class="fas fa-video"></i> Transmisión en vivo</div>
+        <div class="trust-badge"><i class="fas fa-warehouse"></i> Vehículo real en stock IAC</div>
+        <div class="trust-badge"><i class="fas fa-shield-halved"></i> Folio verificable</div>
+      </div>
 
-    <div class="countdown" id="countdown">
-      <div class="cd-box"><div class="n" id="cdD">--</div><div class="l">Días</div></div>
-      <div class="cd-box"><div class="n" id="cdH">--</div><div class="l">Horas</div></div>
-      <div class="cd-box"><div class="n" id="cdM">--</div><div class="l">Min</div></div>
-      <div class="cd-box"><div class="n" id="cdS">--</div><div class="l">Seg</div></div>
+      <div class="countdown" id="countdown">
+        <div class="cd-box"><div class="n" id="cdD">--</div><div class="l">Días</div></div>
+        <div class="cd-box"><div class="n" id="cdH">--</div><div class="l">Horas</div></div>
+        <div class="cd-box"><div class="n" id="cdM">--</div><div class="l">Min</div></div>
+        <div class="cd-box"><div class="n" id="cdS">--</div><div class="l">Seg</div></div>
+      </div>
+      <div class="cd-caption" id="cdCaption">Cargando fechas del sorteo…</div>
     </div>
-    <div class="cd-caption" id="cdCaption">Cargando fechas del sorteo…</div>
   </section>
 
   <div class="no-sorteo-card wrap" id="noSorteoCard">
@@ -281,6 +326,90 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
         </div>
       </div>
     </div>
+  </section>
+
+  <section class="steps-section wrap needs-sorteo">
+    <div class="section-label">
+      <h2>Cómo funciona</h2>
+      <div class="rule"></div>
+      <div class="tag">4 pasos</div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <i class="fas fa-hand-pointer"></i>
+        <h3>Elige tu placa</h3>
+        <p>Bronce, Plata u Oro — mientras más estampillas, más barata sale cada una.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <i class="fas fa-lock"></i>
+        <h3>Paga con Flow</h3>
+        <p>Tarjeta de crédito, débito o transferencia — la misma pasarela que usan miles de sitios en Chile.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <i class="fas fa-bolt"></i>
+        <h3>Recibe al instante</h3>
+        <p>Tu folio numerado llega por correo apenas se confirma el pago, con foto del vehículo y hash de verificación.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <i class="fas fa-gavel"></i>
+        <h3>Espera el sorteo</h3>
+        <p>Se realiza ante notario y se transmite en vivo por Instagram — el resultado queda público en <a href="ganadores.html" style="color:var(--gold-hi)">Ganadores</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust-section wrap">
+    <div class="section-label">
+      <h2>Por qué confiar en IAC</h2>
+      <div class="rule"></div>
+      <div class="tag">No somos una rifa de redes</div>
+    </div>
+    <div class="trust-grid">
+      <div class="trust-card">
+        <i class="fas fa-warehouse"></i>
+        <h3>Empresa real, con historial</h3>
+        <p>Somos IAC Arica, importadora de vehículos americanos. El premio sale de nuestro propio inventario — no es una promesa, es un auto que ya está en Arica.</p>
+      </div>
+      <div class="trust-card">
+        <i class="fas fa-file-signature"></i>
+        <h3>Sorteo notariado y verificable</h3>
+        <p>El resultado lo certifica un notario público, en acto transmitido en vivo. Cada estampilla tiene un folio y un hash únicos que puedes guardar como comprobante.</p>
+      </div>
+      <div class="trust-card">
+        <i class="fas fa-map-marker-alt"></i>
+        <h3>Presencia física en Arica</h3>
+        <p>No somos anónimos: tenemos local, WhatsApp y redes activas. Escríbenos cuando quieras — <a href="contacto.html">contacto aquí</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="mini-faq wrap needs-sorteo">
+    <div class="section-label">
+      <h2>Antes de comprar</h2>
+      <div class="rule"></div>
+      <div class="tag">Preguntas rápidas</div>
+    </div>
+    <details class="mf-item" open>
+      <summary>¿Qué pasa si no se vende el mínimo de estampillas?</summary>
+      <div class="mf-body">El sorteo se hace igual si se alcanza la meta interna de venta. Si no se alcanza a tiempo, podemos atrasar la fecha en bloques de 30 días — y desde el segundo atraso puedes pedir la devolución del 100% de tu compra sin dar explicaciones. <a href="faq.html">Ver detalle completo →</a></div>
+    </details>
+    <details class="mf-item">
+      <summary>¿Puedo usar el auto donde quiera si gano?</summary>
+      <div class="mf-body">El vehículo circula libremente en Arica y Parinacota. Liberarlo para el resto de Chile es un trámite y costo aparte, a cargo del ganador. <a href="bases.html#sexto">Ver cláusula Sexto →</a></div>
+    </details>
+    <details class="mf-item">
+      <summary>¿Cómo sé que esto es legítimo?</summary>
+      <div class="mf-body">Las bases están notariadas y publicadas completas en <a href="bases.html">bases.html</a>. El sorteo se transmite en vivo y el resultado queda publicado con acta notarial en <a href="ganadores.html">Ganadores</a>.</div>
+    </details>
+    <details class="mf-item">
+      <summary>¿Qué pasa si no gano?</summary>
+      <div class="mf-body">Tu Sticker Digital queda como comprobante de participación — por su naturaleza digital no aplica devolución, salvo el caso de meta mínima explicado arriba.</div>
+    </details>
+    <p class="mini-faq-more">¿Tienes otra duda? <a href="faq.html">Ver todas las preguntas frecuentes →</a></p>
   </section>
 
   <section class="packs-section wrap" id="packsSection">
@@ -432,6 +561,7 @@ function showNoSorteoState() {
   document.getElementById('cdCaption').style.display = 'none';
   document.getElementById('premioSection').style.display = 'none';
   document.getElementById('packsSection').style.display = 'none';
+  document.querySelectorAll('.needs-sorteo').forEach(el => el.style.display = 'none');
   document.getElementById('noSorteoCard').style.display = 'block';
 }
 
@@ -463,6 +593,10 @@ function renderPremio() {
     mainImg.classList.remove('skeleton');
     mainImg.alt = vehicle.name;
     mainImg.addEventListener('click', () => openLightbox(0));
+
+    const heroBg = document.getElementById('heroBg');
+    heroBg.style.backgroundImage = `url("${galleryImages[0]}")`;
+    heroBg.classList.add('show');
   }
 
   const thumbs = document.getElementById('premioThumbs');
