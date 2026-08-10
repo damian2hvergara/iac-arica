@@ -443,10 +443,10 @@ async function enviarCorreoConfirmacion(orden, folios) {
 
     // Cada estampilla recibe una foto distinta del vehículo (todas las fotos
     // cargadas del auto se reparten entre las estampillas emitidas).
-    const estampillasConFoto = folios.map(f => ({
+    const estampillasConFoto = folios.map((f, i) => ({
       folio: f.numero_folio,
       hash: f.hash_seguridad,
-      imagenUrl: vehicleImages.length ? pickStickerImage(vehicleImages, f.numero_folio) : vehicleImg
+      imagenUrl: vehicleImages.length ? pickStickerImage(vehicleImages, i) : vehicleImg
     }));
 
     await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {

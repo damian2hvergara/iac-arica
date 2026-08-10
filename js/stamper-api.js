@@ -351,19 +351,18 @@ class StamperAPI {
 }
 
 /**
- * Asigna una foto del vehículo a cada estampilla de forma determinística
- * (mismo folio → siempre la misma foto), repartiendo todas las fotos
- * disponibles entre las estampillas en vez de usar siempre la misma.
+ * Asigna una foto del vehículo por posición (0, 1, 2...) en vez de al azar,
+ * para que dentro de un mismo grupo (los packs en pantalla, o las
+ * estampillas de una misma orden) nunca se repita una foto mientras
+ * queden fotos distintas sin usar. Si el grupo tiene más elementos que
+ * fotos disponibles, recién ahí empieza a repetir en el mismo orden.
  * images: array de {image_url, order_index} (ya ordenado).
+ * index: posición del elemento dentro de su grupo (0-based).
  */
-function pickStickerImage(images, folio) {
+function pickStickerImage(images, index) {
     if (!images || !images.length) return null;
-    if (!folio) return images[0].image_url;
-    let hash = 0;
-    for (let i = 0; i < folio.length; i++) {
-        hash = (hash * 31 + folio.charCodeAt(i)) >>> 0;
-    }
-    return images[hash % images.length].image_url;
+    const i = Number.isInteger(index) ? index : 0;
+    return images[i % images.length].image_url;
 }
 
 window.pickStickerImage = pickStickerImage;

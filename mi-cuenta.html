@@ -144,8 +144,8 @@ function renderResultado(data) {
   const list = document.getElementById('folioList');
   const images = (data.vehicleImages || []).map((url, idx) => ({ image_url: url, order_index: idx }));
   if (data.folios && data.folios.length) {
-    list.innerHTML = data.folios.map(f => {
-      const img = images.length ? pickStickerImage(images, f.numero_folio) : null;
+    list.innerHTML = data.folios.map((f, i) => {
+      const img = images.length ? pickStickerImage(images, i) : null;
       return `
       <div class="folio-item">
         ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(data.vehicleName || 'tu premio')}">` : ''}

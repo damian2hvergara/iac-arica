@@ -120,10 +120,6 @@ main{padding-top:56px}
 .refund-banner a{color:var(--green);text-decoration:underline}
 
 /* Counter */
-.counter-wrap{text-align:center;padding:26px 0 8px}
-.counter-num{font-family:var(--font-h);font-size:36px;font-weight:800;color:var(--gold-hi);font-variant-numeric:tabular-nums}
-.counter-lbl{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
-
 /* Packs — placas coleccionables */
 .packs-section{padding:26px 0 46px}
 .packs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;perspective:1400px}
@@ -287,11 +283,6 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     </div>
   </section>
 
-  <section class="counter-wrap wrap" id="counterSection">
-    <div class="counter-num" id="counterNum">—</div>
-    <div class="counter-lbl">Estampillas vendidas</div>
-  </section>
-
   <section class="packs-section wrap" id="packsSection">
     <div class="section-label">
       <h2>Elige tu placa</h2>
@@ -431,21 +422,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (e) {
     console.error('Error cargando packs:', e);
   }
-
-  try {
-    const count = await stamperAPI.getStickersVendidos(sorteo?.id || null);
-    document.getElementById('counterNum').textContent = '+' + Number(count).toLocaleString('es-CL');
-  } catch (e) {
-    console.error('Error cargando contador:', e);
-    document.getElementById('counterNum').textContent = '—';
-  }
 });
 
+// La urgencia se comunica solo por tiempo (countdown), nunca mostrando
+// cuántas estampillas se han vendido — a propósito no hay contador público.
 function showNoSorteoState() {
   document.getElementById('countdown').style.display = 'none';
   document.getElementById('cdCaption').style.display = 'none';
   document.getElementById('premioSection').style.display = 'none';
-  document.getElementById('counterSection').style.display = 'none';
   document.getElementById('packsSection').style.display = 'none';
   document.getElementById('noSorteoCard').style.display = 'block';
 }
@@ -582,7 +566,7 @@ function renderPacks() {
       ? p.rareza
       : tierForIndex(i, sorted.length);
     const img = galleryImages.length ? pickStickerImage(
-      galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), p.slug
+      galleryImages.map((url, idx) => ({ image_url: url, order_index: idx })), i
     ) : null;
     return `
     <div class="plate" data-tier="${tier}" data-slug="${escapeHtml(p.slug)}">
@@ -696,7 +680,7 @@ async function initFlowPayment(orden) {
 function showSuccess(orden, folios, comprador) {
   const images = galleryImages.map((url, idx) => ({ image_url: url, order_index: idx }));
   document.getElementById('stampCards').innerHTML = folios.map((f, i) => {
-    const img = images.length ? pickStickerImage(images, f.numero_folio) : null;
+    const img = images.length ? pickStickerImage(images, i) : null;
     return `
     <div class="stamp-card-mini">
       ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(vehicle?.name || 'tu premio')}">` : ''}
@@ -724,10 +708,10 @@ async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
   const images = galleryImages.map((url, idx) => ({ image_url: url, order_index: idx }));
   const vehicleImg = galleryImages[0] || null;
 
-  const estampillasConFoto = folios.map(f => ({
+  const estampillasConFoto = folios.map((f, i) => ({
     folio: f.numero_folio,
     hash: f.hash_seguridad,
-    imagenUrl: images.length ? pickStickerImage(images, f.numero_folio) : vehicleImg
+    imagenUrl: images.length ? pickStickerImage(images, i) : vehicleImg
   }));
 
   await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {
