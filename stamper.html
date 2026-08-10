@@ -138,38 +138,34 @@ main{padding-top:56px}
 .refund-banner .t{font-weight:700;color:var(--green);margin-bottom:3px;font-size:13px}
 .refund-banner a{color:var(--green);text-decoration:underline}
 
-/* Cómo funciona */
-.steps-section{padding:36px 0 8px}
-.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media(max-width:760px){.steps-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:460px){.steps-grid{grid-template-columns:1fr}}
-.step-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 16px;position:relative}
-.step-num{font-family:var(--font-h);font-size:13px;font-weight:800;color:var(--gold-hi);letter-spacing:1px;margin-bottom:10px}
-.step-card i{font-size:20px;color:var(--gold-hi);margin-bottom:10px;display:block}
-.step-card h3{font-family:var(--font-h);font-size:15px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
-.step-card p{color:var(--muted);font-size:12.5px;line-height:1.5}
+/* Cómo funciona — mosaico compacto tipo placa, no tarjetas largas */
+.steps-section{padding:24px 0 2px}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:600px){.steps-grid{grid-template-columns:repeat(2,1fr);gap:7px}}
+.step-card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 8px;text-align:center}
+.step-num{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--gold-hi);letter-spacing:1px;margin-bottom:4px}
+.step-card i{font-size:15px;color:var(--gold-hi);margin-bottom:5px;display:block}
+.step-card h3{font-family:var(--font-h);font-size:11px;text-transform:uppercase;font-weight:700;line-height:1.2}
 
-/* Confianza / empresa real */
-.trust-section{padding:36px 0 8px}
-.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:760px){.trust-grid{grid-template-columns:1fr}}
-.trust-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:20px}
-.trust-card i{font-size:19px;color:var(--gold-hi);margin-bottom:8px;display:block}
-.trust-card h3{font-family:var(--font-h);font-size:14.5px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
-.trust-card p{color:var(--muted);font-size:12.5px;line-height:1.55}
-.trust-card a{color:var(--gold-hi);text-decoration:underline}
+/* Confianza / empresa real — mismo formato compacto */
+.trust-section{padding:20px 0 2px}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:600px){.trust-grid{gap:7px}}
+.trust-card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:13px 8px;text-align:center}
+.trust-card i{font-size:15px;color:var(--gold-hi);margin-bottom:5px;display:block}
+.trust-card h3{font-family:var(--font-h);font-size:10.5px;text-transform:uppercase;font-weight:700;line-height:1.2}
 
-/* Mini FAQ */
-.mini-faq{padding:36px 0 8px}
-.mf-item{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:9px;overflow:hidden}
-.mf-item summary{padding:15px 16px;cursor:pointer;font-size:13.5px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+/* Mini FAQ — acordeón compacto, cerrado por defecto */
+.mini-faq{padding:20px 0 2px}
+.mf-item{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:6px;overflow:hidden}
+.mf-item summary{padding:11px 13px;cursor:pointer;font-size:12px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
 .mf-item summary::-webkit-details-marker{display:none}
-.mf-item summary::after{content:'+';font-size:19px;color:var(--muted);flex-shrink:0}
+.mf-item summary::after{content:'+';font-size:16px;color:var(--muted);flex-shrink:0}
 .mf-item[open] summary::after{content:'–'}
 .mf-item[open] summary{border-bottom:1px solid var(--line)}
-.mf-body{padding:12px 16px 16px;color:var(--muted);font-size:12.5px;line-height:1.6}
+.mf-body{padding:0 13px 12px;color:var(--muted);font-size:11.5px;line-height:1.5}
 .mf-body a{color:var(--gold-hi)}
-.mini-faq-more{text-align:center;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.mini-faq-more{text-align:center;margin-top:10px;font-size:11.5px;color:var(--muted)}
 .mini-faq-more a{color:var(--gold-hi);text-decoration:underline}
 
 /* Counter */
@@ -380,25 +376,21 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
         <div class="step-num">01</div>
         <i class="fas fa-hand-pointer"></i>
         <h3>Elige tu placa</h3>
-        <p>Bronce, Plata u Oro — mientras más estampillas, más barata sale cada una.</p>
       </div>
       <div class="step-card">
         <div class="step-num">02</div>
         <i class="fas fa-lock"></i>
         <h3>Paga con Flow</h3>
-        <p>Tarjeta de crédito, débito o transferencia — la misma pasarela que usan miles de sitios en Chile.</p>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
         <i class="fas fa-bolt"></i>
         <h3>Recibe al instante</h3>
-        <p>Tu folio numerado llega por correo apenas se confirma el pago, con foto del vehículo y hash de verificación.</p>
       </div>
       <div class="step-card">
         <div class="step-num">04</div>
         <i class="fas fa-gavel"></i>
         <h3>Espera el sorteo</h3>
-        <p>Se realiza ante notario y se transmite en vivo por Instagram — el resultado queda público en <a href="ganadores.html" style="color:var(--gold-hi)">Ganadores</a>.</p>
       </div>
     </div>
   </section>
@@ -407,23 +399,20 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <div class="section-label">
       <h2>Por qué confiar en IAC</h2>
       <div class="rule"></div>
-      <div class="tag">No somos una rifa de redes</div>
+      <div class="tag">No es una rifa de redes</div>
     </div>
     <div class="trust-grid">
       <div class="trust-card">
         <i class="fas fa-warehouse"></i>
-        <h3>Empresa real, con historial</h3>
-        <p>Somos IAC Arica, importadora de vehículos americanos. El premio sale de nuestro propio inventario — no es una promesa, es un auto que ya está en Arica.</p>
+        <h3>Empresa real</h3>
       </div>
       <div class="trust-card">
         <i class="fas fa-file-signature"></i>
-        <h3>Sorteo notariado y verificable</h3>
-        <p>El resultado lo certifica un notario público, en acto transmitido en vivo. Cada estampilla tiene un folio y un hash únicos que puedes guardar como comprobante.</p>
+        <h3>Sorteo notariado</h3>
       </div>
       <div class="trust-card">
         <i class="fas fa-map-marker-alt"></i>
-        <h3>Presencia física en Arica</h3>
-        <p>No somos anónimos: tenemos local, WhatsApp y redes activas. Escríbenos cuando quieras — <a href="contacto.html">contacto aquí</a>.</p>
+        <h3>Local en Arica</h3>
       </div>
     </div>
   </section>
@@ -434,7 +423,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="rule"></div>
       <div class="tag">Preguntas rápidas</div>
     </div>
-    <details class="mf-item" open>
+    <details class="mf-item">
       <summary>¿Qué pasa si no se vende el mínimo de estampillas?</summary>
       <div class="mf-body">El sorteo se hace igual si se alcanza la meta interna de venta. Si no se alcanza a tiempo, podemos atrasar la fecha en bloques de 30 días — y desde el segundo atraso puedes pedir la devolución del 100% de tu compra sin dar explicaciones. <a href="faq.html">Ver detalle completo →</a></div>
     </details>
