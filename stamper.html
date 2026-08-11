@@ -998,7 +998,10 @@ function renderPacks() {
   }).join('');
 
   grid.querySelectorAll('.plate').forEach(card => {
-    card.addEventListener('click', () => selectPack(card.dataset.slug));
+    card.addEventListener('click', () => {
+      selectPack(card.dataset.slug);
+      openCheckout();
+    });
     card.addEventListener('mousemove', (e) => {
       const r = card.getBoundingClientRect();
       const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
