@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>No Sueñes, Gánatelo | Sorteo Dodge Challenger — IAC Arica</title>
-<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo notariado de un vehículo del inventario real de IAC Arica. Packs desde $5.500.">
+<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo con veedores independientes de un vehículo del inventario real de IAC Arica. Packs desde $5.700.">
 <link rel="canonical" href="https://iac-arica.cl/stamper.html">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="No Sueñes, Gánatelo">
-<meta property="og:description" content="Sorteo notariado de un vehículo importado por IAC Arica. Compra tu Sticker Digital coleccionable desde $5.500.">
+<meta property="og:description" content="Sorteo con veedores independientes de un vehículo importado por IAC Arica. Compra tu Sticker Digital coleccionable desde $5.700.">
 <meta property="og:url" content="https://iac-arica.cl/stamper.html">
 <meta property="og:image" content="https://iac-arica.cl/img/challenger-og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -187,6 +187,9 @@ main{padding-top:56px}
 .refund-banner{display:none;margin-top:14px;background:rgba(0,197,102,0.08);border:1px solid rgba(0,197,102,0.35);border-radius:var(--r-md);padding:15px 17px}
 .refund-banner .t{font-weight:700;color:var(--green);margin-bottom:3px;font-size:13px}
 .refund-banner a{color:var(--green);text-decoration:underline}
+.no-return-note{margin-top:14px;display:flex;gap:9px;align-items:flex-start;color:var(--muted);font-size:12px;line-height:1.5}
+.no-return-note i{color:var(--muted);font-size:13px;margin-top:2px;flex-shrink:0}
+.no-return-note a{color:var(--gold-hi)}
 
 /* Cómo funciona — mosaico compacto tipo placa, no tarjetas largas */
 .steps-section{padding:24px 0 2px}
@@ -357,16 +360,22 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 .ref-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 14px}
 .ref-row .pos{font-family:var(--font-h);font-weight:800;color:var(--gold-hi);width:20px;text-align:center;font-size:14px}
 .ref-row .nm{flex:1;font-size:12.5px;font-weight:600}
+.ref-row .ct-wrap{text-align:right}
 .ref-row .ct{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
+.ref-row .prize{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--green);margin-top:1px}
 .referidores-note{text-align:center;color:var(--muted);font-size:11px;margin-top:10px}
 .referidores-note i{margin-right:4px}
-.ref-row.champion{background:linear-gradient(135deg,rgba(233,200,118,0.14),var(--surface));border-color:rgba(233,200,118,0.45)}
-.ref-row .pos i{color:var(--gold-hi);font-size:15px}
+.ref-row.medal-1{background:linear-gradient(135deg,rgba(233,200,118,0.16),var(--surface));border-color:rgba(233,200,118,0.5)}
+.ref-row.medal-1 .pos i{color:var(--gold-hi);font-size:15px}
+.ref-row.medal-2{background:linear-gradient(135deg,rgba(199,204,210,0.14),var(--surface));border-color:rgba(199,204,210,0.4)}
+.ref-row.medal-2 .pos i{color:var(--silver-hi);font-size:14px}
+.ref-row.medal-3{background:linear-gradient(135deg,rgba(179,118,63,0.14),var(--surface));border-color:rgba(179,118,63,0.4)}
+.ref-row.medal-3 .pos i{color:var(--bronze-hi);font-size:14px}
 
-/* Banner del premio sorpresa + acordeón "cómo funciona" — breve por
+/* Banner de premios del ranking + acordeón "cómo funciona" — breve por
    defecto, el detalle completo queda a un clic. */
-.ref-prize-banner{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;background:linear-gradient(135deg,rgba(233,200,118,0.16),rgba(155,0,0,0.08));border:1px solid rgba(233,200,118,0.35);border-radius:var(--r-full);padding:10px 16px;font-size:11.5px;color:var(--paper);margin-bottom:16px}
-.ref-prize-banner i{color:var(--gold-hi);font-size:13px;flex-shrink:0}
+.ref-prize-banner{display:flex;align-items:flex-start;gap:9px;text-align:left;background:linear-gradient(135deg,rgba(233,200,118,0.16),rgba(155,0,0,0.08));border:1px solid rgba(233,200,118,0.35);border-radius:var(--r-md);padding:12px 16px;font-size:11.5px;color:var(--paper);line-height:1.5;margin-bottom:16px}
+.ref-prize-banner i{color:var(--gold-hi);font-size:13px;flex-shrink:0;margin-top:2px}
 .ref-prize-banner b{color:var(--gold-hi)}
 .ref-details{max-width:420px;margin:14px auto 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .ref-details summary{padding:12px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--gold-hi);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -448,7 +457,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       </div>
 
       <div class="trust-row">
-        <div class="trust-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
+        <div class="trust-badge"><i class="fas fa-gavel"></i> Sorteo con veedores independientes</div>
         <div class="trust-badge"><i class="fas fa-video"></i> Transmisión en vivo</div>
         <div class="trust-badge"><i class="fas fa-warehouse"></i> Vehículo real en stock IAC</div>
         <div class="trust-badge"><i class="fas fa-shield-halved"></i> Folio verificable</div>
@@ -492,7 +501,11 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 
         <div class="refund-banner" id="refundBanner">
           <div class="t">Ventana de reembolso abierta</div>
-          <div>Puedes solicitar la devolución del 100% de tu compra. <a href="contacto.html">Solicitar →</a></div>
+          <div>Se prorrogó el sorteo por segunda vez sin alcanzar la meta mínima — puedes solicitar la devolución del 100% de tu compra, sin dar explicaciones, mientras siga prorrogándose. <a href="contacto.html">Solicitar →</a></div>
+        </div>
+        <div class="no-return-note" id="noReturnNote">
+          <i class="fas fa-info-circle"></i>
+          <div>Por su naturaleza digital, el Sticker Digital no tiene cambio ni devolución, salvo el caso de meta mínima explicado en la <a href="bases.html#octavo">cláusula Octavo</a>.</div>
         </div>
       </div>
     </div>
@@ -534,7 +547,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="rule"></div>
       <div class="tag">Bronce · Plata · Oro</div>
     </div>
-    <p class="packs-intro">Cada pack trae una selección distinta de stickers digitales coleccionables de nuestro vehículo en sorteo. Al elegir tu pack, cada sticker que compras es un número más participando por el gran premio — mientras más stickers, más chances de ganar.</p>
+    <p class="packs-intro">Cada pack trae una selección distinta de stickers digitales coleccionables de nuestro vehículo en sorteo. Cada Sticker Digital que compras suma tu número a la promoción del vehículo — mientras más stickers coleccionas, más números tienes participando.</p>
     <div class="packs-grid" id="packsGrid">
       <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
       <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
@@ -558,7 +571,10 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="rule"></div>
       <div class="tag">Top 5</div>
     </div>
-    <div class="ref-prize-banner"><i class="fas fa-crown"></i> El <b>#1</b> de este ranking gana un <b>premio sorpresa</b>, 10 días antes del sorteo.</div>
+    <div class="ref-prize-banner">
+      <i class="fas fa-crown"></i>
+      <span>Los <b>3 primeros lugares</b> de este ranking ganan premio en dinero efectivo: <b>1° $300.000</b> · <b>2° $150.000</b> · <b>3° $50.000</b>. Se pagan el mismo día del sorteo.</span>
+    </div>
     <div class="referidores-list" id="referidoresList"></div>
     <p class="referidores-note"><i class="fas fa-lock"></i> Mostramos solo el primer nombre e inicial del apellido de cada persona, para proteger su privacidad.</p>
     <details class="ref-details">
@@ -567,7 +583,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
         <div class="rdb-step"><i class="fas fa-ticket-alt"></i> Compra tu Sticker Digital y te damos un link personal con tu código.</div>
         <div class="rdb-step"><i class="fas fa-share-alt"></i> Comparte tu link con tus amigos.</div>
         <div class="rdb-step"><i class="fas fa-gift"></i> Cada <b>4 amigos</b> que compren con tu código, ganas <b>1 sticker gratis</b> — una oportunidad más de participar en el sorteo.</div>
-        <div class="rdb-step"><i class="fas fa-crown"></i> Además, quien tenga más referidos al cierre de la venta se lleva un <b>premio sorpresa</b>, que se revela 10 días antes del sorteo.</div>
+        <div class="rdb-step"><i class="fas fa-crown"></i> Además, el ranking cierra al término del período de venta. Los 3 con más referidos ganan: <b>1er lugar $300.000</b>, <b>2do lugar $150.000</b> y <b>3er lugar $50.000</b> en dinero efectivo, pagados por transferencia el mismo día del sorteo.</div>
       </div>
     </details>
   </section>
@@ -584,8 +600,8 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
         <h3>Empresa real</h3>
       </div>
       <div class="trust-card">
-        <i class="fas fa-file-signature"></i>
-        <h3>Sorteo notariado</h3>
+        <i class="fas fa-eye"></i>
+        <h3>Tómbola con veedores</h3>
       </div>
       <div class="trust-card">
         <i class="fas fa-map-marker-alt"></i>
@@ -610,7 +626,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     </details>
     <details class="mf-item">
       <summary>¿Cómo sé que esto es legítimo?</summary>
-      <div class="mf-body">Las bases están notariadas y publicadas completas en <a href="bases.html">bases.html</a>. El sorteo se transmite en vivo y el resultado queda publicado con acta notarial en <a href="ganadores.html">Ganadores</a>.</div>
+      <div class="mf-body">Las bases están firmadas y publicadas completas en <a href="bases.html">bases.html</a>. El sorteo se transmite en vivo y el resultado queda publicado con la declaración jurada de los veedores en <a href="ganadores.html">Ganadores</a>.</div>
     </details>
     <details class="mf-item">
       <summary>¿Qué pasa si no gano?</summary>
@@ -808,11 +824,15 @@ async function loadTopReferidores() {
   try {
     const top = await stamperAPI.topReferidores(5);
     if (!top.length) return;
+    const PRIZES = ['$300.000', '$150.000', '$50.000'];
     document.getElementById('referidoresList').innerHTML = top.map((r, i) => `
-      <div class="ref-row ${i === 0 ? 'champion' : ''}">
-        <div class="pos">${i === 0 ? '<i class="fas fa-crown"></i>' : i + 1}</div>
+      <div class="ref-row ${i < 3 ? 'medal-' + (i + 1) : ''}">
+        <div class="pos">${i < 3 ? `<i class="fas fa-${i === 0 ? 'crown' : 'medal'}"></i>` : i + 1}</div>
         <div class="nm">${escapeHtml(r.nombre_publico)}</div>
-        <div class="ct">${r.total_referido} referidas</div>
+        <div class="ct-wrap">
+          <div class="ct">${r.total_referido} referidas</div>
+          ${i < 3 ? `<div class="prize">${PRIZES[i]}</div>` : ''}
+        </div>
       </div>
     `).join('');
     document.getElementById('referidoresSection').style.display = 'block';
@@ -911,8 +931,13 @@ function renderZonaFranca() {
   document.getElementById('zfText').textContent = sorteo.zona_franca_texto ||
     'El vehículo circula libremente en Arica y Parinacota. Liberarlo para el resto de Chile corre por cuenta y costo del ganador.';
 }
+// La ventana de reembolso solo existe desde la 2ª prórroga sin meta
+// mínima (cláusula Octavo) y se calcula en el backend (sorteo_publico);
+// nunca se muestra por defecto, para no prometer algo que no aplica.
 function renderRefundBanner() {
-  if (sorteo.ventana_reembolso_abierta) document.getElementById('refundBanner').style.display = 'block';
+  const abierta = !!sorteo.ventana_reembolso_abierta;
+  document.getElementById('refundBanner').style.display = abierta ? 'block' : 'none';
+  document.getElementById('noReturnNote').style.display = abierta ? 'none' : 'flex';
 }
 
 /* ---------- Countdown ---------- */
@@ -927,7 +952,7 @@ function startCountdown() {
     caption = 'Cierre de venta: ' + cierre.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' });
   } else if (sorteoFecha) {
     target = sorteoFecha;
-    caption = 'Sorteo ante notario: ' + sorteoFecha.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    caption = 'Sorteo en vivo: ' + sorteoFecha.toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
   } else {
     document.getElementById('cdCaption').textContent = 'Fecha por confirmar';
     return;
@@ -1300,7 +1325,7 @@ async function shareImage() {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#e9c876';
   ctx.font = '700 30px "DM Sans",sans-serif';
-  ctx.fillText('SORTEO NOTARIADO · IAC ARICA', 540, 150);
+  ctx.fillText('SORTEO CON VEEDORES · IAC ARICA', 540, 150);
 
   ctx.fillStyle = '#fff';
   ctx.font = '900 84px "Barlow Condensed",sans-serif';

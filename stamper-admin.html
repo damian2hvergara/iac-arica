@@ -201,7 +201,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       <div class="card">
         <h2>Packs de venta</h2>
         <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
-          Precio base $5.500/unidad. El sistema no permite guardar un pack por debajo de $4.000/unidad (piso legal).
+          Precio base $5.700/unidad. El sistema no permite guardar un pack por debajo de $4.500/unidad (piso legal).
         </p>
         <div id="packsList"></div>
       </div>
@@ -282,9 +282,12 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         <div class="form-grid">
           <div class="field"><label>Meta mínima de stickers (interno — nunca público)</label><input type="number" id="sorteoMetaMinima"></div>
           <div class="field"><label>Total emitidos (interno — nunca público)</label><input type="number" id="sorteoTotalEmitidos"></div>
-          <div class="field"><label>Extensiones realizadas (cláusula Octavo)</label><input type="number" id="sorteoExtensiones"></div>
-          <div class="field"><label class="toggle"><input type="checkbox" id="sorteoVentanaReembolso"> Ventana de reembolso abierta (desde 2ª prórroga)</label></div>
+          <div class="field"><label>Extensiones (prórrogas) realizadas — cláusula Octavo</label><input type="number" id="sorteoExtensiones"></div>
+          <div class="field"><label class="toggle"><input type="checkbox" id="sorteoConfirmadoSinMeta"> Sorteo confirmado sin alcanzar la meta (opción b, cláusula Octavo)</label></div>
         </div>
+        <p style="color:var(--muted);font-size:12px;margin-top:4px">
+          Ventana de reembolso (según cláusula Octavo): <b id="reembolsoEstado">—</b> — se calcula sola a partir de las extensiones y el flag de arriba, nunca se marca a mano.
+        </p>
         <div style="margin-top:16px">
           <button class="btn btn-primary" onclick="saveSorteoConfig()"><i class="fas fa-save"></i> Guardar configuración</button>
         </div>
@@ -615,8 +618,8 @@ async function savePackForm() {
   const warn = document.getElementById('packFloorWarn');
 
   if (!cantidad || !precio) { alert('Completa cantidad y precio.'); return; }
-  if (precio < cantidad * 4000) {
-    warn.textContent = `El precio no puede ser menor a $${(cantidad*4000).toLocaleString('es-CL')} ($4.000/unidad, piso legal). La base de datos rechazará este guardado.`;
+  if (precio < cantidad * 4500) {
+    warn.textContent = `El precio no puede ser menor a $${(cantidad*4500).toLocaleString('es-CL')} ($4.500/unidad, piso legal). La base de datos rechazará este guardado.`;
     warn.style.display = 'block';
     return;
   }
@@ -674,7 +677,7 @@ async function loadSorteoConfig() {
       document.getElementById('sorteoMetaMinima').value = s.meta_minima_stickers || 6500;
       document.getElementById('sorteoTotalEmitidos').value = s.total_stickers_emitidos || 10000;
       document.getElementById('sorteoExtensiones').value = s.extensiones_realizadas || 0;
-      document.getElementById('sorteoVentanaReembolso').checked = !!s.ventana_reembolso_abierta;
+      document.getElementById('sorteoConfirmadoSinMeta').checked = !!s.sorteo_confirmado_sin_meta;
       window.__sorteoId = s.id;
       window.__selectedVehicleId = s.vehicle_id || null;
       window.__heroImagenUrl = s.hero_imagen_url || null;
@@ -687,9 +690,10 @@ async function loadSorteoConfig() {
       document.getElementById('sorteoMetaMinima').value = 6500;
       document.getElementById('sorteoTotalEmitidos').value = 10000;
       document.getElementById('sorteoExtensiones').value = 0;
-      document.getElementById('sorteoVentanaReembolso').checked = false;
+      document.getElementById('sorteoConfirmadoSinMeta').checked = false;
       setHeroImagePreview(null);
     }
+    actualizarEstadoReembolso();
   } catch (e) {
     console.error(e);
     alert('Error al cargar la configuración del sorteo: ' + (e.message || e));
@@ -697,6 +701,22 @@ async function loadSorteoConfig() {
 
   await loadVehiclePicker();
 }
+
+// Refleja la misma regla que calcula sorteo_publico en la base de
+// datos (cláusula Octavo): abierta desde la 2ª prórroga, cerrada si
+// ya se confirmó el sorteo sin meta. Solo informativo — el valor real
+// lo calcula la vista sorteo_publico, esto es para que el admin vea
+// el resultado sin tener que adivinarlo.
+function actualizarEstadoReembolso() {
+  const extensiones = parseInt(document.getElementById('sorteoExtensiones').value, 10) || 0;
+  const sinMeta = document.getElementById('sorteoConfirmadoSinMeta').checked;
+  const abierta = extensiones >= 2 && !sinMeta;
+  const el = document.getElementById('reembolsoEstado');
+  el.textContent = abierta ? 'ABIERTA' : 'CERRADA';
+  el.style.color = abierta ? 'var(--green)' : 'var(--muted)';
+}
+document.getElementById('sorteoExtensiones').addEventListener('input', actualizarEstadoReembolso);
+document.getElementById('sorteoConfirmadoSinMeta').addEventListener('change', actualizarEstadoReembolso);
 
 async function loadVehiclePicker() {
   const grid = document.getElementById('vehiclePickerGrid');
@@ -790,7 +810,7 @@ async function saveSorteoConfig() {
     meta_minima_stickers: parseInt(document.getElementById('sorteoMetaMinima').value, 10) || 6500,
     total_stickers_emitidos: parseInt(document.getElementById('sorteoTotalEmitidos').value, 10) || 10000,
     extensiones_realizadas: parseInt(document.getElementById('sorteoExtensiones').value, 10) || 0,
-    ventana_reembolso_abierta: document.getElementById('sorteoVentanaReembolso').checked,
+    sorteo_confirmado_sin_meta: document.getElementById('sorteoConfirmadoSinMeta').checked,
     hero_imagen_url: window.__heroImagenUrl || null
   };
   try {
