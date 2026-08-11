@@ -259,10 +259,33 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .sp-media{position:relative;z-index:1;width:100%;aspect-ratio:16/9;border-radius:var(--r-md);overflow:hidden;margin-bottom:16px;background:var(--surface-2)}
 .sp-media img{width:100%;height:100%;object-fit:cover}
 .sp-badge{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;background:rgba(233,200,118,0.14);border:1px solid rgba(233,200,118,0.4);color:#f0d080;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:var(--r-full);margin-bottom:12px}
-.sp-title{position:relative;z-index:1;font-family:var(--font-h);font-size:clamp(22px,6vw,28px);font-weight:800;color:var(--white);line-height:1.1;margin-bottom:8px}
+.sp-kicker{position:relative;z-index:1;font-family:var(--font-h);font-weight:800;font-size:clamp(28px,8vw,38px);text-transform:uppercase;letter-spacing:.5px;line-height:1;margin-bottom:8px;background:linear-gradient(100deg,#dba468,#f7e2a6 45%,#eef1f4 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sp-title{position:relative;z-index:1;font-family:var(--font-h);font-size:18px;font-weight:700;color:var(--white);line-height:1.2;margin-bottom:8px}
 .sp-title span{color:#f0d080}
 .sp-sub{position:relative;z-index:1;font-size:13.5px;color:var(--muted);line-height:1.6;max-width:400px;margin:0 auto 20px}
 .sp-cta{position:relative;z-index:1;display:inline-flex;align-items:center;gap:9px;background:var(--red);color:var(--white);font-family:var(--font-h);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:14px 26px;border-radius:var(--r-full);box-shadow:0 8px 24px rgba(155,0,0,0.35);-webkit-tap-highlight-color:transparent}
+
+/* ============================================
+   BOTÓN FLOTANTE — comprar sticker, visible siempre
+   ============================================ */
+.sticker-fab{
+  position:fixed;right:16px;bottom:calc(88px + env(safe-area-inset-bottom));
+  z-index:790;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(150deg,#f7e2a6,#e9c876);
+  color:#0B0A09;text-align:center;line-height:1.1;
+  box-shadow:0 6px 20px rgba(0,0,0,0.45),0 0 0 1px rgba(233,200,118,0.4);
+  animation:fabPulse 2.6s ease-in-out infinite;
+  -webkit-tap-highlight-color:transparent;
+}
+.sticker-fab i{font-size:17px;margin-bottom:2px}
+.sticker-fab span{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.2px}
+@keyframes fabPulse{
+  0%,100%{box-shadow:0 6px 20px rgba(0,0,0,0.45),0 0 0 1px rgba(233,200,118,0.4)}
+  50%{box-shadow:0 8px 26px rgba(0,0,0,0.5),0 0 0 7px rgba(233,200,118,0.16)}
+}
+@media(prefers-reduced-motion:reduce){.sticker-fab{animation:none}}
 
 /* ============================================
    SECCIÓN COMÚN
@@ -1142,6 +1165,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="sorteo-promo-card">
     <div class="sp-media" id="spMedia"><img id="spVehicleImg" alt="" loading="lazy"></div>
     <div class="sp-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
+    <div class="sp-kicker">Sorteo Arica</div>
     <h2 class="sp-title">Gana <span id="spVehicleName">un vehículo de nuestro inventario</span></h2>
     <p class="sp-sub">Compra tu Sticker Digital coleccionable desde $5.500 y participa. Invita a tus amigos con tu link y gana estampillas gratis.</p>
     <a class="sp-cta" href="stamper.html" onclick="trackEvent('click','Sorteo','Promo Banner')">
@@ -1411,6 +1435,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <i class="fab fa-whatsapp" style="font-size:20px"></i> Consultar / Reservar por WhatsApp
   </a>
 </div>
+
+<!-- ========= BOTÓN FLOTANTE: COMPRAR STICKER (siempre visible) ========= -->
+<a class="sticker-fab" href="stamper.html" onclick="trackEvent('click','Sorteo','Floating Button')">
+  <i class="fas fa-ticket-alt"></i>
+  <span>Comprar<br>Sticker</span>
+</a>
 
 <!-- ========= MODAL: DETALLE VEHÍCULO ========= -->
 <div class="modal" id="detailModal">

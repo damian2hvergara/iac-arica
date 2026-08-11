@@ -91,6 +91,7 @@ main{padding-top:56px}
     radial-gradient(ellipse 90% 55% at 50% -8%,rgba(155,0,0,0.3),transparent 60%);
   pointer-events:none;z-index:1}
 .hero .wrap{position:relative;z-index:2}
+.mega-kicker{font-family:var(--font-h);font-weight:800;font-size:24px;text-transform:uppercase;letter-spacing:1px;line-height:1;margin-bottom:10px;background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-hi);margin-bottom:12px;text-shadow:0 2px 10px rgba(0,0,0,0.6)}
 .hero h1{font-family:var(--font-h);font-weight:800;font-size:32px;text-transform:uppercase;line-height:0.98;text-wrap:balance;text-shadow:0 4px 20px rgba(0,0,0,0.65)}
 .hero h1 em{
@@ -258,6 +259,10 @@ main{padding-top:56px}
 .buy-cta{display:block;width:100%;max-width:380px;margin:26px auto 0;padding:16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;box-shadow:0 8px 24px rgba(155,0,0,0.35)}
 .buy-cta:disabled{opacity:.5;box-shadow:none}
 
+/* Comprar sticker — barra fija, visible en todo momento */
+.buy-sticky{position:fixed;left:0;right:0;bottom:0;z-index:850;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--ink) 0%,rgba(11,10,9,0.92) 65%,transparent 100%);pointer-events:none}
+.buy-sticky-btn{pointer-events:all;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;max-width:444px;margin:0 auto;padding:14px;background:var(--red);color:#fff;font-family:var(--font-h);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border-radius:var(--r-full);box-shadow:0 8px 24px rgba(155,0,0,0.4)}
+
 /* Invita y gana — tiene que notarse a simple vista, no solo leerse */
 .referral-strip{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(233,200,118,0.14),var(--surface) 65%);border:1px solid rgba(233,200,118,0.3);border-radius:var(--r-lg);padding:16px 16px;margin-top:8px}
 .rs-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(150deg,var(--gold-hi),var(--gold));display:flex;align-items:center;justify-content:center;font-size:17px;color:#0B0A09;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,0.35)}
@@ -374,6 +379,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
   <section class="hero">
     <div class="hero-bg" id="heroBg"></div>
     <div class="wrap">
+      <div class="mega-kicker">Sorteo Arica</div>
       <div class="eyebrow">Sorteo notariado · IAC Arica</div>
       <h1 id="heroTitle">No sueñes,<br><em>gánatelo</em></h1>
       <p class="sub" id="heroSub">Compra tu Sticker Digital y participa en el sorteo de un vehículo de nuestro inventario real.</p>
@@ -561,6 +567,11 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <div class="foot-brand">CV North Capital SpA — Import American Cars / IAC Arica · iac-arica.cl</div>
   </footer>
 </main>
+
+<!-- ===== COMPRAR STICKER — visible en todo momento ===== -->
+<div class="buy-sticky needs-sorteo" id="buySticky">
+  <a href="#packsSection" class="buy-sticky-btn"><i class="fas fa-ticket-alt"></i> Comprar mi Sticker Digital</a>
+</div>
 
 <!-- ===== LIGHTBOX GALERÍA ===== -->
 <div class="lightbox" id="lightbox">
