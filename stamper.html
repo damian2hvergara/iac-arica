@@ -317,10 +317,23 @@ main{padding-top:56px}
 .ref-box{background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;padding:14px 16px;text-align:center;margin:16px 0}
 .ref-box .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .ref-box .code{font-family:var(--font-mono);font-size:19px;font-weight:700;color:var(--gold-hi);margin-top:4px;word-break:break-all}
+.ref-box-perks{display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap}
+.ref-box-perks .perk{display:flex;align-items:center;gap:5px;background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-full);padding:6px 12px;font-size:10.5px;font-weight:700;color:var(--paper)}
+.ref-box-perks .perk b{color:var(--gold-hi);font-family:var(--font-mono)}
+.ref-box-perks .perk i{color:var(--gold-hi);font-size:10px}
+.ref-box-perks .perk span{color:var(--green)}
 .bank-list{list-style:none;font-size:13.5px;line-height:2}
 .bank-list b{color:var(--muted);font-weight:600}
 .share-row{display:flex;gap:8px;margin-top:16px}
-.share-btn{flex:1;padding:11px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:8px;font-size:12.5px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.share-btn{flex:1;padding:13px 8px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;font-size:11.5px;font-weight:700;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--paper);transition:transform .15s}
+.share-btn i{font-size:17px}
+.share-btn:active{transform:scale(.96)}
+.share-btn#shareWaBtn{background:rgba(37,211,102,0.12);border-color:rgba(37,211,102,0.4);color:#25D366}
+.share-btn#shareWaBtn i{color:#25D366}
+.share-btn#shareCopyBtn{background:rgba(233,200,118,0.12);border-color:rgba(233,200,118,0.4)}
+.share-btn#shareCopyBtn i{color:var(--gold-hi)}
+.share-btn#shareImgBtn{background:rgba(155,0,0,0.12);border-color:rgba(155,0,0,0.35)}
+.share-btn#shareImgBtn i{color:var(--red-hi)}
 
 /* Estampillas confirmadas (pantalla de éxito) */
 .stamp-cards{display:flex;flex-direction:column;gap:10px;margin:16px 0}
@@ -702,13 +715,16 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <div class="ref-box">
       <div class="lbl">👉 Este es tu link personal de referidos</div>
       <div class="code" id="pendRefCode" style="font-size:15px">—</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">Compártelo: cada 4 estampillas que tus amigos compren usando este link, ganas 1 estampilla gratis para ti.</div>
+      <div class="ref-box-perks">
+        <div class="perk"><b>×4</b> amigos <i class="fas fa-arrow-right"></i> <span>+1 gratis</span></div>
+        <div class="perk"><i class="fas fa-crown"></i> Top 3 <span>ganan premio</span></div>
+      </div>
     </div>
 
     <div class="share-row">
       <a class="share-btn" id="shareWaBtn" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-      <button class="share-btn" onclick="copyRefLink()"><i class="fas fa-link"></i> Copiar link</button>
-      <button class="share-btn" onclick="shareImage()"><i class="fas fa-image"></i> Imagen</button>
+      <button class="share-btn" id="shareCopyBtn" onclick="copyRefLink()"><i class="fas fa-link"></i> Copiar link</button>
+      <button class="share-btn" id="shareImgBtn" onclick="shareImage()"><i class="fas fa-image"></i> Imagen</button>
     </div>
   </div>
 </div>
@@ -1063,18 +1079,6 @@ function selectPack(slug) {
 document.getElementById('buyBtn').addEventListener('click', openCheckout);
 
 /* ---------- Validaciones de datos del comprador ---------- */
-function calcularDVRut(body) {
-  let suma = 0, mult = 2;
-  for (let i = body.length - 1; i >= 0; i--) {
-    suma += parseInt(body[i], 10) * mult;
-    mult = mult === 7 ? 2 : mult + 1;
-  }
-  const resto = 11 - (suma % 11);
-  if (resto === 11) return '0';
-  if (resto === 10) return 'K';
-  return String(resto);
-}
-
 function isValidNombre(v) {
   const partes = v.trim().split(/\s+/);
   const rx = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ'-]{2,}$/;
@@ -1091,12 +1095,14 @@ function isValidTelefono(v) {
   return /^9\d{8}$/.test(local);
 }
 
-// RUT chileno con dígito verificador real (módulo 11), o si no calza
-// con el formato de RUT, se acepta como pasaporte extranjero.
+// RUT chileno (7-8 dígitos + dígito verificador 0-9/K) o, si no calza
+// con ese formato, se acepta como pasaporte extranjero. Solo se valida
+// el formato, sin exigir que el dígito verificador cierre matemático
+// (módulo 11) — de lo contrario un typo en el propio DV bloquea la
+// compra de un cliente real.
 function isValidRutOPasaporte(v) {
   const clean = v.replace(/[.\s]/g, '').toUpperCase();
-  const m = clean.match(/^(\d{7,8})-?([0-9K])$/);
-  if (m) return m[2] === calcularDVRut(m[1]);
+  if (/^\d{7,8}-?[0-9K]$/.test(clean)) return true;
   return /^[A-Z0-9]{6,15}$/.test(clean);
 }
 
