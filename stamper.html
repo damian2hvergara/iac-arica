@@ -54,10 +54,12 @@ a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 input{font-family:inherit;font-size:15px}
-/* Ancho fijo tipo celular en TODOS los dispositivos — la web debe
-   verse idéntica en desktop, tablet o teléfono, tomando el mobile
-   como diseño base (a propósito del usuario). */
-.wrap{max-width:480px;margin:0 auto;padding:0 18px}
+/* Misma identidad visual en cualquier dispositivo (mismas secciones,
+   mismas grillas, mismos componentes — nunca un layout distinto en
+   desktop) pero sin quedar "reducido": el contenedor y la tipografía
+   crecen de forma continua con el viewport hasta un tope, en vez de
+   quedar fijos al ancho de un celular en pantallas grandes. */
+.wrap{max-width:clamp(480px, 70vw, 760px);margin:0 auto;padding:0 18px}
 
 /* Fondos alternados por sección — ritmo visual sin perder la paleta IAC */
 .band{position:relative}
@@ -91,14 +93,14 @@ main{padding-top:56px}
     radial-gradient(ellipse 90% 55% at 50% -8%,rgba(155,0,0,0.3),transparent 60%);
   pointer-events:none;z-index:1}
 .hero .wrap{position:relative;z-index:2}
-.mega-kicker{font-family:var(--font-h);font-weight:800;font-size:38px;text-transform:uppercase;letter-spacing:1px;line-height:1;margin-bottom:10px;background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero h1{font-family:var(--font-h);font-weight:800;font-size:32px;text-transform:uppercase;line-height:0.98;text-wrap:balance;text-shadow:0 4px 20px rgba(0,0,0,0.65)}
+.mega-kicker{font-family:var(--font-h);font-weight:800;font-size:clamp(38px, 5vw, 58px);text-transform:uppercase;letter-spacing:1px;line-height:1;margin-bottom:10px;background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1{font-family:var(--font-h);font-weight:800;font-size:clamp(32px, 4.4vw, 50px);text-transform:uppercase;line-height:0.98;text-wrap:balance;text-shadow:0 4px 20px rgba(0,0,0,0.65)}
 .hero h1 em{
   font-style:normal;
   background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
-.hero p.sub{color:var(--paper);opacity:.85;margin-top:14px;font-size:14.5px;max-width:48ch;margin-inline:auto;text-shadow:0 2px 10px rgba(0,0,0,0.6)}
+.hero p.sub{color:var(--paper);opacity:.85;margin-top:14px;font-size:clamp(14.5px, 1.5vw, 17px);max-width:48ch;margin-inline:auto;text-shadow:0 2px 10px rgba(0,0,0,0.6)}
 
 /* CTA principal del hero — vender el sticker es el objetivo #1 de
    la página, tiene que ser lo primero clicable que se vea. */
@@ -156,7 +158,7 @@ main{padding-top:56px}
 
 /* Section label */
 .section-label{display:flex;align-items:baseline;gap:14px;margin:0 0 22px}
-.section-label h2{font-family:var(--font-h);font-weight:700;font-size:21px;text-transform:uppercase}
+.section-label h2{font-family:var(--font-h);font-weight:700;font-size:clamp(21px, 2.4vw, 30px);text-transform:uppercase}
 .section-label .rule{flex:1;height:1px;background:var(--line-hi)}
 .section-label .tag{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);letter-spacing:1.3px;text-transform:uppercase}
 
@@ -356,6 +358,29 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 .skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);background-size:400% 100%;animation:shimmer 1.4s infinite}
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
 @media(prefers-reduced-motion:reduce){.plate{transition:none}}
+
+/* Pantallas grandes: mismos componentes y la misma grilla de siempre
+   (nunca cambia la estructura), solo más grandes y con más aire —
+   así el diseño no se ve reducido dentro de un monitor de escritorio. */
+@media(min-width:860px){
+  .packs-grid{gap:16px}
+  .plate-name{font-size:15px}
+  .plate-sub{font-size:9.5px}
+  .plate-price{font-size:19px}
+  .plate-per{font-size:8.5px}
+  .rarity{font-size:8.5px;padding:3px 8px}
+  .plate-locale{font-size:8.5px}
+  .plate-badge{font-size:8.5px;padding:4px 9px}
+  .step-icon{width:46px;height:46px;font-size:18px}
+  .step-card h3{font-size:13px}
+  .trust-card i{font-size:17px}
+  .trust-card h3{font-size:12px}
+  .premio-name{font-size:30px}
+  .premio-value{font-size:21px}
+  .buy-cta{font-size:18px}
+  .hero-buy-btn{max-width:400px;font-size:16.5px}
+  .buy-sticky-btn{max-width:560px}
+}
 </style>
 </head>
 <body>
