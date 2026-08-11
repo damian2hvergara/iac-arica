@@ -376,6 +376,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 .ref-row .ct-wrap{text-align:right}
 .ref-row .ct{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
 .ref-row .prize{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--green);margin-top:1px}
+.ref-toggle-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;max-width:420px;margin:10px auto 0;padding:9px;background:var(--surface);border:1px solid var(--line-hi);border-radius:10px;color:var(--gold-hi);font-size:11.5px;font-weight:700}
 .referidores-note{text-align:center;color:var(--muted);font-size:11px;margin-top:10px}
 .referidores-note i{margin-right:4px}
 .ref-row.medal-1{background:linear-gradient(135deg,rgba(233,200,118,0.16),var(--surface));border-color:rgba(233,200,118,0.5)}
@@ -589,6 +590,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <span>Los <b>3 primeros lugares</b> de este ranking ganan premio en dinero efectivo: <b>1° $300.000</b> · <b>2° $150.000</b> · <b>3° $50.000</b>. Se pagan el mismo día del sorteo.</span>
     </div>
     <div class="referidores-list" id="referidoresList"></div>
+    <button class="ref-toggle-btn" id="refToggleBtn" style="display:none"></button>
     <p class="referidores-note"><i class="fas fa-lock"></i> Mostramos solo el primer nombre e inicial del apellido de cada persona, para proteger su privacidad.</p>
     <details class="ref-details">
       <summary>¿Cómo funciona el sistema de referidos? <i class="fas fa-chevron-down"></i></summary>
@@ -838,11 +840,11 @@ async function renderRefBanner() {
 /* ---------- Top referidores ---------- */
 async function loadTopReferidores() {
   try {
-    const top = await stamperAPI.topReferidores(5);
+    const top = await stamperAPI.topReferidores(20);
     if (!top.length) return;
     const PRIZES = ['$300.000', '$150.000', '$50.000'];
     document.getElementById('referidoresList').innerHTML = top.map((r, i) => `
-      <div class="ref-row ${i < 3 ? 'medal-' + (i + 1) : ''}">
+      <div class="ref-row ${i < 3 ? 'medal-' + (i + 1) : ''} ${i >= 5 ? 'ref-row-extra' : ''}" ${i >= 5 ? 'style="display:none"' : ''}>
         <div class="pos">${i < 3 ? `<i class="fas fa-${i === 0 ? 'crown' : 'medal'}"></i>` : i + 1}</div>
         <div class="nm">${escapeHtml(r.nombre_publico)}</div>
         <div class="ct-wrap">
@@ -851,6 +853,24 @@ async function loadTopReferidores() {
         </div>
       </div>
     `).join('');
+
+    const toggleBtn = document.getElementById('refToggleBtn');
+    if (top.length > 5) {
+      toggleBtn.style.display = 'flex';
+      toggleBtn.dataset.expanded = 'false';
+      toggleBtn.innerHTML = `Ver top ${top.length} completo <i class="fas fa-chevron-down"></i>`;
+      toggleBtn.onclick = () => {
+        const expanded = toggleBtn.dataset.expanded === 'true';
+        document.querySelectorAll('.ref-row-extra').forEach(el => el.style.display = expanded ? 'none' : 'flex');
+        toggleBtn.dataset.expanded = String(!expanded);
+        toggleBtn.innerHTML = expanded
+          ? `Ver top ${top.length} completo <i class="fas fa-chevron-down"></i>`
+          : `Ver menos <i class="fas fa-chevron-up"></i>`;
+      };
+    } else {
+      toggleBtn.style.display = 'none';
+    }
+
     document.getElementById('referidoresSection').style.display = 'block';
   } catch (e) {
     console.error('Error cargando top referidores:', e);
