@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mis Stickers | IAC Arica 2026 — No Sueñes, Gánatelo</title>
-<meta name="description" content="Consulta el estado de tu Sticker Digital y tus números de participación en el sorteo IAC Arica 2026.">
+<meta name="description" content="Consulta con tu correo todos tus Stickers Digitales y números de participación en el sorteo IAC Arica 2026.">
 <link rel="canonical" href="https://iac-arica.cl/mi-cuenta.html">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -26,24 +26,30 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
 .field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
 .field input:focus{outline:none;border-color:var(--red)}
-.field .hint{color:var(--muted);font-size:11.5px;margin-top:5px}
 .submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:999px;font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:6px}
 .submit-btn:disabled{opacity:.5}
 .err{color:var(--danger);font-size:13px;text-align:center;margin-top:14px;display:none}
-.result{display:none;margin-top:26px}
-.result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
+.result{display:none;margin-top:26px;display:flex;flex-direction:column;gap:14px}
+.order-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
 .pill{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
 .pill-pend{background:rgba(245,158,11,0.16);color:var(--orange)}
 .pill-ok{background:rgba(0,197,102,0.16);color:var(--green)}
 .pill-rej{background:rgba(255,59,48,0.16);color:var(--danger)}
-.result-name{font-family:var(--font-h);font-size:20px;margin-top:12px}
-.result-meta{color:var(--muted);font-size:13px;margin-top:4px}
-.folio-list{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.order-name{font-family:var(--font-h);font-size:19px;margin-top:12px}
+.order-meta{color:var(--muted);font-size:12.5px;margin-top:3px}
+.folio-list{margin-top:14px;display:flex;flex-direction:column;gap:8px}
 .folio-item{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:12px}
 .folio-item img{width:52px;height:38px;object-fit:cover;border-radius:6px;flex-shrink:0;background:var(--surface)}
 .folio-item .info{flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .folio-item .code{font-family:'SFMono-Regular',Consolas,monospace;font-weight:700;color:var(--gold)}
 .folio-item .bonus{font-size:10px;color:var(--green);text-transform:uppercase}
+.order-pending-note{margin-top:12px;color:var(--muted);font-size:12.5px}
+.resend-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:11px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);font-size:13px;font-weight:600}
+.resend-btn:active{background:var(--surface)}
+.resend-btn:disabled{opacity:.5}
+.resend-msg{font-size:11.5px;text-align:center;margin-top:8px;min-height:14px}
+.resend-msg.ok{color:var(--green)}
+.resend-msg.err{color:var(--danger)}
 </style>
 </head>
 <body>
@@ -54,46 +60,35 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
 
 <div class="wrap">
   <h1>Mis Stickers</h1>
-  <p class="sub">Ingresa el correo con el que compraste y tu referencia de orden o el folio de tu sticker.</p>
+  <p class="sub">Ingresa el correo con el que compraste y te mostramos todos tus números de participación.</p>
 
   <div class="field">
     <label>Correo electrónico</label>
     <input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com">
   </div>
-  <div class="field">
-    <label>Referencia de orden o folio</label>
-    <input id="inId" placeholder="IAC-ORD-XXXXXXXX o IAC-XXXX-XXXX">
-    <div class="hint">La referencia te la mostramos al comprar; el folio te llega por correo cuando se confirma tu pago.</div>
-  </div>
 
-  <button class="submit-btn" id="searchBtn">Buscar</button>
+  <button class="submit-btn" id="searchBtn">Buscar mis stickers</button>
   <div class="err" id="errMsg"></div>
 
-  <div class="result" id="result">
-    <div class="result-card">
-      <span class="pill" id="pillEstado"></span>
-      <div class="result-name" id="resNombre"></div>
-      <div class="result-meta" id="resMeta"></div>
-      <div class="folio-list" id="folioList"></div>
-    </div>
-  </div>
+  <div class="result" id="result"></div>
 </div>
 
 <script src="js/config.js?v=20260809"></script>
 <script src="js/stamper-api.js?v=20260809"></script>
 <script>
 document.getElementById('searchBtn').addEventListener('click', buscar);
+document.getElementById('inEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') buscar(); });
 
 async function buscar() {
   const email = document.getElementById('inEmail').value.trim();
-  const identificador = document.getElementById('inId').value.trim();
   const errEl = document.getElementById('errMsg');
   const resultEl = document.getElementById('result');
   errEl.style.display = 'none';
   resultEl.style.display = 'none';
+  resultEl.innerHTML = '';
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !identificador) {
-    errEl.textContent = 'Ingresa tu correo y tu referencia o folio.';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Ingresa un correo válido.';
     errEl.style.display = 'block';
     return;
   }
@@ -103,63 +98,114 @@ async function buscar() {
   btn.textContent = 'Buscando…';
 
   try {
-    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/lookup-order`, {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/lookup-stickers-by-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
-      body: JSON.stringify({ email, identificador })
+      body: JSON.stringify({ email })
     });
     const data = await res.json();
     if (!data.ok) {
-      errEl.textContent = data.error || 'No encontramos una orden con esos datos.';
+      errEl.textContent = data.error || 'No encontramos compras con ese correo.';
       errEl.style.display = 'block';
       return;
     }
-    renderResultado(data);
+    renderResultado(email, data.ordenes);
   } catch (e) {
     console.error(e);
     errEl.textContent = 'No pudimos hacer la búsqueda. Intenta de nuevo.';
     errEl.style.display = 'block';
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Buscar';
+    btn.textContent = 'Buscar mis stickers';
   }
 }
 
-function renderResultado(data) {
-  const pill = document.getElementById('pillEstado');
-  const estados = {
-    pendiente_pago: { label: 'Pendiente de pago', cls: 'pill-pend' },
-    completado: { label: 'Confirmado', cls: 'pill-ok' },
-    rechazado: { label: 'Rechazado', cls: 'pill-rej' },
-    reembolsado: { label: 'Reembolsado', cls: 'pill-pend' }
-  };
-  const info = estados[data.estado] || { label: data.estado, cls: 'pill-pend' };
-  pill.textContent = info.label;
-  pill.className = 'pill ' + info.cls;
+const ESTADOS = {
+  pendiente_pago: { label: 'Pendiente de pago', cls: 'pill-pend' },
+  completado: { label: 'Confirmado', cls: 'pill-ok' },
+  rechazado: { label: 'Rechazado', cls: 'pill-rej' },
+  reembolsado: { label: 'Reembolsado', cls: 'pill-pend' }
+};
 
-  document.getElementById('resNombre').textContent = escapeHtml(data.nombre);
-  document.getElementById('resMeta').textContent =
-    `${escapeHtml(data.pack)} · ${data.cantidad_stickers} stickers · $${Number(data.monto_total).toLocaleString('es-CL')}`;
+function renderResultado(email, ordenes) {
+  const result = document.getElementById('result');
+  result.innerHTML = ordenes.map((o, oi) => {
+    const info = ESTADOS[o.estado] || { label: o.estado, cls: 'pill-pend' };
+    const images = (o.vehicleImages || []).map((url, idx) => ({ image_url: url, order_index: idx }));
+    const fecha = o.fecha ? new Date(o.fecha).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
-  const list = document.getElementById('folioList');
-  const images = (data.vehicleImages || []).map((url, idx) => ({ image_url: url, order_index: idx }));
-  if (data.folios && data.folios.length) {
-    list.innerHTML = data.folios.map((f, i) => {
-      const img = images.length ? pickStickerImage(images, i) : null;
-      return `
-      <div class="folio-item">
-        ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(data.vehicleName || 'tu premio')}">` : ''}
-        <div class="info">
-          <span class="code">${escapeHtml(f.numero_folio)}</span>
-          ${f.es_bonus ? '<span class="bonus">Bono referido</span>' : ''}
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    list.innerHTML = '<p style="color:var(--muted);font-size:13px">Tus folios aparecerán aquí apenas se confirme tu pago.</p>';
+    let folioListHtml;
+    if (o.folios && o.folios.length) {
+      folioListHtml = `<div class="folio-list">` + o.folios.map((f, i) => {
+        const img = images.length ? pickStickerImage(images, i) : null;
+        return `
+        <div class="folio-item">
+          ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(o.vehicleName || 'tu premio')}">` : ''}
+          <div class="info">
+            <span class="code">${escapeHtml(f.numero_folio)}</span>
+            ${f.es_bonus ? '<span class="bonus">Bono referido</span>' : ''}
+          </div>
+        </div>`;
+      }).join('') + `</div>`;
+    } else if (o.estado === 'pendiente_pago') {
+      folioListHtml = `<div class="order-pending-note">Tus folios aparecerán aquí apenas se confirme tu pago.</div>`;
+    } else {
+      folioListHtml = '';
+    }
+
+    const resendHtml = o.estado === 'completado' ? `
+      <button class="resend-btn" data-orden-id="${escapeHtml(o.ordenId)}" data-idx="${oi}">
+        <i class="fas fa-paper-plane"></i> Reenviar por correo
+      </button>
+      <div class="resend-msg" id="resendMsg-${oi}"></div>
+    ` : '';
+
+    return `
+    <div class="order-card">
+      <span class="pill ${info.cls}">${info.label}</span>
+      <div class="order-name">${escapeHtml(o.pack || 'Sticker Digital')}</div>
+      <div class="order-meta">${o.cantidad_stickers} stickers · $${Number(o.monto_total).toLocaleString('es-CL')} · ${fecha}</div>
+      ${folioListHtml}
+      ${resendHtml}
+    </div>`;
+  }).join('');
+
+  result.style.display = 'flex';
+
+  result.querySelectorAll('.resend-btn').forEach(btn => {
+    btn.addEventListener('click', () => reenviarCorreo(email, btn.dataset.ordenId, btn.dataset.idx, btn));
+  });
+}
+
+async function reenviarCorreo(email, ordenId, idx, btn) {
+  const msgEl = document.getElementById('resendMsg-' + idx);
+  msgEl.textContent = '';
+  msgEl.className = 'resend-msg';
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando…';
+
+  try {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/resend-stamp-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+      body: JSON.stringify({ email, ordenId })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      msgEl.textContent = '✅ Te lo reenviamos — revisa tu correo (y spam).';
+      msgEl.classList.add('ok');
+    } else {
+      msgEl.textContent = data.error || 'No pudimos reenviar el correo.';
+      msgEl.classList.add('err');
+    }
+  } catch (e) {
+    console.error(e);
+    msgEl.textContent = 'No pudimos reenviar el correo. Intenta de nuevo.';
+    msgEl.classList.add('err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Reenviar por correo';
   }
-
-  document.getElementById('result').style.display = 'block';
 }
 </script>
 </body>
