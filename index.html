@@ -226,6 +226,45 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .trust-item strong{color:var(--text);}
 
 /* ============================================
+   TOPBAR — pill del sorteo
+   ============================================ */
+.topbar-sorteo{
+  display:flex;align-items:center;gap:6px;
+  padding:8px 12px;
+  background:rgba(233,200,118,0.14);
+  border:1px solid rgba(233,200,118,0.4);
+  color:#f0d080;
+  border-radius:var(--r-full);
+  font-size:12.5px;font-weight:700;
+  transition:background 0.2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.topbar-sorteo:active{background:rgba(233,200,118,0.24);}
+
+/* ============================================
+   PROMO SORTEO — conecta con stamper.html
+   ============================================ */
+.sorteo-promo{padding:0 20px 8px}
+.sorteo-promo-card{
+  position:relative;overflow:hidden;text-align:center;
+  background:linear-gradient(155deg,#1c1710,var(--surface) 60%);
+  border:1px solid rgba(233,200,118,0.25);
+  border-radius:var(--r-lg);
+  padding:24px 20px;
+}
+.sorteo-promo-card::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(233,200,118,0.16),transparent 65%);
+}
+.sp-media{position:relative;z-index:1;width:100%;aspect-ratio:16/9;border-radius:var(--r-md);overflow:hidden;margin-bottom:16px;background:var(--surface-2)}
+.sp-media img{width:100%;height:100%;object-fit:cover}
+.sp-badge{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;background:rgba(233,200,118,0.14);border:1px solid rgba(233,200,118,0.4);color:#f0d080;font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:5px 12px;border-radius:var(--r-full);margin-bottom:12px}
+.sp-title{position:relative;z-index:1;font-family:var(--font-h);font-size:clamp(22px,6vw,28px);font-weight:800;color:var(--white);line-height:1.1;margin-bottom:8px}
+.sp-title span{color:#f0d080}
+.sp-sub{position:relative;z-index:1;font-size:13.5px;color:var(--muted);line-height:1.6;max-width:400px;margin:0 auto 20px}
+.sp-cta{position:relative;z-index:1;display:inline-flex;align-items:center;gap:9px;background:var(--red);color:var(--white);font-family:var(--font-h);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;padding:14px 26px;border-radius:var(--r-full);box-shadow:0 8px 24px rgba(155,0,0,0.35);-webkit-tap-highlight-color:transparent}
+
+/* ============================================
    SECCIÓN COMÚN
    ============================================ */
 .section{padding:52px 20px;}
@@ -1045,6 +1084,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
         <i class="fab fa-instagram"></i>
       </a>
     </div>
+    <a class="topbar-sorteo" href="stamper.html" onclick="trackEvent('click','Sorteo','Topbar')">
+      <i class="fas fa-gift"></i> Sorteo
+    </a>
     <a class="topbar-wa" href="https://wa.me/56953526956?text=Hola%2C%20me%20interesa%20importar%20un%20vehículo" target="_blank" rel="noopener">
       <i class="fab fa-whatsapp"></i> WhatsApp
     </a>
@@ -1094,6 +1136,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <div class="trust-item"><i class="fas fa-star"></i><span><strong>+142</strong> entregas</span></div>
   </div>
 </div>
+
+<!-- ========= PROMO SORTEO ========= -->
+<section class="sorteo-promo" id="sorteoPromo" style="display:none">
+  <div class="sorteo-promo-card">
+    <div class="sp-media" id="spMedia"><img id="spVehicleImg" alt="" loading="lazy"></div>
+    <div class="sp-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
+    <h2 class="sp-title">Gana <span id="spVehicleName">un vehículo de nuestro inventario</span></h2>
+    <p class="sp-sub">Compra tu Sticker Digital coleccionable desde $5.500 y participa. Invita a tus amigos con tu link y gana estampillas gratis.</p>
+    <a class="sp-cta" href="stamper.html" onclick="trackEvent('click','Sorteo','Promo Banner')">
+      <i class="fas fa-ticket-alt"></i> Comprar mi Sticker Digital
+    </a>
+  </div>
+</section>
 
 <!-- ========= VEHÍCULOS ========= -->
 <section class="section" id="vehicles">
@@ -1338,6 +1393,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     +56953526956<br>
     contacto@importamericancars.cl
   </div>
+  <a href="stamper.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:14px;color:#f0d080;font-size:12.5px;font-weight:600" onclick="trackEvent('click','Sorteo','Footer')">
+    <i class="fas fa-gift"></i> Sorteo: gana un vehículo — compra tu Sticker Digital
+  </a>
   <div class="footer-social">
     <a class="social-link" href="https://wa.me/56953526956" target="_blank" rel="noopener" onclick="trackEvent('social_follow','WhatsApp','Footer')" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
     <a class="social-link" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" onclick="trackEvent('social_follow','Instagram','Footer')" title="Instagram"><i class="fab fa-instagram"></i></a>
@@ -1431,6 +1489,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 <!-- ========= SCRIPTS ========= -->
 <script src="js/config.js?v=20260809"></script>
 <script src="js/api.js?v=20260809"></script>
+<script src="js/stamper-api.js?v=20260809"></script>
 
 <script>
 /* =============================================
@@ -1451,8 +1510,48 @@ document.addEventListener('DOMContentLoaded', async () => {
   handleDeepLink();
   initVideoFeed();
   initWelcomeVideo();
+  loadSorteoPromo();
   trackEvent('page_loaded','Engagement','Home');
 });
+
+/* — Promo del sorteo (banner que conecta con stamper.html) — */
+async function loadSorteoPromo() {
+  try {
+    stamperAPI.init();
+    const sorteo = await stamperAPI.getSorteoPublico();
+    if (!sorteo) return;
+
+    let vehicleName = 'un vehículo de nuestro inventario';
+    let vehicleImg = sorteo.hero_imagen_url || '';
+
+    if (sorteo.vehicle_id) {
+      try {
+        const vehicle = await stamperAPI.getVehiclePublico(sorteo.vehicle_id);
+        if (vehicle) {
+          vehicleName = vehicle.name;
+          if (!vehicleImg) {
+            const img = vehicle.vehicle_images?.find(i => i.is_main)?.image_url || vehicle.vehicle_images?.[0]?.image_url;
+            if (img) vehicleImg = img;
+          }
+        }
+      } catch (e) {
+        console.error('Error cargando vehículo del sorteo:', e);
+      }
+    }
+
+    document.getElementById('spVehicleName').textContent = vehicleName;
+    if (vehicleImg) {
+      const imgEl = document.getElementById('spVehicleImg');
+      imgEl.src = vehicleImg;
+      imgEl.alt = vehicleName;
+    } else {
+      document.getElementById('spMedia').style.display = 'none';
+    }
+    document.getElementById('sorteoPromo').style.display = 'block';
+  } catch (e) {
+    console.error('Error cargando promo del sorteo:', e);
+  }
+}
 
 /* — Cargar vehículos — */
 async function loadVehicles() {

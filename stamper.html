@@ -100,6 +100,26 @@ main{padding-top:56px}
 }
 .hero p.sub{color:var(--paper);opacity:.85;margin-top:14px;font-size:14.5px;max-width:48ch;margin-inline:auto;text-shadow:0 2px 10px rgba(0,0,0,0.6)}
 
+/* CTA principal del hero — vender el sticker es el objetivo #1 de
+   la página, tiene que ser lo primero clicable que se vea. */
+.hero-cta-row{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:20px}
+.hero-buy-btn{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;max-width:340px;padding:15px;
+  background:var(--red);color:#fff;
+  font-family:var(--font-h);font-size:15.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;
+  border-radius:var(--r-full);
+  box-shadow:0 8px 24px rgba(155,0,0,0.4);
+  animation:heroCtaPulse 2.4s ease-in-out infinite;
+}
+@keyframes heroCtaPulse{
+  0%,100%{box-shadow:0 8px 24px rgba(155,0,0,0.4)}
+  50%{box-shadow:0 10px 30px rgba(155,0,0,0.65),0 0 0 5px rgba(155,0,0,0.14)}
+}
+@media(prefers-reduced-motion:reduce){.hero-buy-btn{animation:none}}
+.hero-ref-link{display:flex;align-items:center;gap:7px;color:var(--gold-hi);font-size:12px;font-weight:600}
+.hero-ref-link i{font-size:12px}
+
 /* Trust badges */
 .trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
 .trust-badge{display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-full);padding:7px 14px;font-size:11.5px;color:var(--muted)}
@@ -238,11 +258,16 @@ main{padding-top:56px}
 .buy-cta{display:block;width:100%;max-width:380px;margin:26px auto 0;padding:16px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;box-shadow:0 8px 24px rgba(155,0,0,0.35)}
 .buy-cta:disabled{opacity:.5;box-shadow:none}
 
-/* Invita y gana */
-.referral-strip{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;margin-top:8px}
-.referral-strip i{font-size:22px;color:var(--gold-hi);flex-shrink:0}
-.referral-strip .t{font-weight:700;font-size:13.5px;margin-bottom:2px}
-.referral-strip .d{color:var(--muted);font-size:12.5px}
+/* Invita y gana — tiene que notarse a simple vista, no solo leerse */
+.referral-strip{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(233,200,118,0.14),var(--surface) 65%);border:1px solid rgba(233,200,118,0.3);border-radius:var(--r-lg);padding:16px 16px;margin-top:8px}
+.rs-icon{width:42px;height:42px;border-radius:50%;background:linear-gradient(150deg,var(--gold-hi),var(--gold));display:flex;align-items:center;justify-content:center;font-size:17px;color:#0B0A09;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,0.35)}
+.rs-body{flex:1;min-width:0}
+.rs-body .t{font-weight:700;font-size:13.5px;margin-bottom:2px}
+.rs-body .d{color:var(--muted);font-size:11px;line-height:1.4}
+.rs-chip{flex-shrink:0;display:flex;align-items:center;gap:5px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;padding:7px 9px;font-family:var(--font-mono);font-weight:700;color:var(--gold-hi);text-align:center}
+.rs-chip b{font-size:13px;display:block}
+.rs-chip i{font-size:8px;color:var(--muted);display:block;margin:1px 0}
+.rs-chip span{display:block;color:var(--green);text-transform:uppercase;font-size:8px;letter-spacing:.3px}
 
 /* Checkout / Pending overlay */
 .overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:70px 16px 40px}
@@ -321,7 +346,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 <body>
 
 <div class="topbar">
-  <div class="brand">IAC <span>Arica</span> 2026</div>
+  <a class="brand" href="index.html">IAC <span>Arica</span> 2026</a>
   <nav class="topbar-nav">
     <a href="bases.html">Bases legales</a>
     <a href="mi-cuenta.html">Mis stickers</a>
@@ -334,6 +359,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
   </div>
 </div>
 <nav class="topbar-dropdown" id="topbarDropdown">
+  <a href="index.html"><i class="fas fa-car" style="margin-right:6px;color:var(--gold-hi)"></i> Ver vehículos IAC</a>
   <a href="bases.html">Bases legales</a>
   <a href="mi-cuenta.html">Mis stickers</a>
   <a href="contacto.html">Contacto</a>
@@ -351,6 +377,11 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="eyebrow">Sorteo notariado · IAC Arica</div>
       <h1 id="heroTitle">No sueñes,<br><em>gánatelo</em></h1>
       <p class="sub" id="heroSub">Compra tu Sticker Digital y participa en el sorteo de un vehículo de nuestro inventario real.</p>
+
+      <div class="hero-cta-row" id="heroCtaRow">
+        <a href="#packsSection" class="hero-buy-btn"><i class="fas fa-ticket-alt"></i> Comprar mi Sticker Digital</a>
+        <a href="#referidoresSection" class="hero-ref-link"><i class="fas fa-gift"></i> Invita a tus amigos y gana estampillas gratis</a>
+      </div>
 
       <div class="trust-row">
         <div class="trust-badge"><i class="fas fa-gavel"></i> Sorteo notariado</div>
@@ -448,11 +479,12 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
     <button class="buy-cta" id="buyBtn" disabled>Comprar Sticker Digital</button>
 
     <div class="referral-strip">
-      <i class="fas fa-gift"></i>
-      <div>
+      <div class="rs-icon"><i class="fas fa-gift"></i></div>
+      <div class="rs-body">
         <div class="t">Invita y gana</div>
-        <div class="d">Después de comprar te damos un link personal — cada 4 estampillas que tus amigos compren con él, ganas 1 estampilla extra gratis. Es tu propio sistema de referidos.</div>
+        <div class="d">Después de comprar te damos un link personal para compartir con tus amigos.</div>
       </div>
+      <div class="rs-chip"><b>×4</b><i class="fas fa-arrow-down"></i><span>+1 gratis</span></div>
     </div>
   </section>
 
@@ -515,6 +547,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 
   <footer class="wrap">
     <div class="foot-links">
+      <a href="index.html">Ver vehículos IAC</a>
       <a href="stamper.html">Sorteo</a>
       <a href="bases-resumen.html">Resumen de bases</a>
       <a href="bases.html">Bases legales</a>
@@ -656,6 +689,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function showNoSorteoState() {
   document.getElementById('countdown').style.display = 'none';
   document.getElementById('cdCaption').style.display = 'none';
+  document.getElementById('heroCtaRow').style.display = 'none';
   document.getElementById('premioSection').style.display = 'none';
   document.getElementById('packsSection').style.display = 'none';
   document.querySelectorAll('.needs-sorteo').forEach(el => el.style.display = 'none');
