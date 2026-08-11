@@ -118,8 +118,19 @@ main{padding-top:56px}
   50%{box-shadow:0 10px 30px rgba(155,0,0,0.65),0 0 0 5px rgba(155,0,0,0.14)}
 }
 @media(prefers-reduced-motion:reduce){.hero-buy-btn{animation:none}}
-.hero-ref-link{display:flex;align-items:center;gap:7px;color:var(--gold-hi);font-size:12px;font-weight:600}
-.hero-ref-link i{font-size:12px}
+.hero-ref-link{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(233,200,118,0.12);
+  border:1px solid rgba(233,200,118,0.4);
+  color:var(--gold-hi);font-size:12.5px;font-weight:700;
+  padding:9px 18px;border-radius:var(--r-full);
+}
+.hero-ref-link .ref-ico{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(150deg,var(--gold-hi),var(--gold));
+  display:flex;align-items:center;justify-content:center;
+  color:#0B0A09;font-size:10px;
+}
 
 /* Trust badges */
 .trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
@@ -386,7 +397,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 
       <div class="hero-cta-row" id="heroCtaRow">
         <a href="#packsSection" class="hero-buy-btn"><i class="fas fa-ticket-alt"></i> Comprar mi Sticker Digital</a>
-        <a href="#referidoresSection" class="hero-ref-link"><i class="fas fa-gift"></i> Invita a tus amigos y gana estampillas gratis</a>
+        <a href="#referidoresSection" class="hero-ref-link"><span class="ref-ico"><i class="fas fa-gift"></i></span> Invita a tus amigos y gana un sticker gratis</a>
       </div>
 
       <div class="trust-row">
