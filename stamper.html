@@ -354,6 +354,24 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 .ref-row .ct{font-family:var(--font-mono);font-size:11px;color:var(--muted)}
 .referidores-note{text-align:center;color:var(--muted);font-size:11px;margin-top:10px}
 .referidores-note i{margin-right:4px}
+.ref-row.champion{background:linear-gradient(135deg,rgba(233,200,118,0.14),var(--surface));border-color:rgba(233,200,118,0.45)}
+.ref-row .pos i{color:var(--gold-hi);font-size:15px}
+
+/* Banner del premio sorpresa + acordeón "cómo funciona" — breve por
+   defecto, el detalle completo queda a un clic. */
+.ref-prize-banner{display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;background:linear-gradient(135deg,rgba(233,200,118,0.16),rgba(155,0,0,0.08));border:1px solid rgba(233,200,118,0.35);border-radius:var(--r-full);padding:10px 16px;font-size:11.5px;color:var(--paper);margin-bottom:16px}
+.ref-prize-banner i{color:var(--gold-hi);font-size:13px;flex-shrink:0}
+.ref-prize-banner b{color:var(--gold-hi)}
+.ref-details{max-width:420px;margin:14px auto 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ref-details summary{padding:12px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--gold-hi);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ref-details summary::-webkit-details-marker{display:none}
+.ref-details summary i{font-size:11px;color:var(--muted);transition:transform .2s;flex-shrink:0}
+.ref-details[open] summary{border-bottom:1px solid var(--line)}
+.ref-details[open] summary i{transform:rotate(180deg)}
+.ref-details-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.rdb-step{display:flex;align-items:flex-start;gap:10px;font-size:11.5px;color:var(--muted);line-height:1.5}
+.rdb-step i{color:var(--gold-hi);font-size:12px;margin-top:2px;flex-shrink:0;width:14px;text-align:center}
+.rdb-step b{color:var(--paper)}
 
 .skeleton{background:linear-gradient(90deg,var(--surface) 25%,var(--surface-2) 37%,var(--surface) 63%);background-size:400% 100%;animation:shimmer 1.4s infinite}
 @keyframes shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
@@ -534,8 +552,18 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="rule"></div>
       <div class="tag">Top 5</div>
     </div>
+    <div class="ref-prize-banner"><i class="fas fa-crown"></i> El <b>#1</b> de este ranking gana un <b>premio sorpresa</b>, 10 días antes del sorteo.</div>
     <div class="referidores-list" id="referidoresList"></div>
     <p class="referidores-note"><i class="fas fa-lock"></i> Mostramos solo el primer nombre e inicial del apellido de cada persona, para proteger su privacidad.</p>
+    <details class="ref-details">
+      <summary>¿Cómo funciona el sistema de referidos? <i class="fas fa-chevron-down"></i></summary>
+      <div class="ref-details-body">
+        <div class="rdb-step"><i class="fas fa-ticket-alt"></i> Compra tu Sticker Digital y te damos un link personal con tu código.</div>
+        <div class="rdb-step"><i class="fas fa-share-alt"></i> Comparte tu link con tus amigos.</div>
+        <div class="rdb-step"><i class="fas fa-gift"></i> Cada <b>4 amigos</b> que compren con tu código, ganas <b>1 sticker gratis</b> — una oportunidad más de participar en el sorteo.</div>
+        <div class="rdb-step"><i class="fas fa-crown"></i> Además, quien tenga más referidos al cierre de la venta se lleva un <b>premio sorpresa</b>, que se revela 10 días antes del sorteo.</div>
+      </div>
+    </details>
   </section>
 
   <section class="trust-section wrap band band-panel">
@@ -772,8 +800,8 @@ async function loadTopReferidores() {
     const top = await stamperAPI.topReferidores(5);
     if (!top.length) return;
     document.getElementById('referidoresList').innerHTML = top.map((r, i) => `
-      <div class="ref-row">
-        <div class="pos">${i + 1}</div>
+      <div class="ref-row ${i === 0 ? 'champion' : ''}">
+        <div class="pos">${i === 0 ? '<i class="fas fa-crown"></i>' : i + 1}</div>
         <div class="nm">${escapeHtml(r.nombre_publico)}</div>
         <div class="ct">${r.total_referido} referidas</div>
       </div>
