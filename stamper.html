@@ -732,7 +732,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260809"></script>
+<script src="js/stamper-api.js?v=20260812"></script>
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
@@ -1271,9 +1271,8 @@ async function checkFlowReturn() {
 }
 
 function showSuccess(orden, folios, comprador) {
-  const images = galleryImages.map((url, idx) => ({ image_url: url, order_index: idx }));
   document.getElementById('stampCards').innerHTML = folios.map((f, i) => {
-    const img = images.length ? pickStickerImage(images, i) : null;
+    const img = pickStickerImageForFolio(galleryImages, f.numero_folio);
     return `
     <div class="stamp-card-mini">
       ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(vehicle?.name || 'tu premio')}">` : ''}
@@ -1411,13 +1410,12 @@ async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
   const fechaStr = sorteo?.fecha_sorteo
     ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
     : 'Por confirmar';
-  const images = galleryImages.map((url, idx) => ({ image_url: url, order_index: idx }));
   const vehicleImg = galleryImages[0] || null;
 
-  const estampillasConFoto = folios.map((f, i) => ({
+  const estampillasConFoto = folios.map((f) => ({
     folio: f.numero_folio,
     hash: f.hash_seguridad,
-    imagenUrl: images.length ? pickStickerImage(images, i) : vehicleImg
+    imagenUrl: pickStickerImageForFolio(galleryImages, f.numero_folio) || vehicleImg
   }));
 
   await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {

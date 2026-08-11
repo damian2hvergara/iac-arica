@@ -426,5 +426,25 @@ function pickStickerImage(images, index) {
     return images[i % images.length].image_url;
 }
 
+/**
+ * Asigna la foto de una estampilla ya emitida a partir de su folio
+ * (no de su posición en un array). Así la misma estampilla muestra
+ * siempre la misma foto sin importar dónde se renderice — pantalla de
+ * éxito, correo original, reenvío desde mi-cuenta, o el panel admin —
+ * en vez de depender de que cada uno de esos lugares calcule el mismo
+ * índice "i" sobre la misma lista de fotos en el mismo momento.
+ * images: array de URLs (strings), ya ordenado.
+ * folio: numero_folio de la estampilla (string).
+ */
+function pickStickerImageForFolio(images, folio) {
+    if (!images || !images.length || !folio) return null;
+    let hash = 0;
+    for (let i = 0; i < folio.length; i++) {
+        hash = (hash * 31 + folio.charCodeAt(i)) >>> 0;
+    }
+    return images[hash % images.length];
+}
+
 window.pickStickerImage = pickStickerImage;
+window.pickStickerImageForFolio = pickStickerImageForFolio;
 window.stamperAPI = new StamperAPI();

@@ -24,9 +24,16 @@ function jsonResponse(body: unknown, status: number) {
   });
 }
 
-function pickImage(images: string[], index: number) {
-  if (!images.length) return null;
-  return images[index % images.length];
+// Misma lógica que pickStickerImageForFolio en js/stamper-api.js — la
+// foto de una estampilla depende de su folio, no de su posición, para
+// que un reenvío siempre muestre la misma foto que el correo original.
+function pickImageForFolio(images: string[], folio: string) {
+  if (!images.length || !folio) return null;
+  let hash = 0;
+  for (let i = 0; i < folio.length; i++) {
+    hash = (hash * 31 + folio.charCodeAt(i)) >>> 0;
+  }
+  return images[hash % images.length];
 }
 
 Deno.serve(async (req: Request) => {
@@ -106,10 +113,10 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const estampillas = folios.map((f: any, i: number) => ({
+    const estampillas = folios.map((f: any) => ({
       folio: f.numero_folio,
       hash: f.hash_seguridad,
-      imagenUrl: pickImage(vehicleImages, i),
+      imagenUrl: pickImageForFolio(vehicleImages, f.numero_folio),
     }));
 
     const sendRes = await fetch(`${SUPABASE_URL}/functions/v1/send-stamp-email`, {

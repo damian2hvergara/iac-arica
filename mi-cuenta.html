@@ -74,7 +74,7 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260809"></script>
+<script src="js/stamper-api.js?v=20260812"></script>
 <script>
 document.getElementById('searchBtn').addEventListener('click', buscar);
 document.getElementById('inEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') buscar(); });
@@ -131,13 +131,13 @@ function renderResultado(email, ordenes) {
   const result = document.getElementById('result');
   result.innerHTML = ordenes.map((o, oi) => {
     const info = ESTADOS[o.estado] || { label: o.estado, cls: 'pill-pend' };
-    const images = (o.vehicleImages || []).map((url, idx) => ({ image_url: url, order_index: idx }));
+    const images = o.vehicleImages || [];
     const fecha = o.fecha ? new Date(o.fecha).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
     let folioListHtml;
     if (o.folios && o.folios.length) {
-      folioListHtml = `<div class="folio-list">` + o.folios.map((f, i) => {
-        const img = images.length ? pickStickerImage(images, i) : null;
+      folioListHtml = `<div class="folio-list">` + o.folios.map((f) => {
+        const img = pickStickerImageForFolio(images, f.numero_folio);
         return `
         <div class="folio-item">
           ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(o.vehicleName || 'tu premio')}">` : ''}

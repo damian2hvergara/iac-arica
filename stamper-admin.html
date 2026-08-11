@@ -297,7 +297,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260809"></script>
+<script src="js/stamper-api.js?v=20260812"></script>
 <script>
 let currentUser = null;
 let pendCache = [];
@@ -500,17 +500,18 @@ async function enviarCorreoConfirmacion(orden, folios) {
       ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
       : 'Por confirmar';
     const vehicleName = sorteo?.vehicles?.name || 'Vehículo';
-    const vehicleImages = (sorteo?.vehicles?.vehicle_images || [])
+    const vehicleImageRows = (sorteo?.vehicles?.vehicle_images || [])
       .slice()
       .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-    const vehicleImg = vehicleImages.find(i => i.is_main)?.image_url || vehicleImages[0]?.image_url || null;
+    const vehicleImages = vehicleImageRows.map(i => i.image_url);
+    const vehicleImg = vehicleImageRows.find(i => i.is_main)?.image_url || vehicleImages[0] || null;
 
-    // Cada estampilla recibe una foto distinta del vehículo (todas las fotos
-    // cargadas del auto se reparten entre las estampillas emitidas).
-    const estampillasConFoto = folios.map((f, i) => ({
+    // Cada estampilla muestra siempre la misma foto (elegida a partir de su
+    // propio folio), sin importar desde dónde se envíe el correo.
+    const estampillasConFoto = folios.map((f) => ({
       folio: f.numero_folio,
       hash: f.hash_seguridad,
-      imagenUrl: vehicleImages.length ? pickStickerImage(vehicleImages, i) : vehicleImg
+      imagenUrl: pickStickerImageForFolio(vehicleImages, f.numero_folio) || vehicleImg
     }));
 
     await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {
