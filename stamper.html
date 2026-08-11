@@ -292,11 +292,17 @@ main{padding-top:56px}
 .sheet{background:var(--surface);border:1px solid var(--line-hi);border-radius:var(--r-lg);max-width:460px;width:100%;padding:26px 22px;position:relative}
 .sheet-close{position:absolute;top:14px;right:14px;color:var(--muted);font-size:18px}
 .sheet h2{font-family:var(--font-h);font-size:22px;text-transform:uppercase;margin-bottom:4px}
-.sheet .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
+.sheet .sub{color:var(--muted);font-size:12.5px}
+.checkout-pack-preview{display:flex;align-items:center;gap:12px;margin:12px 0 18px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:10px;padding:10px 12px}
+.checkout-pack-preview img{width:52px;height:52px;object-fit:cover;border-radius:8px;flex-shrink:0;background:var(--surface)}
+.checkout-pack-preview img[src=""],.checkout-pack-preview img:not([src]){display:none}
+.checkout-pack-preview .sub{margin-bottom:0}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--line-hi);border-radius:8px;color:var(--paper)}
 .field input:focus{outline:none;border-color:var(--red-hi)}
+.field input.invalid{border-color:var(--danger)}
+.field-err{color:var(--danger);font-size:11px;margin-top:5px;min-height:0}
 .summary-row{display:flex;justify-content:space-between;padding:10px 0;border-top:1px dashed var(--line-hi);font-size:14px}
 .summary-row.total{font-weight:700;font-family:var(--font-h);font-size:18px}
 .submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:16px}
@@ -648,12 +654,15 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
   <div class="sheet">
     <button class="sheet-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
     <h2>Completa tu compra</h2>
-    <p class="sub" id="checkoutPackLabel"></p>
+    <div class="checkout-pack-preview" id="checkoutPackPreview">
+      <img id="checkoutPackImg" alt="">
+      <p class="sub" id="checkoutPackLabel"></p>
+    </div>
 
-    <div class="field"><label>Nombre completo</label><input id="inNombre" placeholder="Juan Pérez"></div>
-    <div class="field"><label>RUT o pasaporte</label><input id="inRut" placeholder="12.345.678-9"></div>
-    <div class="field"><label>Correo electrónico</label><input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com"></div>
-    <div class="field"><label>WhatsApp</label><input id="inTelefono" type="tel" placeholder="+56 9 1234 5678"></div>
+    <div class="field"><label>Nombre completo</label><input id="inNombre" placeholder="Juan Pérez"><div class="field-err" id="errNombre"></div></div>
+    <div class="field"><label>RUT o pasaporte</label><input id="inRut" placeholder="12.345.678-9"><div class="field-err" id="errRut"></div></div>
+    <div class="field"><label>Correo electrónico</label><input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com"><div class="field-err" id="errEmail"></div></div>
+    <div class="field"><label>WhatsApp</label><input id="inTelefono" type="tel" placeholder="+56 9 1234 5678"><div class="field-err" id="errTelefono"></div></div>
 
     <div class="summary-row"><span>Pack</span><span id="sumPack">—</span></div>
     <div class="summary-row"><span>Stickers</span><span id="sumQty">—</span></div>
@@ -1028,32 +1037,98 @@ function selectPack(slug) {
 
 document.getElementById('buyBtn').addEventListener('click', openCheckout);
 
+/* ---------- Validaciones de datos del comprador ---------- */
+function calcularDVRut(body) {
+  let suma = 0, mult = 2;
+  for (let i = body.length - 1; i >= 0; i--) {
+    suma += parseInt(body[i], 10) * mult;
+    mult = mult === 7 ? 2 : mult + 1;
+  }
+  const resto = 11 - (suma % 11);
+  if (resto === 11) return '0';
+  if (resto === 10) return 'K';
+  return String(resto);
+}
+
+function isValidNombre(v) {
+  const partes = v.trim().split(/\s+/);
+  const rx = /^[A-Za-zÀ-ÖØ-öø-ÿÑñ'-]{2,}$/;
+  return partes.length >= 2 && partes.every(p => rx.test(p));
+}
+
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/.test(v.trim());
+}
+
+function isValidTelefono(v) {
+  const digits = v.replace(/\D/g, '');
+  const local = (digits.startsWith('56') && digits.length === 11) ? digits.slice(2) : digits;
+  return /^9\d{8}$/.test(local);
+}
+
+// RUT chileno con dígito verificador real (módulo 11), o si no calza
+// con el formato de RUT, se acepta como pasaporte extranjero.
+function isValidRutOPasaporte(v) {
+  const clean = v.replace(/[.\s]/g, '').toUpperCase();
+  const m = clean.match(/^(\d{7,8})-?([0-9K])$/);
+  if (m) return m[2] === calcularDVRut(m[1]);
+  return /^[A-Z0-9]{6,15}$/.test(clean);
+}
+
+const FIELD_VALIDATORS = {
+  inNombre: { errId: 'errNombre', fn: isValidNombre, msg: 'Ingresa tu nombre y apellido (solo letras).' },
+  inRut: { errId: 'errRut', fn: isValidRutOPasaporte, msg: 'Ingresa un RUT válido (12.345.678-9) o pasaporte.' },
+  inEmail: { errId: 'errEmail', fn: isValidEmail, msg: 'Ingresa un correo válido.' },
+  inTelefono: { errId: 'errTelefono', fn: isValidTelefono, msg: 'Ingresa un WhatsApp chileno válido (+56 9 1234 5678).' },
+};
+
+function validateField(id) {
+  const cfg = FIELD_VALIDATORS[id];
+  const input = document.getElementById(id);
+  const ok = cfg.fn(input.value.trim());
+  input.classList.toggle('invalid', !ok);
+  document.getElementById(cfg.errId).textContent = ok ? '' : cfg.msg;
+  return ok;
+}
+
+Object.keys(FIELD_VALIDATORS).forEach(id => {
+  document.getElementById(id).addEventListener('blur', () => {
+    if (document.getElementById(id).value.trim()) validateField(id);
+  });
+});
+
 /* ---------- Checkout ---------- */
 function openCheckout() {
   if (!selectedPack) return;
+  const packImg = selectedPack.imagen_url || galleryImages[0] || '';
+  const imgEl = document.getElementById('checkoutPackImg');
+  if (packImg) { imgEl.src = packImg; imgEl.alt = selectedPack.nombre; } else { imgEl.removeAttribute('src'); }
   document.getElementById('checkoutPackLabel').textContent =
     `${selectedPack.nombre} · ${selectedPack.cantidad_stickers} stickers`;
   document.getElementById('sumPack').textContent = selectedPack.nombre;
   document.getElementById('sumQty').textContent = selectedPack.cantidad_stickers;
   document.getElementById('sumTotal').textContent = '$' + Number(selectedPack.precio_total).toLocaleString('es-CL');
   document.getElementById('formErr').textContent = '';
+  Object.keys(FIELD_VALIDATORS).forEach(id => {
+    document.getElementById(id).classList.remove('invalid');
+    document.getElementById(FIELD_VALIDATORS[id].errId).textContent = '';
+  });
   document.getElementById('checkoutOverlay').classList.add('show');
 }
 function closeCheckout() { document.getElementById('checkoutOverlay').classList.remove('show'); }
 function closeSuccess() { document.getElementById('successOverlay').classList.remove('show'); }
 
 async function submitOrder() {
+  const errEl = document.getElementById('formErr');
+  errEl.textContent = '';
+
+  const allOk = Object.keys(FIELD_VALIDATORS).map(validateField).every(Boolean);
+  if (!allOk) { errEl.textContent = 'Revisa los datos marcados en rojo.'; return; }
+
   const nombre = document.getElementById('inNombre').value.trim();
   const rut = document.getElementById('inRut').value.trim();
   const email = document.getElementById('inEmail').value.trim();
   const telefono = document.getElementById('inTelefono').value.trim();
-  const errEl = document.getElementById('formErr');
-  errEl.textContent = '';
-
-  if (nombre.length < 3) { errEl.textContent = 'Ingresa tu nombre completo.'; return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errEl.textContent = 'Ingresa un correo válido.'; return; }
-  if (telefono.length < 8) { errEl.textContent = 'Ingresa tu WhatsApp.'; return; }
-  if (rut.length < 5) { errEl.textContent = 'Ingresa tu RUT o pasaporte.'; return; }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
