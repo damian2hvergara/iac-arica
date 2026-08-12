@@ -1633,18 +1633,18 @@ function renderVehicles(vehicles) {
 
     // Tags solo los más útiles en la card
     let tags = '';
-    if (v.specifications?.motor) tags += `<div class="vc-tag"><i class="fas fa-cog" style="font-size:10px;color:var(--muted)"></i>${v.specifications.motor}</div>`;
-    if (v.specifications?.traccion) tags += `<div class="vc-tag"><i class="fas fa-road" style="font-size:10px;color:var(--muted)"></i>${v.specifications.traccion}</div>`;
-    if (v.location) tags += `<div class="vc-tag"><i class="fas fa-map-marker-alt" style="font-size:10px;color:var(--muted)"></i>${v.location}</div>`;
+    if (v.specifications?.motor) tags += `<div class="vc-tag"><i class="fas fa-cog" style="font-size:10px;color:var(--muted)"></i>${escapeHtml(v.specifications.motor)}</div>`;
+    if (v.specifications?.traccion) tags += `<div class="vc-tag"><i class="fas fa-road" style="font-size:10px;color:var(--muted)"></i>${escapeHtml(v.specifications.traccion)}</div>`;
+    if (v.location) tags += `<div class="vc-tag"><i class="fas fa-map-marker-alt" style="font-size:10px;color:var(--muted)"></i>${escapeHtml(v.location)}</div>`;
 
     const transit = v.status === 'transit' && v.transit_time
-      ? `<div class="transit-pill"><i class="fas fa-shipping-fast"></i>Llega en aproximadamente <strong>${v.transit_time} días</strong></div>`
+      ? `<div class="transit-pill"><i class="fas fa-shipping-fast"></i>Llega en aproximadamente <strong>${escapeHtml(v.transit_time)} días</strong></div>`
       : '';
 
     return `
     <div class="vehicle-card" id="vc-${v.id}">
       <div class="vc-image-wrap" onclick="openDetail('${v.id}')">
-        <img src="${v.baseImage}" alt="${v.name}" loading="lazy">
+        <img src="${escapeHtml(v.baseImage)}" alt="${escapeHtml(v.name)}" loading="lazy">
         <div class="vc-status ${st.cls}">${st.label}</div>
         <button class="vc-share" onclick="event.stopPropagation();shareVehicle('${v.id}')" title="Compartir">
           <i class="fas fa-share-alt"></i>
@@ -1652,7 +1652,7 @@ function renderVehicles(vehicles) {
         ${galleryCount > 1 ? `<div class="vc-gallery-hint"><i class="fas fa-images"></i>${galleryCount} fotos</div>` : ''}
       </div>
       <div class="vc-body">
-        <div class="vc-name">${v.name}</div>
+        <div class="vc-name">${escapeHtml(v.name)}</div>
         <div class="vc-price">$${formatPrice(v.price)} <span>CLP</span></div>
         ${transit}
         ${tags ? `<div class="vc-meta">${tags}</div>` : ''}
@@ -1728,8 +1728,8 @@ async function openDetail(vehicleId) {
 
     const thumbsHtml = v.gallery && v.gallery.length > 1
       ? v.gallery.map((img, i) =>
-          `<div class="detail-thumb ${i===0?'active':''}" onclick="switchDetailImg('${img}',this)">
-             <img src="${img}" alt="foto ${i+1}" loading="lazy">
+          `<div class="detail-thumb ${i===0?'active':''}" data-img="${escapeHtml(img)}">
+             <img src="${escapeHtml(img)}" alt="foto ${i+1}" loading="lazy">
            </div>`
         ).join('')
       : '';
@@ -1741,33 +1741,33 @@ async function openDetail(vehicleId) {
       ? `<div class="detail-specs">
           ${specsEntries.map(([k,val]) =>
             `<div class="spec-item">
-               <div class="spec-label">${k}</div>
-               <div class="spec-value">${val}</div>
+               <div class="spec-label">${escapeHtml(k)}</div>
+               <div class="spec-value">${escapeHtml(val)}</div>
              </div>`
           ).join('')}
          </div>`
       : '';
 
     const transit = v.status === 'transit' && v.transit_time
-      ? `<div class="transit-pill" style="margin-bottom:14px"><i class="fas fa-shipping-fast"></i>Llega en aproximadamente <strong>${v.transit_time} días</strong></div>`
+      ? `<div class="transit-pill" style="margin-bottom:14px"><i class="fas fa-shipping-fast"></i>Llega en aproximadamente <strong>${escapeHtml(v.transit_time)} días</strong></div>`
       : '';
 
     const reservaNote = `Reserva con el 10-30% del valor: desde $${formatPrice(Math.round(v.price*0.1))} CLP`;
 
     content.innerHTML = `
       <div class="detail-hero" onclick="openGallery('${v.id}')">
-        <img src="${v.baseImage}" alt="${v.name}" id="detailMainImg">
+        <img src="${escapeHtml(v.baseImage)}" alt="${escapeHtml(v.name)}" id="detailMainImg">
       </div>
       ${thumbsHtml ? `<div class="detail-thumbs">${thumbsHtml}</div>` : ''}
       <div class="detail-body">
         <div class="detail-status-row">
           <div class="vc-status ${st.cls}" style="position:static">${st.label}</div>
         </div>
-        <div class="detail-name">${v.name}</div>
+        <div class="detail-name">${escapeHtml(v.name)}</div>
         <div class="detail-price">$${formatPrice(v.price)} CLP</div>
-        <div class="detail-price-note">${reservaNote}</div>
+        <div class="detail-price-note">${escapeHtml(reservaNote)}</div>
         ${transit}
-        ${v.description ? `<p class="detail-desc">${v.description}</p>` : ''}
+        ${v.description ? `<p class="detail-desc">${escapeHtml(v.description)}</p>` : ''}
         ${specsHtml}
         <div class="detail-actions">
           <button class="detail-wa-btn" onclick="contactVehicle('${v.id}')">
@@ -1780,6 +1780,9 @@ async function openDetail(vehicleId) {
             : ''}
         </div>
       </div>`;
+
+    content.querySelectorAll('.detail-thumb').forEach(el =>
+      el.addEventListener('click', () => switchDetailImg(el.dataset.img, el)));
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -1828,7 +1831,7 @@ function renderGallery() {
   const dots = document.getElementById('galleryDots');
   slides.innerHTML = currentGallery.map((img, i) =>
     `<div class="gallery-slide ${i===0?'active':''}" data-idx="${i}">
-       <img src="${img}" alt="Foto ${i+1}">
+       <img src="${escapeHtml(img)}" alt="Foto ${i+1}">
      </div>`
   ).join('');
   dots.innerHTML = currentGallery.map((_,i) =>
