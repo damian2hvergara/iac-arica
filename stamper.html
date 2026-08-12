@@ -745,11 +745,13 @@ let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
 let galleryImages = [], galleryIndex = 0, galleryAutoTimer = null;
 
-// Único método de pago: Flow.cl. Mientras no esté conectado, se simula
-// una confirmación instantánea (ver confirmar_orden_simulado en Supabase).
-// Cuando se conecte Flow de verdad: cambiar a 'live' e implementar
-// initFlowPayment() para redirigir al checkout real de Flow.
-const FLOW_MODE = 'simulation';
+// Único método de pago: Flow.cl. El checkout SIEMPRE pasa por Flow real
+// (initFlowPayment) — el "modo simulación" que existía acá antes
+// (confirmar_orden_simulado) se sacó de producción: dejaba que cualquier
+// visitante confirmara una compra sin pagar nada llamando el RPC directo
+// por REST, sin pasar por esta página. Mientras no estén cargados
+// FLOW_API_KEY/FLOW_SECRET_KEY en Supabase, el checkout público
+// simplemente no puede completarse — eso es intencional.
 
 document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
@@ -833,7 +835,7 @@ async function renderRefBanner() {
   const codigo = sessionStorage.getItem('iac_ref');
   if (!codigo) return;
   try {
-    const info = await stamperAPI.infoReferido(codigo);
+    const info = await stamperAPI.referenteNombrePublico(codigo);
     if (!info || !info.referente_nombre) return;
     const primerNombre = info.referente_nombre.trim().split(' ')[0];
     const banner = document.getElementById('refBanner');
@@ -1220,17 +1222,7 @@ async function submitOrder() {
       nombre, email, telefono, rutPasaporte: rut, packSlug: selectedPack.slug, referidoPor
     });
 
-    if (FLOW_MODE === 'simulation') {
-      const folios = await stamperAPI.confirmarOrdenSimulado(orden.orden_id);
-      closeCheckout();
-      showSuccess(orden, folios, { nombre, email });
-      sendConfirmationEmailPublic(orden, folios, nombre, email).catch(e => console.warn('Email:', e));
-      if (referidoPor) {
-        notifyReferrer(referidoPor, nombre, folios.length, orden.orden_id).catch(e => console.warn('Email referente:', e));
-      }
-    } else {
-      await initFlowPayment(orden);
-    }
+    await initFlowPayment(orden);
   } catch (e) {
     errEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
     console.error(e);
@@ -1436,77 +1428,6 @@ async function shareImage() {
     URL.revokeObjectURL(url);
     showToast('Imagen descargada — súbela a tu Instagram o WhatsApp');
   }, 'image/png');
-}
-
-async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
-  const fechaStr = sorteo?.fecha_sorteo
-    ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
-    : 'Por confirmar';
-  const vehicleImg = galleryImages[0] || null;
-
-  const estampillasConFoto = folios.map((f) => ({
-    folio: f.numero_folio,
-    hash: f.hash_seguridad,
-    imagenUrl: pickStickerImageForFolio(galleryImages, f.numero_folio) || vehicleImg
-  }));
-
-  await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
-    body: JSON.stringify({
-      nombre, email,
-      estampillas: estampillasConFoto,
-      vehicleName: vehicle?.name || 'Vehículo',
-      vehicleImg, fechaSorteo: fechaStr,
-      pack: selectedPack?.nombre || '',
-      monto: orden.monto_total,
-      codigoReferido: orden.codigo_referido
-    })
-  });
-}
-
-async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada, ordenId) {
-  const info = await stamperAPI.infoReferido(codigoReferido);
-  if (!info || !info.referente_email) return;
-
-  // Si esta compra completó otro grupo de 4 referidos, acá aparecen
-  // la(s) estampilla(s) de regalo recién generadas (con folio real),
-  // para mandárselas al referente en el mismo correo — antes solo se
-  // avisaba el progreso, nunca la estampilla en sí.
-  let bonusEstampillas = [];
-  try {
-    const bonos = ordenId ? await stamperAPI.bonosPendientesNotificacion(ordenId) : [];
-    bonusEstampillas = bonos.map(b => ({
-      folio: b.numero_folio,
-      hash: b.hash_seguridad,
-      imagenUrl: pickStickerImageForFolio(galleryImages, b.numero_folio)
-    }));
-  } catch (e) {
-    console.warn('No se pudo obtener el bono pendiente de notificar:', e);
-  }
-
-  const fechaStr = sorteo?.fecha_sorteo
-    ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
-    : 'Por confirmar';
-
-  await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-referral-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
-    body: JSON.stringify({
-      referenteEmail: info.referente_email,
-      referenteNombre: info.referente_nombre,
-      referidoNombre,
-      cantidadComprada,
-      totalAcumulado: info.total_comprado,
-      bonosGanados: info.bonos_ganados,
-      faltanParaProximo: info.faltan_para_proximo,
-      codigoReferido,
-      bonusEstampillas,
-      vehicleName: vehicle?.name || 'Vehículo',
-      vehicleImg: galleryImages[0] || null,
-      fechaSorteo: fechaStr
-    })
-  });
 }
 
 function copyRefLink() {

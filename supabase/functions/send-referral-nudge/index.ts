@@ -3,9 +3,23 @@
  * Recordatorio para compradores que AÚN no han referido a nadie:
  * "no olvides compartir tu link". Lo dispara el admin manualmente
  * desde stamper-admin.html (campaña puntual, no un cron automático).
+ *
+ * Antes cualquiera con la anon key podía llamarla directo y mandar
+ * este correo a cualquier destinatario con nombre/código inventados.
+ * Ahora exige el JWT de una sesión real de Supabase Auth cuyo email
+ * esté en admin_emails — el mismo criterio que usa la RLS del resto
+ * del panel admin (ver migración parte 27).
+ *
  * Secrets necesarios: RESEND_API_KEY, RESEND_FROM (los mismos que
  * las otras funciones de correo).
  */
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+function escapeHtml(str: unknown): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -17,6 +31,25 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders });
 
+  const authHeader = req.headers.get('Authorization') || '';
+  const callerToken = authHeader.replace(/^Bearer\s+/i, '');
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+  const anonClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY')!);
+  const { data: userData, error: userErr } = await anonClient.auth.getUser(callerToken);
+  const callerEmail = userData?.user?.email?.toLowerCase();
+  if (userErr || !callerEmail) {
+    return new Response(JSON.stringify({ error: 'No autorizado' }), {
+      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+  const adminClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const { data: adminRow } = await adminClient.from('admin_emails').select('email').eq('email', callerEmail).maybeSingle();
+  if (!adminRow) {
+    return new Response(JSON.stringify({ error: 'No autorizado' }), {
+      status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
   let body: any;
   try {
     body = await req.json();
@@ -24,8 +57,9 @@ Deno.serve(async (req: Request) => {
     return new Response('Invalid JSON', { status: 400, headers: corsHeaders });
   }
 
-  const { nombre, email, codigoReferido } = body;
-  if (!nombre || !email || !codigoReferido) {
+  const { email, codigoReferido } = body;
+  const nombre = escapeHtml(body.nombre);
+  if (!body.nombre || !email || !codigoReferido) {
     return new Response('Faltan datos', { status: 400, headers: corsHeaders });
   }
 

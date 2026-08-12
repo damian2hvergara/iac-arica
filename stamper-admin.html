@@ -884,11 +884,14 @@ async function enviarRecordatoriosReferidos() {
     let enviados = 0, fallidos = 0;
     resultado.textContent = `Enviando 0 / ${compradores.length}…`;
 
+    const { data: sessionData } = await stamperAPI.client.auth.getSession();
+    const adminToken = sessionData?.session?.access_token;
+
     for (const c of compradores) {
       try {
         const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-referral-nudge`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
           body: JSON.stringify({ nombre: c.nombre, email: c.email, codigoReferido: c.codigo_referido })
         });
         if (res.ok) enviados++; else fallidos++;

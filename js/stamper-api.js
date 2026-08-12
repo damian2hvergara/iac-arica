@@ -135,48 +135,17 @@ class StamperAPI {
         }
     }
 
-    // Confirmación simulada de pago Flow — solo mientras Flow.cl no está
-    // conectado de verdad (ver supabase/migrations/2026_sorteo_rebuild_part3.sql).
-    async confirmarOrdenSimulado(ordenId) {
+    // Nombre del referente (sin email) para el banner "fulano te invitó"
+    // en el checkout — el resto de la lógica de aviso al referente
+    // (email, progreso, bono) corre server-side en flow-webhook.
+    async referenteNombrePublico(codigoReferido) {
         try {
             const { data, error } = await this.client
-                .rpc('confirmar_orden_simulado', { p_orden_id: ordenId });
-            if (error) throw error;
-            return data; // [{numero_folio, hash_seguridad, orden_en_pack}, ...]
-        } catch (error) {
-            console.error('Error confirmarOrdenSimulado:', error);
-            throw error;
-        }
-    }
-
-    // Estampillas de regalo que se le generaron al referente de esta
-    // orden y que todavía no se le avisaron por correo. Se llama justo
-    // después de confirmar la compra de un amigo referido — si devuelve
-    // filas, hay que mandarle a ese referente el correo con su
-    // estampilla de bono real (folio + foto), no solo el aviso de
-    // progreso. Marca lo devuelto como ya notificado en el mismo paso.
-    async bonosPendientesNotificacion(ordenId) {
-        try {
-            const { data, error } = await this.client
-                .rpc('bonos_pendientes_notificacion', { p_orden_id: ordenId });
-            if (error) throw error;
-            return data || [];
-        } catch (error) {
-            console.error('Error bonosPendientesNotificacion:', error);
-            throw error;
-        }
-    }
-
-    // Progreso del referente hacia su próxima estampilla bonus
-    // (1 cada 4 compradas con su código) — se usa para avisarle por correo.
-    async infoReferido(codigoReferido) {
-        try {
-            const { data, error } = await this.client
-                .rpc('info_referido', { p_codigo_referido: codigoReferido });
+                .rpc('referente_nombre_publico', { p_codigo_referido: codigoReferido });
             if (error) throw error;
             return data && data[0];
         } catch (error) {
-            console.error('Error infoReferido:', error);
+            console.error('Error referenteNombrePublico:', error);
             throw error;
         }
     }

@@ -11,7 +11,17 @@
  *
  * Secrets necesarios: RESEND_API_KEY, RESEND_FROM (los mismos que
  * usa send-stamp-email).
+ *
+ * Solo la llama flow-webhook (server-side, con la service role key) —
+ * antes cualquiera con la anon key podía mandar este correo con
+ * cifras y folios de bono 100% inventados a cualquier destinatario.
  */
+
+function escapeHtml(str: unknown): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -23,6 +33,13 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders });
 
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  if (req.headers.get('Authorization') !== `Bearer ${SERVICE_ROLE_KEY}`) {
+    return new Response(JSON.stringify({ error: 'No autorizado' }), {
+      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
   let body: any;
   try {
     body = await req.json();
@@ -31,12 +48,16 @@ Deno.serve(async (req: Request) => {
   }
 
   const {
-    referenteEmail, referenteNombre, referidoNombre, cantidadComprada,
+    referenteEmail, cantidadComprada,
     totalAcumulado, bonosGanados, faltanParaProximo, codigoReferido,
-    bonusEstampillas, vehicleName, vehicleImg, fechaSorteo,
+    bonusEstampillas, vehicleImg, fechaSorteo: fechaSorteoRaw,
   } = body;
+  const referenteNombre = escapeHtml(body.referenteNombre);
+  const referidoNombre = escapeHtml(body.referidoNombre);
+  const vehicleName = escapeHtml(body.vehicleName);
+  const fechaSorteo = escapeHtml(fechaSorteoRaw);
 
-  if (!referenteEmail || !referenteNombre) {
+  if (!referenteEmail || !body.referenteNombre) {
     return new Response('Faltan datos', { status: 400, headers: corsHeaders });
   }
 
@@ -57,10 +78,10 @@ Deno.serve(async (req: Request) => {
   const bonusCards = tieneBono ? bonusEstampillas.map((e: any) => `
     <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(140deg,#0a1f10,#0d0d0d);border-radius:12px;border:1px solid rgba(0,197,102,0.45);margin-bottom:14px;">
       <tr><td style="padding:10px 16px;border-bottom:1px solid #2a2a2a;">
-        <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${e.folio}</span>
+        <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${escapeHtml(e.folio)}</span>
         <span style="color:#00C566;font-size:11px;float:right;line-height:1.8;">🎁 Estampilla de regalo</span>
       </td></tr>
-      ${(e.imagenUrl || vehicleImg) ? `<tr><td><img src="${e.imagenUrl || vehicleImg}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
+      ${(e.imagenUrl || vehicleImg) ? `<tr><td><img src="${escapeHtml(e.imagenUrl || vehicleImg)}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
       <tr><td style="padding:14px 16px;">
         <p style="font-family:monospace;font-size:10px;color:rgba(201,168,76,0.65);letter-spacing:2px;margin:0 0 8px;">CHILE · ARICA</p>
         <p style="font-family:'Arial Black',sans-serif;font-size:18px;font-weight:900;color:#fff;text-align:center;margin:0 0 3px;text-transform:uppercase;">${vehicleName || 'Vehículo'}</p>
@@ -70,9 +91,9 @@ Deno.serve(async (req: Request) => {
           <td><p style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin:0 0 2px;">SORTEO</p>
             <p style="font-size:11px;color:rgba(255,255,255,0.75);font-weight:600;margin:0;">${fechaSorteo || 'Por confirmar'}</p></td>
           <td align="right"><p style="font-family:monospace;font-size:9px;color:rgba(240,208,128,0.45);text-transform:uppercase;margin:0 0 2px;">FOLIO</p>
-            <p style="font-family:monospace;font-size:13px;color:#F0D080;font-weight:700;margin:0;">${e.folio}</p></td>
+            <p style="font-family:monospace;font-size:13px;color:#F0D080;font-weight:700;margin:0;">${escapeHtml(e.folio)}</p></td>
         </tr></table>
-        <p style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.22);text-align:center;margin:10px 0 0;">Hash: ${e.hash}</p>
+        <p style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.22);text-align:center;margin:10px 0 0;">Hash: ${escapeHtml(e.hash)}</p>
       </td></tr>
     </table>`).join('') : '';
 

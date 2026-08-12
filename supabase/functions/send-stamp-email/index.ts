@@ -1,8 +1,20 @@
 /**
  * send-stamp-email — IAC Arica
- * Llamada directamente desde stamper.html (sin webhook)
+ * Envía el correo con las estampillas de una orden REAL, ya
+ * confirmada. Solo la llaman flow-webhook y resend-stamp-email
+ * (ambos server-side, con la service role key) — nunca el navegador
+ * directo. Antes cualquiera con la anon key podía mandar este correo
+ * con contenido 100% inventado (folios falsos, montos falsos) a
+ * cualquier destinatario, usando el dominio real de la empresa —
+ * ahora se exige que el llamador tenga la service role key.
  * Secrets necesarios: RESEND_API_KEY, RESEND_FROM
  */
+
+function escapeHtml(str: unknown): string {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 const PACK_LABELS: Record<string, string> = {
   inicio:        'Pack Inicio',
@@ -28,6 +40,13 @@ Deno.serve(async (req: Request) => {
     return new Response('Method not allowed', { status: 405, headers: corsHeaders });
   }
 
+  const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+  if (req.headers.get('Authorization') !== `Bearer ${SERVICE_ROLE_KEY}`) {
+    return new Response(JSON.stringify({ error: 'No autorizado' }), {
+      status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
   let body: any;
   try {
     body = await req.json();
@@ -35,15 +54,18 @@ Deno.serve(async (req: Request) => {
     return new Response('Invalid JSON', { status: 400, headers: corsHeaders });
   }
 
-  const { nombre, email, estampillas, vehicleName, vehicleImg, fechaSorteo, pack, monto, codigoReferido } = body;
+  const { estampillas, vehicleImg, fechaSorteo, pack, monto, codigoReferido } = body;
+  const nombre = escapeHtml(body.nombre);
+  const email = body.email;
+  const vehicleName = escapeHtml(body.vehicleName);
 
-  if (!email || !nombre || !estampillas?.length) {
+  if (!email || !body.nombre || !estampillas?.length) {
     return new Response('Faltan datos', { status: 400, headers: corsHeaders });
   }
 
   const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!;
   const RESEND_FROM    = Deno.env.get('RESEND_FROM') ?? 'noreply@iac-arica.cl';
-  const packLabel      = PACK_LABELS[pack] ?? pack;
+  const packLabel      = escapeHtml(PACK_LABELS[pack] ?? pack);
   const montoStr       = Number(monto).toLocaleString('es-CL');
   const refLink         = codigoReferido ? `https://iac-arica.cl/stamper.html?ref=${encodeURIComponent(codigoReferido)}` : null;
 
@@ -56,10 +78,10 @@ Deno.serve(async (req: Request) => {
   const stampCards = estampillas.map((e: any, i: number) => `
     <table width="100%" cellpadding="0" cellspacing="0" style="background:${e.esBonus ? 'linear-gradient(140deg,#0a1f10,#0d0d0d)' : 'linear-gradient(140deg,#1c0b03,#0d0d0d)'};border-radius:12px;border:1px solid ${e.esBonus ? 'rgba(0,197,102,0.45)' : '#2a2a2a'};margin-bottom:14px;">
       <tr><td style="padding:10px 16px;border-bottom:1px solid #2a2a2a;">
-        <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${e.folio}</span>
+        <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${escapeHtml(e.folio)}</span>
         <span style="color:#00C566;font-size:11px;float:right;line-height:1.8;">${e.esBonus ? '🎁 Gratis · Bono referido' : `Participación #${i + 1}`}</span>
       </td></tr>
-      ${(e.imagenUrl || vehicleImg) ? `<tr><td><img src="${e.imagenUrl || vehicleImg}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
+      ${(e.imagenUrl || vehicleImg) ? `<tr><td><img src="${escapeHtml(e.imagenUrl || vehicleImg)}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
       <tr><td style="padding:14px 16px;">
         <p style="font-family:monospace;font-size:10px;color:rgba(201,168,76,0.65);letter-spacing:2px;margin:0 0 8px;">CHILE · ARICA</p>
         <p style="font-family:'Arial Black',sans-serif;font-size:18px;font-weight:900;color:#fff;text-align:center;margin:0 0 3px;text-transform:uppercase;">${vehicleName}</p>
@@ -68,14 +90,14 @@ Deno.serve(async (req: Request) => {
         <table width="100%" cellpadding="0" cellspacing="0"><tr>
           <td>
             <p style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;margin:0 0 2px;">SORTEO</p>
-            <p style="font-size:11px;color:rgba(255,255,255,0.75);font-weight:600;margin:0;">${fechaSorteo}</p>
+            <p style="font-size:11px;color:rgba(255,255,255,0.75);font-weight:600;margin:0;">${escapeHtml(fechaSorteo)}</p>
           </td>
           <td align="right">
             <p style="font-family:monospace;font-size:9px;color:rgba(240,208,128,0.45);text-transform:uppercase;margin:0 0 2px;">FOLIO</p>
-            <p style="font-family:monospace;font-size:13px;color:#F0D080;font-weight:700;margin:0;">${e.folio}</p>
+            <p style="font-family:monospace;font-size:13px;color:#F0D080;font-weight:700;margin:0;">${escapeHtml(e.folio)}</p>
           </td>
         </tr></table>
-        <p style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.22);text-align:center;margin:10px 0 0;">Hash: ${e.hash}</p>
+        <p style="font-family:monospace;font-size:9px;color:rgba(255,255,255,0.22);text-align:center;margin:10px 0 0;">Hash: ${escapeHtml(e.hash)}</p>
       </td></tr>
     </table>`).join('');
 
@@ -99,7 +121,7 @@ Deno.serve(async (req: Request) => {
       <td><p style="font-size:11px;color:#9B0000;text-transform:uppercase;letter-spacing:1px;margin:0 0 3px;font-weight:700;">🏆 Premio del sorteo</p>
         <p style="font-family:'Arial Black',sans-serif;font-size:18px;color:#fff;margin:0;font-weight:900;">${vehicleName}</p></td>
       <td align="right"><p style="font-size:11px;color:#6E6E6E;margin:0 0 3px;">Fecha sorteo</p>
-        <p style="font-family:monospace;font-size:13px;color:#F0D080;font-weight:700;margin:0;">${fechaSorteo}</p></td>
+        <p style="font-family:monospace;font-size:13px;color:#F0D080;font-weight:700;margin:0;">${escapeHtml(fechaSorteo)}</p></td>
     </tr></table>
   </td></tr>
   <tr><td style="background:#161616;border-left:1px solid #2a2a2a;border-right:1px solid #2a2a2a;padding:24px 20px;">
