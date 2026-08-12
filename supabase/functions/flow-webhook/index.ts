@@ -99,16 +99,28 @@ Deno.serve(async (req: Request) => {
         .limit(1)
         .maybeSingle();
 
-      const vehicleImages = (sorteo?.vehicles?.vehicle_images || [])
+      const vehicleImageRows = (sorteo?.vehicles?.vehicle_images || [])
         .slice()
         .sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0));
-      const vehicleImg = vehicleImages.find((i: any) => i.is_main)?.image_url || vehicleImages[0]?.image_url || null;
-      const pickImg = (idx: number) => (vehicleImages.length ? vehicleImages[idx % vehicleImages.length].image_url : vehicleImg);
+      const vehicleImages = vehicleImageRows.map((i: any) => i.image_url);
+      const vehicleImg = vehicleImageRows.find((i: any) => i.is_main)?.image_url || vehicleImages[0] || null;
 
-      const estampillas = (folios || []).map((f: any, i: number) => ({
+      // Misma lógica que pickStickerImageForFolio en js/stamper-api.js —
+      // la foto depende del folio, no de la posición, para que coincida
+      // siempre con lo que se muestra en pantalla y en reenvíos.
+      const pickImgForFolio = (folio: string) => {
+        if (!vehicleImages.length || !folio) return vehicleImg;
+        let hash = 0;
+        for (let i = 0; i < folio.length; i++) {
+          hash = (hash * 31 + folio.charCodeAt(i)) >>> 0;
+        }
+        return vehicleImages[hash % vehicleImages.length];
+      };
+
+      const estampillas = (folios || []).map((f: any) => ({
         folio: f.numero_folio,
         hash: f.hash_seguridad,
-        imagenUrl: pickImg(i),
+        imagenUrl: pickImgForFolio(f.numero_folio),
       }));
 
       const fechaStr = sorteo?.fecha_sorteo
