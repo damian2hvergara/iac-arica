@@ -10,4 +10,8 @@
 
 GRANT EXECUTE ON FUNCTION stickers_vendidos_count(uuid) TO authenticated;
 
+-- Reafirma también el grant de "Marketing de referidos" (mismo patrón
+-- de reseteo silencioso) mientras se revisa esta parte del panel.
+GRANT EXECUTE ON FUNCTION compradores_sin_referir() TO authenticated;
+
 NOTIFY pgrst, 'reload schema';
