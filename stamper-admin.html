@@ -395,6 +395,7 @@ async function loadDashboard() {
     `).join('') || '<tr><td colspan="4" class="empty">Sin órdenes completadas aún</td></tr>';
   } catch (e) {
     console.error(e);
+    alert('Error al cargar el dashboard: ' + (e.message || e));
   }
 }
 
