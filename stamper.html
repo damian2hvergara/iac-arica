@@ -736,7 +736,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260813"></script>
+<script src="js/stamper-api.js?v=20260814"></script>
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
@@ -1201,7 +1201,7 @@ async function submitOrder() {
       showSuccess(orden, folios, { nombre, email });
       sendConfirmationEmailPublic(orden, folios, nombre, email).catch(e => console.warn('Email:', e));
       if (referidoPor) {
-        notifyReferrer(referidoPor, nombre, folios.length).catch(e => console.warn('Email referente:', e));
+        notifyReferrer(referidoPor, nombre, folios.length, orden.orden_id).catch(e => console.warn('Email referente:', e));
       }
     } else {
       await initFlowPayment(orden);
@@ -1437,9 +1437,29 @@ async function sendConfirmationEmailPublic(orden, folios, nombre, email) {
   });
 }
 
-async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada) {
+async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada, ordenId) {
   const info = await stamperAPI.infoReferido(codigoReferido);
   if (!info || !info.referente_email) return;
+
+  // Si esta compra completó otro grupo de 4 referidos, acá aparecen
+  // la(s) estampilla(s) de regalo recién generadas (con folio real),
+  // para mandárselas al referente en el mismo correo — antes solo se
+  // avisaba el progreso, nunca la estampilla en sí.
+  let bonusEstampillas = [];
+  try {
+    const bonos = ordenId ? await stamperAPI.bonosPendientesNotificacion(ordenId) : [];
+    bonusEstampillas = bonos.map(b => ({
+      folio: b.numero_folio,
+      hash: b.hash_seguridad,
+      imagenUrl: pickStickerImageForFolio(galleryImages, b.numero_folio)
+    }));
+  } catch (e) {
+    console.warn('No se pudo obtener el bono pendiente de notificar:', e);
+  }
+
+  const fechaStr = sorteo?.fecha_sorteo
+    ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
+    : 'Por confirmar';
 
   await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-referral-email`, {
     method: 'POST',
@@ -1452,7 +1472,11 @@ async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada) 
       totalAcumulado: info.total_comprado,
       bonosGanados: info.bonos_ganados,
       faltanParaProximo: info.faltan_para_proximo,
-      codigoReferido
+      codigoReferido,
+      bonusEstampillas,
+      vehicleName: vehicle?.name || 'Vehículo',
+      vehicleImg: galleryImages[0] || null,
+      fechaSorteo: fechaStr
     })
   });
 }

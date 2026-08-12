@@ -150,6 +150,17 @@ Deno.serve(async (req: Request) => {
         const { data: infoRows } = await supabase.rpc('info_referido', { p_codigo_referido: orden.referido_por });
         const info = infoRows && infoRows[0];
         if (info?.referente_email) {
+          // Si esta compra completó otro grupo de 4 referidos, esto trae
+          // la(s) estampilla(s) de regalo recién generadas con su folio
+          // real, para incluirlas en el correo (y no solo avisar el
+          // progreso, como pasaba antes).
+          const { data: bonos } = await supabase.rpc('bonos_pendientes_notificacion', { p_orden_id: ordenId });
+          const bonusEstampillas = (bonos || []).map((b: any) => ({
+            folio: b.numero_folio,
+            hash: b.hash_seguridad,
+            imagenUrl: pickImgForFolio(b.numero_folio),
+          }));
+
           await fetch(`${SUPABASE_URL}/functions/v1/send-referral-email`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SERVICE_KEY}` },
@@ -162,6 +173,10 @@ Deno.serve(async (req: Request) => {
               bonosGanados: info.bonos_ganados,
               faltanParaProximo: info.faltan_para_proximo,
               codigoReferido: orden.referido_por,
+              bonusEstampillas,
+              vehicleName: sorteo?.vehicles?.name || 'Vehículo',
+              vehicleImg,
+              fechaSorteo: fechaStr,
             }),
           }).catch((e) => console.warn('send-referral-email falló:', e));
         }

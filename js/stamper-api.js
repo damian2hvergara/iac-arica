@@ -149,6 +149,24 @@ class StamperAPI {
         }
     }
 
+    // Estampillas de regalo que se le generaron al referente de esta
+    // orden y que todavía no se le avisaron por correo. Se llama justo
+    // después de confirmar la compra de un amigo referido — si devuelve
+    // filas, hay que mandarle a ese referente el correo con su
+    // estampilla de bono real (folio + foto), no solo el aviso de
+    // progreso. Marca lo devuelto como ya notificado en el mismo paso.
+    async bonosPendientesNotificacion(ordenId) {
+        try {
+            const { data, error } = await this.client
+                .rpc('bonos_pendientes_notificacion', { p_orden_id: ordenId });
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error bonosPendientesNotificacion:', error);
+            throw error;
+        }
+    }
+
     // Progreso del referente hacia su próxima estampilla bonus
     // (1 cada 4 compradas con su código) — se usa para avisarle por correo.
     async infoReferido(codigoReferido) {
