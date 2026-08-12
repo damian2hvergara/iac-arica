@@ -71,10 +71,14 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
   <div class="err" id="errMsg"></div>
 
   <div class="result" id="result"></div>
+
+  <p style="text-align:center;margin-top:26px;font-size:12.5px;color:var(--muted)">
+    ¿Referiste amigos? <a href="mis-referidos.html">Ve tu ranking y cuánto te falta para el premio →</a>
+  </p>
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260812"></script>
+<script src="js/stamper-api.js?v=20260813"></script>
 <script>
 document.getElementById('searchBtn').addEventListener('click', buscar);
 document.getElementById('inEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') buscar(); });

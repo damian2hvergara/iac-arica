@@ -177,6 +177,22 @@ class StamperAPI {
         }
     }
 
+    // Panel privado del referenciador: su posición exacta, cuánto le
+    // falta para el podio, etc. Requiere correo + RUT/pasaporte (los
+    // mismos datos con que compró) porque expone cuánto refirió en
+    // comparación con otros — más sensible que solo ver sus stickers.
+    async miRankingReferidos(email, rutPasaporte) {
+        try {
+            const { data, error } = await this.client
+                .rpc('mi_ranking_referidos', { p_email: email, p_rut_pasaporte: rutPasaporte });
+            if (error) throw error;
+            return data && data[0];
+        } catch (error) {
+            console.error('Error miRankingReferidos:', error);
+            throw error;
+        }
+    }
+
     // ====================================
     // ADMIN — requiere sesión autenticada
     // ====================================

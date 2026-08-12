@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Ranking de Referidos | IAC Arica 2026 — No Sueñes, Gánatelo</title>
+<meta name="description" content="Descubre tu posición en el ranking de referidos del sorteo IAC Arica 2026 y qué tan cerca estás de ganar el premio en dinero del Top 3.">
+<link rel="canonical" href="https://iac-arica.cl/mis-referidos.html">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--red:#9B0000;--red-hi:#c81e1e;--bg:#0C0C0C;--surface:#161616;--surface-2:#202020;--border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);--text:#F2F2F2;--muted:#9c9689;--gold:#F0D080;--gold-hi:#f7e2a6;--silver-hi:#eef1f4;--bronze-hi:#dba468;--green:#00C566;--orange:#F59E0B;--danger:#ff3b30;--font-h:'Barlow Condensed',sans-serif;--font-b:'DM Sans',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.6;font-size:15px}
+a{color:var(--gold)}
+button{font-family:inherit;cursor:pointer;border:none}
+input{font-family:inherit;font-size:15px}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:var(--font-h);font-weight:700;font-size:16px}
+.brand span{color:var(--red)}
+.back{font-size:13px;color:var(--muted);text-decoration:none}
+.wrap{max-width:480px;margin:0 auto;padding:44px 20px 70px}
+
+.kicker{text-align:center;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-hi);margin-bottom:10px}
+h1{font-family:var(--font-h);font-size:clamp(24px,6vw,32px);text-transform:uppercase;text-align:center;line-height:1.1}
+.sub{color:var(--muted);font-size:13.5px;text-align:center;margin-top:10px;margin-bottom:28px;line-height:1.5}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input{width:100%;padding:12px 13px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
+.field input:focus{outline:none;border-color:var(--red)}
+.submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:999px;font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:6px}
+.submit-btn:disabled{opacity:.5}
+.err{color:var(--danger);font-size:13px;text-align:center;margin-top:14px;display:none}
+.gate-note{text-align:center;color:var(--muted);font-size:11.5px;margin-top:14px;line-height:1.5}
+
+.result{display:none;margin-top:8px}
+
+/* Posición grande, mismo tratamiento visual que el resto del sitio */
+.rank-hero{text-align:center;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1px solid var(--border-hi);border-radius:16px;padding:26px 20px;margin-top:10px}
+.rank-num{font-family:var(--font-h);font-weight:800;font-size:56px;line-height:1;letter-spacing:1px;background:linear-gradient(100deg,var(--bronze-hi),var(--gold-hi) 45%,var(--silver-hi) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rank-label{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+.urgency-banner{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:14px 16px;border-radius:12px;font-size:12.5px;line-height:1.5}
+.urgency-banner.hot{background:rgba(155,0,0,0.14);border:1px solid rgba(155,0,0,0.4);color:var(--text)}
+.urgency-banner.hot i{color:var(--red-hi);font-size:15px;margin-top:1px}
+.urgency-banner.win{background:rgba(0,197,102,0.1);border:1px solid rgba(0,197,102,0.35);color:var(--text)}
+.urgency-banner.win i{color:var(--green);font-size:15px;margin-top:1px}
+.urgency-banner b{color:var(--gold-hi)}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center}
+.stat-box .n{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--gold-hi)}
+.stat-box .l{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+.bonus-progress{margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.bonus-progress .t{font-size:12px;font-weight:600;margin-bottom:8px}
+.bonus-progress .t b{color:var(--gold-hi)}
+.bp-track{height:8px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.bp-fill{height:100%;background:linear-gradient(90deg,var(--bronze-hi),var(--gold-hi));border-radius:999px;transition:width .4s ease}
+
+.share-card{margin-top:18px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px}
+.share-card .t{font-family:var(--font-h);font-size:15px;text-transform:uppercase;margin-bottom:4px}
+.share-card .d{color:var(--muted);font-size:12px;margin-bottom:12px;line-height:1.5}
+.ref-code-box{background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;padding:11px 14px;text-align:center;font-family:'SFMono-Regular',Consolas,monospace;font-weight:700;color:var(--gold-hi);font-size:14px;word-break:break-all;margin-bottom:12px}
+.share-row{display:flex;gap:8px}
+.share-btn{flex:1;padding:13px 8px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:10px;font-size:11.5px;font-weight:700;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--text)}
+.share-btn i{font-size:17px}
+.share-btn#waBtn{background:rgba(37,211,102,0.12);border-color:rgba(37,211,102,0.4);color:#25D366}
+.share-btn#waBtn i{color:#25D366}
+.share-btn#copyBtn{background:rgba(233,200,118,0.12);border-color:rgba(233,200,118,0.4)}
+.share-btn#copyBtn i{color:var(--gold-hi)}
+
+.section-label{display:flex;align-items:baseline;gap:12px;margin:30px 0 14px}
+.section-label h2{font-family:var(--font-h);font-weight:700;font-size:18px;text-transform:uppercase}
+.section-label .rule{flex:1;height:1px;background:var(--border-hi)}
+.section-label .tag{font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+.ref-prize-banner{display:flex;align-items:flex-start;gap:9px;background:linear-gradient(135deg,rgba(233,200,118,0.16),rgba(155,0,0,0.08));border:1px solid rgba(233,200,118,0.35);border-radius:10px;padding:12px 14px;font-size:11.5px;color:var(--text);line-height:1.5;margin-bottom:14px}
+.ref-prize-banner i{color:var(--gold-hi);font-size:13px;flex-shrink:0;margin-top:2px}
+.ref-prize-banner b{color:var(--gold-hi)}
+
+.referidores-list{display:flex;flex-direction:column;gap:6px}
+.ref-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px}
+.ref-row .pos{font-family:var(--font-h);font-weight:800;color:var(--gold-hi);width:20px;text-align:center;font-size:14px}
+.ref-row .pos i{font-size:15px}
+.ref-row .nm{flex:1;font-size:12.5px;font-weight:600}
+.ref-row .ct-wrap{text-align:right}
+.ref-row .ct{font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;color:var(--muted)}
+.ref-row .prize{font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;font-weight:700;color:var(--green);margin-top:1px}
+.ref-row.medal-1{background:linear-gradient(135deg,rgba(233,200,118,0.16),var(--surface));border-color:rgba(233,200,118,0.5)}
+.ref-row.medal-1 .pos i{color:var(--gold-hi)}
+.ref-row.medal-2{background:linear-gradient(135deg,rgba(199,204,210,0.14),var(--surface));border-color:rgba(199,204,210,0.4)}
+.ref-row.medal-2 .pos i{color:var(--silver-hi)}
+.ref-row.medal-3{background:linear-gradient(135deg,rgba(179,118,63,0.14),var(--surface));border-color:rgba(179,118,63,0.4)}
+.ref-row.medal-3 .pos i{color:var(--bronze-hi)}
+.ref-toggle-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:10px;padding:9px;background:var(--surface);border:1px solid var(--border-hi);border-radius:10px;color:var(--gold-hi);font-size:11.5px;font-weight:700}
+
+details.ref-details{margin-top:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+details.ref-details summary{padding:12px 14px;cursor:pointer;font-size:12px;font-weight:700;color:var(--gold-hi);list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details.ref-details summary::-webkit-details-marker{display:none}
+details.ref-details[open] summary{border-bottom:1px solid var(--border)}
+.ref-details-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.rdb-step{display:flex;align-items:flex-start;gap:10px;font-size:11.5px;color:var(--muted);line-height:1.5}
+.rdb-step i{color:var(--gold-hi);font-size:12px;margin-top:2px;flex-shrink:0;width:14px;text-align:center}
+.rdb-step b{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">IAC <span>Arica</span> 2026</div>
+  <a class="back" href="stamper.html"><i class="fas fa-arrow-left"></i> Volver al sorteo</a>
+</div>
+
+<div class="wrap">
+  <div class="kicker">Panel de referidos</div>
+  <h1>¿Cuántos amigos ya te acercaron al premio?</h1>
+  <p class="sub">Entra con tu correo y RUT/pasaporte y descubre tu posición exacta en el ranking. Los 3 primeros se llevan dinero en efectivo el mismo día del sorteo.</p>
+
+  <div id="gateWrap">
+    <div class="field">
+      <label>Correo electrónico</label>
+      <input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com">
+    </div>
+    <div class="field">
+      <label>RUT o pasaporte</label>
+      <input id="inRut" placeholder="12.345.678-9">
+    </div>
+    <button class="submit-btn" id="verBtn">Ver mi ranking</button>
+    <div class="err" id="errMsg"></div>
+    <p class="gate-note">Usa los mismos datos con los que compraste tu Sticker Digital.</p>
+  </div>
+
+  <div class="result" id="result">
+    <div class="rank-hero">
+      <div class="rank-num" id="miPosicion">#—</div>
+      <div class="rank-label">de <span id="totalReferenciadores">—</span> referenciadores</div>
+    </div>
+
+    <div id="urgencyBanner"></div>
+
+    <div class="stats-grid">
+      <div class="stat-box"><div class="n" id="miTotal">—</div><div class="l">Amigos referidos</div></div>
+      <div class="stat-box"><div class="n" id="miBonos">—</div><div class="l">Stickers gratis</div></div>
+    </div>
+
+    <div class="bonus-progress">
+      <div class="t" id="bonusProgressText">—</div>
+      <div class="bp-track"><div class="bp-fill" id="bonusProgressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="share-card">
+      <div class="t">Sigue compartiendo</div>
+      <div class="d">Cada persona que compre con tu link te acerca al podio — y a la próxima estampilla gratis.</div>
+      <div class="ref-code-box" id="miCodigo">—</div>
+      <div class="share-row">
+        <a class="share-btn" id="waBtn" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        <button class="share-btn" id="copyBtn"><i class="fas fa-link"></i> Copiar link</button>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <h2>Ranking completo</h2>
+      <div class="rule"></div>
+      <div class="tag">Top 5</div>
+    </div>
+    <div class="ref-prize-banner">
+      <i class="fas fa-crown"></i>
+      <span>Los <b>3 primeros lugares</b> ganan premio en dinero efectivo: <b>1° $300.000</b> · <b>2° $150.000</b> · <b>3° $50.000</b>. Se pagan el mismo día del sorteo.</span>
+    </div>
+    <div class="referidores-list" id="referidoresList"></div>
+    <button class="ref-toggle-btn" id="refToggleBtn" style="display:none"></button>
+
+    <details class="ref-details">
+      <summary>¿Cómo funciona el sistema de referidos? <i class="fas fa-chevron-down"></i></summary>
+      <div class="ref-details-body">
+        <div class="rdb-step"><i class="fas fa-ticket-alt"></i> Compra tu Sticker Digital y te damos un link personal con tu código.</div>
+        <div class="rdb-step"><i class="fas fa-share-alt"></i> Comparte tu link con tus amigos.</div>
+        <div class="rdb-step"><i class="fas fa-gift"></i> Cada <b>4 amigos</b> que compren con tu código, ganas <b>1 sticker gratis</b> — una oportunidad más de participar en el sorteo.</div>
+        <div class="rdb-step"><i class="fas fa-crown"></i> Además, el ranking cierra al término del período de venta. Los 3 con más referidos ganan: <b>1er lugar $300.000</b>, <b>2do lugar $150.000</b> y <b>3er lugar $50.000</b> en dinero efectivo, pagados el mismo día del sorteo.</div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<script src="js/config.js?v=20260809"></script>
+<script src="js/stamper-api.js?v=20260813"></script>
+<script>
+document.getElementById('verBtn').addEventListener('click', verRanking);
+document.getElementById('inRut').addEventListener('keydown', (e) => { if (e.key === 'Enter') verRanking(); });
+
+async function verRanking() {
+  const email = document.getElementById('inEmail').value.trim();
+  const rut = document.getElementById('inRut').value.trim();
+  const errEl = document.getElementById('errMsg');
+  errEl.style.display = 'none';
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || rut.length < 5) {
+    errEl.textContent = 'Ingresa tu correo y tu RUT o pasaporte.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('verBtn');
+  btn.disabled = true;
+  btn.textContent = 'Buscando…';
+
+  try {
+    stamperAPI.init();
+    const mi = await stamperAPI.miRankingReferidos(email, rut);
+    if (!mi) {
+      errEl.textContent = 'No encontramos una compra confirmada con esos datos.';
+      errEl.style.display = 'block';
+      return;
+    }
+    await renderMiRanking(mi);
+    document.getElementById('gateWrap').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+  } catch (e) {
+    console.error(e);
+    errEl.textContent = 'No encontramos una compra confirmada con esos datos.';
+    errEl.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Ver mi ranking';
+  }
+}
+
+async function renderMiRanking(mi) {
+  document.getElementById('miPosicion').textContent = '#' + mi.mi_posicion;
+  document.getElementById('totalReferenciadores').textContent = mi.total_referenciadores;
+  document.getElementById('miTotal').textContent = mi.mi_total_referido;
+  document.getElementById('miBonos').textContent = mi.mi_bonos_ganados;
+  document.getElementById('miCodigo').textContent = mi.mi_codigo_referido || '—';
+
+  const urgencyEl = document.getElementById('urgencyBanner');
+  if (mi.ya_esta_en_top3) {
+    const premios = { 1: '$300.000', 2: '$150.000', 3: '$50.000' };
+    const premio = premios[mi.mi_posicion] || '$50.000';
+    urgencyEl.innerHTML = `
+      <div class="urgency-banner win">
+        <i class="fas fa-trophy"></i>
+        <div>¡Estás en el <b>Top 3</b>! Si el ranking cerrara hoy, ganarías <b>${premio}</b> en dinero efectivo. Sigue compartiendo para no bajar del podio.</div>
+      </div>`;
+  } else if (mi.mi_total_referido > 0) {
+    urgencyEl.innerHTML = `
+      <div class="urgency-banner hot">
+        <i class="fas fa-fire"></i>
+        <div>Te faltan <b>${mi.faltan_para_top3} referido${mi.faltan_para_top3 === 1 ? '' : 's'}</b> para entrar al <b>Top 3</b> y ganar dinero en efectivo el día del sorteo.</div>
+      </div>`;
+  } else {
+    urgencyEl.innerHTML = `
+      <div class="urgency-banner hot">
+        <i class="fas fa-fire"></i>
+        <div>Aún no tienes referidos — comparte tu link y empieza a subir en el ranking. El Top 3 gana dinero en efectivo el día del sorteo.</div>
+      </div>`;
+  }
+
+  const restoParaBono = mi.mi_faltan_proximo_bono;
+  const avance = ((4 - restoParaBono) / 4) * 100;
+  document.getElementById('bonusProgressText').innerHTML =
+    restoParaBono > 0
+      ? `Te faltan <b>${restoParaBono}</b> referido${restoParaBono === 1 ? '' : 's'} más para tu próximo sticker gratis`
+      : `<b>¡Sticker gratis desbloqueado!</b> Sigue compartiendo para ganar otro`;
+  document.getElementById('bonusProgressFill').style.width = avance + '%';
+
+  const shareUrl = `${window.location.origin}/stamper.html?ref=${encodeURIComponent(mi.mi_codigo_referido || '')}`;
+  document.getElementById('waBtn').href =
+    `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
+  document.getElementById('copyBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      const btn = document.getElementById('copyBtn');
+      const original = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+      setTimeout(() => { btn.innerHTML = original; }, 1800);
+    });
+  });
+
+  await cargarRankingCompleto();
+}
+
+async function cargarRankingCompleto() {
+  try {
+    const top = await stamperAPI.topReferidores(20);
+    if (!top.length) return;
+    const PRIZES = ['$300.000', '$150.000', '$50.000'];
+    document.getElementById('referidoresList').innerHTML = top.map((r, i) => `
+      <div class="ref-row ${i < 3 ? 'medal-' + (i + 1) : ''} ${i >= 5 ? 'ref-row-extra' : ''}" ${i >= 5 ? 'style="display:none"' : ''}>
+        <div class="pos">${i < 3 ? `<i class="fas fa-${i === 0 ? 'crown' : 'medal'}"></i>` : i + 1}</div>
+        <div class="nm">${escapeHtml(r.nombre_publico)}</div>
+        <div class="ct-wrap">
+          <div class="ct">${r.total_referido} referidas</div>
+          ${i < 3 ? `<div class="prize">${PRIZES[i]}</div>` : ''}
+        </div>
+      </div>
+    `).join('');
+
+    const toggleBtn = document.getElementById('refToggleBtn');
+    if (top.length > 5) {
+      toggleBtn.style.display = 'flex';
+      toggleBtn.dataset.expanded = 'false';
+      toggleBtn.innerHTML = `Ver top ${top.length} completo <i class="fas fa-chevron-down"></i>`;
+      toggleBtn.onclick = () => {
+        const expanded = toggleBtn.dataset.expanded === 'true';
+        document.querySelectorAll('.ref-row-extra').forEach(el => el.style.display = expanded ? 'none' : 'flex');
+        toggleBtn.dataset.expanded = String(!expanded);
+        toggleBtn.innerHTML = expanded
+          ? `Ver top ${top.length} completo <i class="fas fa-chevron-down"></i>`
+          : `Ver menos <i class="fas fa-chevron-up"></i>`;
+      };
+    }
+  } catch (e) {
+    console.error('Error cargando ranking completo:', e);
+  }
+}
+</script>
+</body>
+</html>
