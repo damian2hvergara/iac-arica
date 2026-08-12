@@ -373,7 +373,7 @@ class StamperAPI {
         try {
             const { data, error } = await this.client
                 .from('sorteo_config')
-                .select('*, vehicles(name, price, vehicle_images(image_url, is_main))')
+                .select('*, vehicles(name, price, vehicle_images(image_url, is_main, order_index))')
                 .eq('activo', true)
                 .order('id', { ascending: false })
                 .limit(1);

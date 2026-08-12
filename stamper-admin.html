@@ -297,7 +297,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260814"></script>
+<script src="js/stamper-api.js?v=20260815"></script>
 <script>
 let currentUser = null;
 let pendCache = [];
@@ -450,9 +450,10 @@ async function confirmarPedido(ordenId) {
   if (!confirm(`¿Confirmar el pago de ${orden.nombre} por $${(orden.monto_total||0).toLocaleString('es-CL')}?`)) return;
   try {
     const folios = await stamperAPI.confirmarOrden(ordenId);
-    await enviarCorreoConfirmacion(orden, folios);
+    const sorteo = await stamperAPI.getSorteoConfigAdmin();
+    await enviarCorreoConfirmacion(orden, folios, sorteo);
     if (orden.referido_por) {
-      notifyReferrer(orden.referido_por, orden.nombre, folios.length).catch(e => console.warn('Email referente:', e));
+      notifyReferrer(orden.referido_por, orden.nombre, folios.length, orden.id, sorteo).catch(e => console.warn('Email referente:', e));
     }
     alert('Orden confirmada y correo enviado.');
     loadPendientes();
@@ -462,9 +463,34 @@ async function confirmarPedido(ordenId) {
   }
 }
 
-async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada) {
+// Igual que en stamper.html/flow-webhook: si esta confirmación completó
+// otro grupo de 4 referidos, se le manda al referente la estampilla de
+// bono real (folio + foto), no solo el aviso de progreso.
+async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada, ordenId, sorteo) {
   const info = await stamperAPI.infoReferido(codigoReferido);
   if (!info || !info.referente_email) return;
+
+  const fechaStr = sorteo?.fecha_sorteo
+    ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
+    : 'Por confirmar';
+  const vehicleName = sorteo?.vehicles?.name || 'Vehículo';
+  const vehicleImageRows = (sorteo?.vehicles?.vehicle_images || [])
+    .slice()
+    .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+  const vehicleImages = vehicleImageRows.map(i => i.image_url);
+  const vehicleImg = vehicleImageRows.find(i => i.is_main)?.image_url || vehicleImages[0] || null;
+
+  let bonusEstampillas = [];
+  try {
+    const bonos = ordenId ? await stamperAPI.bonosPendientesNotificacion(ordenId) : [];
+    bonusEstampillas = bonos.map(b => ({
+      folio: b.numero_folio,
+      hash: b.hash_seguridad,
+      imagenUrl: pickStickerImageForFolio(vehicleImages, b.numero_folio)
+    }));
+  } catch (e) {
+    console.warn('No se pudo obtener el bono pendiente de notificar:', e);
+  }
 
   await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-referral-email`, {
     method: 'POST',
@@ -477,7 +503,11 @@ async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada) 
       totalAcumulado: info.total_comprado,
       bonosGanados: info.bonos_ganados,
       faltanParaProximo: info.faltan_para_proximo,
-      codigoReferido
+      codigoReferido,
+      bonusEstampillas,
+      vehicleName,
+      vehicleImg,
+      fechaSorteo: fechaStr
     })
   });
 }
@@ -493,9 +523,9 @@ async function rechazarPedido(ordenId) {
   }
 }
 
-async function enviarCorreoConfirmacion(orden, folios) {
+async function enviarCorreoConfirmacion(orden, folios, sorteo) {
   try {
-    const sorteo = await stamperAPI.getSorteoConfigAdmin();
+    sorteo = sorteo || await stamperAPI.getSorteoConfigAdmin();
     const fechaStr = sorteo?.fecha_sorteo
       ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
       : 'Por confirmar';
