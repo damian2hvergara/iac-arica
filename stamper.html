@@ -1133,6 +1133,28 @@ function isValidRutOPasaporte(v) {
   return /^[A-Z0-9]{6,15}$/.test(clean);
 }
 
+// Un pasaporte siempre parte con letras; si lo que queda al sacar
+// puntos/espacios/guion es puro número (+ opcional K de verificador),
+// es un RUT chileno y se puede llevar siempre al mismo formato — así
+// "188539351" y "18853935-1" quedan escritos igual en vez de contarse
+// como dos personas distintas al comparar.
+function esFormatoRutChileno(v) {
+  const clean = v.replace(/[.\s-]/g, '');
+  return /^[0-9]{7,8}[0-9kK]$/.test(clean);
+}
+function formatearRutChileno(v) {
+  const clean = v.replace(/[.\s-]/g, '').toUpperCase();
+  const body = clean.slice(0, -1);
+  const dv = clean.slice(-1);
+  const conPuntos = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${conPuntos}-${dv}`;
+}
+document.getElementById('inRut').addEventListener('blur', () => {
+  const el = document.getElementById('inRut');
+  const v = el.value.trim();
+  if (v && esFormatoRutChileno(v)) el.value = formatearRutChileno(v);
+});
+
 const FIELD_VALIDATORS = {
   inNombre: { errId: 'errNombre', fn: isValidNombre, msg: 'Ingresa tu nombre y apellido (solo letras).' },
   inRut: { errId: 'errRut', fn: isValidRutOPasaporte, msg: 'Ingresa un RUT válido (12.345.678-9) o pasaporte.' },
