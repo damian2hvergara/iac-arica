@@ -13,8 +13,13 @@
  * los mismos correos (send-stamp-email, send-referral-email) que ya
  * están funcionando.
  *
- * NO ACTIVO todavía: nadie llama a esta URL mientras Flow no esté
- * conectado de verdad (FLOW_MODE='simulation' en stamper.html).
+ * También la llama directamente stamper-admin.html (botón "Verificar
+ * pago en Flow" en Pedidos Pendientes) para el mismo caso de siempre
+ * — el webhook puede no haber llegado — pero ahora reutilizando esta
+ * misma verificación real contra Flow, en vez de confiar a ciegas en
+ * que el admin calzó bien una transferencia. confirmar_orden() ya NO
+ * tiene permiso para authenticated (ver parte 26): la única forma de
+ * confirmar una orden es que Flow, acá, confirme que el pago existe.
  *
  * Secrets necesarios: los mismos que flow-create-payment
  * (FLOW_API_KEY, FLOW_SECRET_KEY, FLOW_BASE_URL opcional).
@@ -23,6 +28,12 @@
  * status: 1 pendiente · 2 pagada · 3 rechazada · 4 anulada
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
 
 async function signParams(params: Record<string, string>, secretKey: string): Promise<string> {
   const sortedKeys = Object.keys(params).sort();
@@ -35,22 +46,29 @@ async function signParams(params: Record<string, string>, secretKey: string): Pr
   return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+function json(body: unknown, status: number) {
+  return new Response(JSON.stringify(body), {
+    status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+}
+
 Deno.serve(async (req: Request) => {
-  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders });
 
   let token: string | null = null;
   try {
     const form = await req.formData();
     token = form.get('token')?.toString() ?? null;
   } catch {
-    return new Response('Invalid body', { status: 400 });
+    return json({ ok: false, error: 'invalid_body' }, 400);
   }
-  if (!token) return new Response('Falta token', { status: 400 });
+  if (!token) return json({ ok: false, error: 'falta_token' }, 400);
 
   const FLOW_API_KEY = Deno.env.get('FLOW_API_KEY');
   const FLOW_SECRET_KEY = Deno.env.get('FLOW_SECRET_KEY');
   const FLOW_BASE_URL = Deno.env.get('FLOW_BASE_URL') ?? 'https://sandbox.flow.cl/api';
-  if (!FLOW_API_KEY || !FLOW_SECRET_KEY) return new Response('Flow no configurado', { status: 500 });
+  if (!FLOW_API_KEY || !FLOW_SECRET_KEY) return json({ ok: false, error: 'flow_no_configurado' }, 500);
 
   const statusParams: Record<string, string> = { apiKey: FLOW_API_KEY, token };
   statusParams.s = await signParams(statusParams, FLOW_SECRET_KEY);
@@ -61,17 +79,17 @@ Deno.serve(async (req: Request) => {
     const flowRes = await fetch(`${FLOW_BASE_URL}/payment/getStatus?${qs}`);
     if (!flowRes.ok) {
       console.error('Flow getStatus error:', await flowRes.text());
-      return new Response('Error consultando estado', { status: 502 });
+      return json({ ok: false, error: 'error_consultando_estado' }, 502);
     }
     flowData = await flowRes.json();
   } catch (e: any) {
     console.error('Error de red consultando Flow:', e);
-    return new Response('Flow unreachable', { status: 502 });
+    return json({ ok: false, error: 'flow_unreachable' }, 502);
   }
 
   const ordenId = flowData.commerceOrder;
   const status = flowData.status;
-  if (!ordenId) return new Response('commerceOrder ausente', { status: 400 });
+  if (!ordenId) return json({ ok: false, error: 'commerceOrder_ausente' }, 400);
 
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -80,10 +98,10 @@ Deno.serve(async (req: Request) => {
     if (error) {
       // Flow puede reintentar el mismo webhook — si ya estaba confirmada, no es un error real.
       if (String(error.message).includes('orden_ya_procesada')) {
-        return new Response('OK (ya procesada)', { status: 200 });
+        return json({ ok: true, confirmed: true, alreadyProcessed: true, status, message: 'La orden ya estaba confirmada.' }, 200);
       }
       console.error('confirmar_orden error:', error);
-      return new Response('Error confirmando orden', { status: 500 });
+      return json({ ok: false, error: 'error_confirmando_orden' }, 500);
     }
 
     try {
@@ -188,16 +206,16 @@ Deno.serve(async (req: Request) => {
       console.error('Error armando/enviando correos post-confirmación:', e);
     }
 
-    return new Response('OK', { status: 200 });
+    return json({ ok: true, confirmed: true, status, message: 'Pago confirmado por Flow: estampillas generadas y correo enviado.' }, 200);
   }
 
   if (status === 3 || status === 4) {
     await supabase
       .rpc('rechazar_orden', { p_orden_id: ordenId, p_nota: `Flow: status=${status}` })
       .catch((e) => console.warn('rechazar_orden falló (puede que ya estuviera procesada):', e));
-    return new Response('OK', { status: 200 });
+    return json({ ok: true, confirmed: false, status, message: 'Flow marcó este pago como rechazado o anulado.' }, 200);
   }
 
   // status 1 (pendiente) — todavía no hay nada que hacer.
-  return new Response('OK', { status: 200 });
+  return json({ ok: true, confirmed: false, status, message: 'Flow todavía no registra el pago como recibido.' }, 200);
 });

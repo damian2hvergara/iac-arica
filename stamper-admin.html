@@ -191,7 +191,9 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       <div class="card">
         <h2>Pedidos pendientes de confirmar pago</h2>
         <p class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
-          Revisa la cuenta bancaria y calza la <b>referencia</b>, el monto y el nombre antes de confirmar.
+          Estas órdenes se confirman solas apenas Flow avisa que el pago llegó — este panel es solo un respaldo
+          por si ese aviso automático no llega. "Verificar pago en Flow" vuelve a preguntarle a Flow el estado real;
+          <b>solo confirma la orden si Flow confirma el pago</b>, nunca a criterio del admin.
         </p>
         <div class="table-wrap">
           <table id="pendientesTable">
@@ -447,7 +449,9 @@ async function loadPendientes() {
         <td>${escapeHtml(o.packs_config?.nombre || '')} (${o.cantidad_stickers})</td>
         <td>$${(o.monto_total||0).toLocaleString('es-CL')}</td>
         <td>
-          <button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Confirmar pago</button>
+          ${o.flow_token
+            ? `<button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Verificar pago en Flow</button>`
+            : `<span style="color:var(--muted);font-size:11.5px">Sin pago Flow asociado</span>`}
           <button class="btn btn-ghost btn-sm" data-action="rechazar" data-id="${o.id}">Rechazar</button>
         </td>
       </tr>
@@ -464,69 +468,32 @@ async function loadPendientes() {
 async function confirmarPedido(ordenId) {
   const orden = pendCache.find(o => o.id === ordenId);
   if (!orden) return;
-  if (!confirm(`¿Confirmar el pago de ${orden.nombre} por $${(orden.monto_total||0).toLocaleString('es-CL')}?`)) return;
+  if (!orden.flow_token) {
+    alert('Esta orden no tiene un pago de Flow asociado, así que no hay nada que verificar. Ya no es posible confirmar órdenes a mano — solo Flow puede confirmar un pago real.');
+    return;
+  }
+  if (!confirm(`Se le va a preguntar a Flow el estado real del pago de ${orden.nombre} ($${(orden.monto_total||0).toLocaleString('es-CL')}). Solo se confirmará la orden si Flow confirma que el pago fue recibido. ¿Continuar?`)) return;
   try {
-    const folios = await stamperAPI.confirmarOrden(ordenId);
-    const sorteo = await stamperAPI.getSorteoConfigAdmin();
-    await enviarCorreoConfirmacion(orden, folios, sorteo);
-    if (orden.referido_por) {
-      notifyReferrer(orden.referido_por, orden.nombre, folios.length, orden.id, sorteo).catch(e => console.warn('Email referente:', e));
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/flow-webhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ token: orden.flow_token }).toString()
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      alert('Error al verificar con Flow: ' + (data.error || res.status));
+      return;
     }
-    alert('Orden confirmada y correo enviado.');
-    loadPendientes();
-    loadPendientesBadge();
+    if (data.confirmed) {
+      alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : 'Flow confirmó el pago: la orden quedó confirmada y el correo con las estampillas ya se envió.');
+      loadPendientes();
+      loadPendientesBadge();
+    } else {
+      alert('Flow todavía no confirma este pago (estado Flow: ' + data.status + ').\n' + (data.message || '') + '\nLa orden sigue pendiente — no se confirmó nada.');
+    }
   } catch (e) {
-    alert('Error al confirmar: ' + (e.message || e));
+    alert('Error al verificar con Flow: ' + (e.message || e));
   }
-}
-
-// Igual que en stamper.html/flow-webhook: si esta confirmación completó
-// otro grupo de 4 referidos, se le manda al referente la estampilla de
-// bono real (folio + foto), no solo el aviso de progreso.
-async function notifyReferrer(codigoReferido, referidoNombre, cantidadComprada, ordenId, sorteo) {
-  const info = await stamperAPI.infoReferido(codigoReferido);
-  if (!info || !info.referente_email) return;
-
-  const fechaStr = sorteo?.fecha_sorteo
-    ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
-    : 'Por confirmar';
-  const vehicleName = sorteo?.vehicles?.name || 'Vehículo';
-  const vehicleImageRows = (sorteo?.vehicles?.vehicle_images || [])
-    .slice()
-    .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-  const vehicleImages = vehicleImageRows.map(i => i.image_url);
-  const vehicleImg = vehicleImageRows.find(i => i.is_main)?.image_url || vehicleImages[0] || null;
-
-  let bonusEstampillas = [];
-  try {
-    const bonos = ordenId ? await stamperAPI.bonosPendientesNotificacion(ordenId) : [];
-    bonusEstampillas = bonos.map(b => ({
-      folio: b.numero_folio,
-      hash: b.hash_seguridad,
-      imagenUrl: pickStickerImageForFolio(vehicleImages, b.numero_folio)
-    }));
-  } catch (e) {
-    console.warn('No se pudo obtener el bono pendiente de notificar:', e);
-  }
-
-  await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-referral-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
-    body: JSON.stringify({
-      referenteEmail: info.referente_email,
-      referenteNombre: info.referente_nombre,
-      referidoNombre,
-      cantidadComprada,
-      totalAcumulado: info.total_comprado,
-      bonosGanados: info.bonos_ganados,
-      faltanParaProximo: info.faltan_para_proximo,
-      codigoReferido,
-      bonusEstampillas,
-      vehicleName,
-      vehicleImg,
-      fechaSorteo: fechaStr
-    })
-  });
 }
 
 async function rechazarPedido(ordenId) {
@@ -537,45 +504,6 @@ async function rechazarPedido(ordenId) {
     loadPendientesBadge();
   } catch (e) {
     alert('Error al rechazar: ' + (e.message || e));
-  }
-}
-
-async function enviarCorreoConfirmacion(orden, folios, sorteo) {
-  try {
-    sorteo = sorteo || await stamperAPI.getSorteoConfigAdmin();
-    const fechaStr = sorteo?.fecha_sorteo
-      ? new Date(sorteo.fecha_sorteo).toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' })
-      : 'Por confirmar';
-    const vehicleName = sorteo?.vehicles?.name || 'Vehículo';
-    const vehicleImageRows = (sorteo?.vehicles?.vehicle_images || [])
-      .slice()
-      .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-    const vehicleImages = vehicleImageRows.map(i => i.image_url);
-    const vehicleImg = vehicleImageRows.find(i => i.is_main)?.image_url || vehicleImages[0] || null;
-
-    // Cada estampilla muestra siempre la misma foto (elegida a partir de su
-    // propio folio), sin importar desde dónde se envíe el correo.
-    const estampillasConFoto = folios.map((f) => ({
-      folio: f.numero_folio,
-      hash: f.hash_seguridad,
-      imagenUrl: pickStickerImageForFolio(vehicleImages, f.numero_folio) || vehicleImg
-    }));
-
-    await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-stamp-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
-      body: JSON.stringify({
-        nombre: orden.nombre,
-        email: orden.email,
-        estampillas: estampillasConFoto,
-        vehicleName, vehicleImg, fechaSorteo: fechaStr,
-        pack: orden.packs_config?.nombre || '',
-        monto: orden.monto_total,
-        codigoReferido: orden.codigo_referido
-      })
-    });
-  } catch (e) {
-    console.warn('Email:', e);
   }
 }
 

@@ -255,18 +255,6 @@ class StamperAPI {
         }
     }
 
-    async confirmarOrden(ordenId) {
-        try {
-            const { data, error } = await this.client
-                .rpc('confirmar_orden', { p_orden_id: ordenId });
-            if (error) throw error;
-            return data; // [{numero_folio, hash_seguridad, orden_en_pack}, ...]
-        } catch (error) {
-            console.error('Error confirmarOrden:', error);
-            throw error;
-        }
-    }
-
     async rechazarOrden(ordenId, nota) {
         try {
             const { error } = await this.client

@@ -1,0 +1,8 @@
+# IAC ARICA 2026 — config mínimo para Supabase CLI.
+# flow-webhook lo llama Flow.cl directo (servidor a servidor) y nunca
+# manda un JWT de Supabase, así que necesita verify_jwt=false. Sin este
+# archivo, cualquier "supabase functions deploy flow-webhook" sin el
+# flag --no-verify-jwt vuelve a exigir JWT y el webhook real de Flow
+# empieza a fallar con 401 en silencio.
+[functions.flow-webhook]
+verify_jwt = false
