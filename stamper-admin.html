@@ -59,6 +59,13 @@ main{padding:22px;max-width:1200px;margin:0 auto}
 .kpi .val.gold{color:var(--gold)}
 .kpi .val.green{color:var(--green)}
 
+.meta-progress-track{position:relative;height:30px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:15px;overflow:hidden;margin:18px 0 30px}
+.meta-progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:15px 0 0 15px;transition:width .5s ease;min-width:2px}
+.meta-progress-fill.reached{background:linear-gradient(90deg,var(--green),#00e589)}
+.meta-progress-marker{position:absolute;top:-6px;bottom:-6px;width:2px;background:#fff;z-index:2}
+.meta-progress-marker-label{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:10.5px;font-weight:600;color:var(--text);white-space:nowrap;background:var(--surface);padding:2px 8px;border-radius:5px;border:1px solid var(--border-hi)}
+.meta-progress-labels{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:13px;color:var(--muted)}
+
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px}
 .card h2{font-family:var(--font-h);font-size:18px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 
@@ -144,6 +151,20 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
   <main>
     <!-- ===== DASHBOARD ===== -->
     <section class="tab-panel active" id="panel-dashboard">
+      <div class="card">
+        <h2>Progreso de venta</h2>
+        <div class="meta-progress-track">
+          <div class="meta-progress-fill" id="metaProgressFill" style="width:0%"></div>
+          <div class="meta-progress-marker" id="metaProgressMarker" style="left:0%">
+            <div class="meta-progress-marker-label" id="metaProgressMarkerLabel">Meta mínima</div>
+          </div>
+        </div>
+        <div class="meta-progress-labels">
+          <span id="metaProgressText">Cargando…</span>
+          <span id="metaProgressStatus"></span>
+        </div>
+      </div>
+
       <div class="kpi-grid" id="kpiGrid">
         <div class="kpi"><div class="lbl">Total estampillas emitidas</div><div class="val gold" id="kpiVendidas">—</div></div>
         <div class="kpi"><div class="lbl">Estampillas por venta</div><div class="val" id="kpiPorVenta">—</div></div>
@@ -156,7 +177,6 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         </div>
         <div class="kpi"><div class="lbl">Órdenes completadas</div><div class="val" id="kpiOrdenes">—</div></div>
         <div class="kpi"><div class="lbl">Pendientes de confirmar</div><div class="val" id="kpiPendientes">—</div></div>
-        <div class="kpi"><div class="lbl">Progreso a meta mínima</div><div class="val" id="kpiMeta">—</div></div>
       </div>
 
       <div class="card">
@@ -381,10 +401,25 @@ async function loadDashboard() {
     document.getElementById('kpiPorReferidos').textContent = porReferidos.toLocaleString('es-CL');
     document.getElementById('kpiPorReferidosPct').textContent = `${pctReferidos}% de las estampillas vendidas`;
 
-    const pct = sorteo.meta_minima_stickers > 0
-      ? Math.min(100, Math.round((stickersVendidos / sorteo.meta_minima_stickers) * 100))
-      : 0;
-    document.getElementById('kpiMeta').textContent = pct + '%';
+    // Barra de progreso: vendidas vs. el total de estampillas emitidas (10.000),
+    // con una marca en la meta mínima (6.500) que define si se cumple la
+    // cláusula Octavo (bajo esa meta, riesgo de reembolso).
+    const totalCap = sorteo.total_stickers_emitidos || 0;
+    const metaMin = sorteo.meta_minima_stickers || 0;
+    const pctVendido = totalCap > 0 ? Math.min(100, (stickersVendidos / totalCap) * 100) : 0;
+    const pctMeta = totalCap > 0 ? Math.min(100, (metaMin / totalCap) * 100) : 0;
+    const metaAlcanzada = metaMin > 0 && stickersVendidos >= metaMin;
+
+    const fillEl = document.getElementById('metaProgressFill');
+    fillEl.style.width = pctVendido.toFixed(1) + '%';
+    fillEl.classList.toggle('reached', metaAlcanzada);
+    document.getElementById('metaProgressMarker').style.left = pctMeta.toFixed(1) + '%';
+    document.getElementById('metaProgressMarkerLabel').textContent = `Meta mínima: ${metaMin.toLocaleString('es-CL')}`;
+    document.getElementById('metaProgressText').textContent =
+      `${stickersVendidos.toLocaleString('es-CL')} de ${totalCap.toLocaleString('es-CL')} estampillas emitidas (${pctVendido.toFixed(1)}%)`;
+    document.getElementById('metaProgressStatus').innerHTML = metaAlcanzada
+      ? `<span style="color:var(--green);font-weight:600">✅ Meta mínima alcanzada</span>`
+      : `<span style="color:var(--orange);font-weight:600">Faltan ${(metaMin - stickersVendidos).toLocaleString('es-CL')} para la meta mínima</span>`;
 
     // Packs breakdown
     const byPack = {};
