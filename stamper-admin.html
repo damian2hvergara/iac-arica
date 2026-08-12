@@ -145,9 +145,16 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
     <!-- ===== DASHBOARD ===== -->
     <section class="tab-panel active" id="panel-dashboard">
       <div class="kpi-grid" id="kpiGrid">
-        <div class="kpi"><div class="lbl">Estampillas vendidas</div><div class="val gold" id="kpiVendidas">—</div></div>
+        <div class="kpi"><div class="lbl">Total estampillas emitidas</div><div class="val gold" id="kpiVendidas">—</div></div>
+        <div class="kpi"><div class="lbl">Estampillas por venta</div><div class="val" id="kpiPorVenta">—</div></div>
+        <div class="kpi"><div class="lbl">Estampillas regaladas (bono referido)</div><div class="val" id="kpiRegaladas">—</div></div>
+        <div class="kpi"><div class="lbl">Recaudación total</div><div class="val green" id="kpiRecaudacion">—</div></div>
+        <div class="kpi">
+          <div class="lbl">Estampillas compradas por referido</div>
+          <div class="val" id="kpiPorReferidos">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px" id="kpiPorReferidosPct"></div>
+        </div>
         <div class="kpi"><div class="lbl">Órdenes completadas</div><div class="val" id="kpiOrdenes">—</div></div>
-        <div class="kpi"><div class="lbl">Recaudación</div><div class="val green" id="kpiRecaudacion">—</div></div>
         <div class="kpi"><div class="lbl">Pendientes de confirmar</div><div class="val" id="kpiPendientes">—</div></div>
         <div class="kpi"><div class="lbl">Progreso a meta mínima</div><div class="val" id="kpiMeta">—</div></div>
       </div>
@@ -297,7 +304,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260815"></script>
+<script src="js/stamper-api.js?v=20260816"></script>
 <script>
 let currentUser = null;
 let pendCache = [];
@@ -353,15 +360,24 @@ function initApp() {
 /* ---------- Dashboard ---------- */
 async function loadDashboard() {
   try {
-    const { ordenes, sorteo, stickersVendidos } = await stamperAPI.getDashboardStats();
+    const { ordenes, sorteo, stickersVendidos, estampillasRegaladas } = await stamperAPI.getDashboardStats();
     const completadas = ordenes.filter(o => o.estado === 'completado');
     const pendientes = ordenes.filter(o => o.estado === 'pendiente_pago');
     const recaudacion = completadas.reduce((s, o) => s + (o.monto_total || 0), 0);
+    const porVenta = stickersVendidos - estampillasRegaladas;
+    const porReferidos = completadas
+      .filter(o => o.referido_por)
+      .reduce((s, o) => s + (o.cantidad_stickers || 0), 0);
+    const pctReferidos = porVenta > 0 ? Math.round((porReferidos / porVenta) * 100) : 0;
 
     document.getElementById('kpiVendidas').textContent = stickersVendidos.toLocaleString('es-CL');
+    document.getElementById('kpiPorVenta').textContent = porVenta.toLocaleString('es-CL');
+    document.getElementById('kpiRegaladas').textContent = estampillasRegaladas.toLocaleString('es-CL');
     document.getElementById('kpiOrdenes').textContent = completadas.length.toLocaleString('es-CL');
     document.getElementById('kpiRecaudacion').textContent = '$' + recaudacion.toLocaleString('es-CL');
     document.getElementById('kpiPendientes').textContent = pendientes.length.toLocaleString('es-CL');
+    document.getElementById('kpiPorReferidos').textContent = porReferidos.toLocaleString('es-CL');
+    document.getElementById('kpiPorReferidosPct').textContent = `${pctReferidos}% de las estampillas vendidas`;
 
     const pct = sorteo.meta_minima_stickers > 0
       ? Math.min(100, Math.round((stickersVendidos / sorteo.meta_minima_stickers) * 100))

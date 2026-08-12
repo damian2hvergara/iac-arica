@@ -298,7 +298,7 @@ class StamperAPI {
         try {
             const { data: ordenes, error } = await this.client
                 .from('ordenes')
-                .select('estado, monto_total, cantidad_stickers, pack_id, created_at, packs_config(nombre)');
+                .select('estado, monto_total, cantidad_stickers, pack_id, referido_por, created_at, packs_config(nombre)');
             if (error) throw error;
 
             const { data: sorteoRows, error: errSorteo } = await this.client
@@ -314,7 +314,14 @@ class StamperAPI {
                 .rpc('stickers_vendidos_count', { p_sorteo_id: null });
             if (errCount) throw errCount;
 
-            return { ordenes, sorteo, stickersVendidos };
+            const { count: estampillasRegaladas, error: errBonus } = await this.client
+                .from('estampillas')
+                .select('id, ordenes!inner(estado)', { count: 'exact', head: true })
+                .eq('es_bonus', true)
+                .eq('ordenes.estado', 'completado');
+            if (errBonus) throw errBonus;
+
+            return { ordenes, sorteo, stickersVendidos, estampillasRegaladas: estampillasRegaladas || 0 };
         } catch (error) {
             console.error('Error getDashboardStats:', error);
             throw error;
