@@ -43,6 +43,9 @@ h1{font-family:var(--font-h);font-size:clamp(24px,5vw,30px);text-transform:upper
 .folio-item .info{flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .folio-item .code{font-family:'SFMono-Regular',Consolas,monospace;font-weight:700;color:var(--gold)}
 .folio-item .bonus{font-size:10px;color:var(--green);text-transform:uppercase}
+.folio-item.is-bonus{background:linear-gradient(135deg,rgba(0,197,102,0.12),var(--surface-2));border-color:rgba(0,197,102,0.4)}
+.folio-item.is-bonus .gift-ico{width:52px;height:38px;border-radius:6px;flex-shrink:0;background:rgba(0,197,102,0.15);border:1px solid rgba(0,197,102,0.4);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:16px}
+.folio-item.is-bonus .bonus{background:rgba(0,197,102,0.16);padding:3px 8px;border-radius:20px;font-weight:700}
 .order-pending-note{margin-top:12px;color:var(--muted);font-size:12.5px}
 .resend-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:11px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);font-size:13px;font-weight:600}
 .resend-btn:active{background:var(--surface)}
@@ -142,12 +145,15 @@ function renderResultado(email, ordenes) {
     if (o.folios && o.folios.length) {
       folioListHtml = `<div class="folio-list">` + o.folios.map((f) => {
         const img = pickStickerImageForFolio(images, f.numero_folio);
+        const imgHtml = f.es_bonus
+          ? `<div class="gift-ico"><i class="fas fa-gift"></i></div>`
+          : (img ? `<img src="${img}" alt="Foto de ${escapeHtml(o.vehicleName || 'tu premio')}">` : '');
         return `
-        <div class="folio-item">
-          ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(o.vehicleName || 'tu premio')}">` : ''}
+        <div class="folio-item ${f.es_bonus ? 'is-bonus' : ''}">
+          ${imgHtml}
           <div class="info">
             <span class="code">${escapeHtml(f.numero_folio)}</span>
-            ${f.es_bonus ? '<span class="bonus">Bono referido</span>' : ''}
+            ${f.es_bonus ? '<span class="bonus">🎁 Gratis · Bono referido</span>' : ''}
           </div>
         </div>`;
       }).join('') + `</div>`;

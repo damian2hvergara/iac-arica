@@ -343,6 +343,9 @@ main{padding-top:56px}
 .stamp-card-mini .folio{font-family:var(--font-mono);font-weight:700;color:var(--gold-hi);font-size:14px}
 .stamp-card-mini .part{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 .stamp-card-mini .bonus-tag{font-size:9.5px;color:var(--green);text-transform:uppercase;font-weight:700;margin-left:6px}
+.stamp-card-mini.is-bonus{background:linear-gradient(135deg,rgba(0,197,102,0.12),var(--surface-2));border-color:rgba(0,197,102,0.4)}
+.stamp-card-mini.is-bonus .gift-ico{width:64px;height:48px;border-radius:6px;flex-shrink:0;background:rgba(0,197,102,0.15);border:1px solid rgba(0,197,102,0.4);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:18px}
+.stamp-card-mini.is-bonus .bonus-tag{background:rgba(0,197,102,0.16);padding:2px 7px;border-radius:20px}
 
 /* Lightbox */
 .lightbox{display:none;position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;padding:20px}
@@ -1277,12 +1280,15 @@ async function checkFlowReturn() {
 function showSuccess(orden, folios, comprador) {
   document.getElementById('stampCards').innerHTML = folios.map((f, i) => {
     const img = pickStickerImageForFolio(galleryImages, f.numero_folio);
+    const imgHtml = f.es_bonus
+      ? `<div class="gift-ico"><i class="fas fa-gift"></i></div>`
+      : (img ? `<img src="${img}" alt="Foto de ${escapeHtml(vehicle?.name || 'tu premio')}">` : '');
     return `
-    <div class="stamp-card-mini">
-      ${img ? `<img src="${img}" alt="Foto de ${escapeHtml(vehicle?.name || 'tu premio')}">` : ''}
+    <div class="stamp-card-mini ${f.es_bonus ? 'is-bonus' : ''}">
+      ${imgHtml}
       <div class="body">
         <div class="folio">${escapeHtml(f.numero_folio)}</div>
-        <div class="part">Participación #${i + 1}${f.es_bonus ? '<span class="bonus-tag">Bono referido</span>' : ''}</div>
+        <div class="part">Participación #${i + 1}${f.es_bonus ? '<span class="bonus-tag">🎁 Gratis</span>' : ''}</div>
       </div>
     </div>`;
   }).join('');

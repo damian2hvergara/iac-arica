@@ -54,10 +54,10 @@ Deno.serve(async (req: Request) => {
   );
 
   const stampCards = estampillas.map((e: any, i: number) => `
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(140deg,#1c0b03,#0d0d0d);border-radius:12px;border:1px solid #2a2a2a;margin-bottom:14px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:${e.esBonus ? 'linear-gradient(140deg,#0a1f10,#0d0d0d)' : 'linear-gradient(140deg,#1c0b03,#0d0d0d)'};border-radius:12px;border:1px solid ${e.esBonus ? 'rgba(0,197,102,0.45)' : '#2a2a2a'};margin-bottom:14px;">
       <tr><td style="padding:10px 16px;border-bottom:1px solid #2a2a2a;">
         <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${e.folio}</span>
-        <span style="color:#00C566;font-size:11px;float:right;line-height:1.8;">Participación #${i + 1}</span>
+        <span style="color:#00C566;font-size:11px;float:right;line-height:1.8;">${e.esBonus ? '🎁 Gratis · Bono referido' : `Participación #${i + 1}`}</span>
       </td></tr>
       ${(e.imagenUrl || vehicleImg) ? `<tr><td><img src="${e.imagenUrl || vehicleImg}" width="100%" style="display:block;height:150px;object-fit:cover;"></td></tr>` : ''}
       <tr><td style="padding:14px 16px;">

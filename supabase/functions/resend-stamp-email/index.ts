@@ -74,7 +74,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: folios } = await supabase
       .from('estampillas')
-      .select('numero_folio, hash_seguridad')
+      .select('numero_folio, hash_seguridad, es_bonus')
       .eq('orden_id', ordenId)
       .order('orden_en_pack', { ascending: true });
 
@@ -117,6 +117,7 @@ Deno.serve(async (req: Request) => {
       folio: f.numero_folio,
       hash: f.hash_seguridad,
       imagenUrl: pickImageForFolio(vehicleImages, f.numero_folio),
+      esBonus: f.es_bonus,
     }));
 
     const sendRes = await fetch(`${SUPABASE_URL}/functions/v1/send-stamp-email`, {

@@ -55,7 +55,7 @@ Deno.serve(async (req: Request) => {
   const tieneBono = Array.isArray(bonusEstampillas) && bonusEstampillas.length > 0;
 
   const bonusCards = tieneBono ? bonusEstampillas.map((e: any) => `
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(140deg,#1c0b03,#0d0d0d);border-radius:12px;border:1px solid rgba(233,200,118,0.35);margin-bottom:14px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:linear-gradient(140deg,#0a1f10,#0d0d0d);border-radius:12px;border:1px solid rgba(0,197,102,0.45);margin-bottom:14px;">
       <tr><td style="padding:10px 16px;border-bottom:1px solid #2a2a2a;">
         <span style="color:#F0D080;font-family:monospace;font-size:14px;font-weight:700;letter-spacing:1px;">${e.folio}</span>
         <span style="color:#00C566;font-size:11px;float:right;line-height:1.8;">🎁 Estampilla de regalo</span>
