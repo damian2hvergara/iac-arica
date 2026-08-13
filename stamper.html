@@ -771,6 +771,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }));
 
   storeReferralFromUrl();
+  storeTestModeFromUrl();
   renderRefBanner();
   checkFlowReturn();
 
@@ -826,6 +827,24 @@ function storeReferralFromUrl() {
   const params = new URLSearchParams(window.location.search);
   const ref = params.get('ref');
   if (ref) sessionStorage.setItem('iac_ref', ref);
+}
+
+// Ventana de pruebas pre-lanzamiento (antes del 17-08-2026): con
+// ?modo_prueba=<secreto> en la URL, el checkout confirma al instante
+// vía test-simulate-purchase en vez de redirigir a Flow — mismo folio
+// real, mismo correo real, sin pagar. Solo funciona si el secreto
+// coincide con TEST_MODE_SECRET en Supabase; se cierra borrando ese
+// secret. Nadie sin el link puede activarlo por accidente.
+function storeTestModeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const secret = params.get('modo_prueba');
+  if (secret) sessionStorage.setItem('iac_test_secret', secret);
+  if (sessionStorage.getItem('iac_test_secret')) {
+    const bar = document.createElement('div');
+    bar.textContent = '🧪 MODO PRUEBA — esta compra es simulada, no se cobra nada real';
+    bar.style.cssText = 'position:sticky;top:0;z-index:9999;background:#F0D080;color:#0C0C0C;text-align:center;font-weight:800;font-size:13px;padding:8px;letter-spacing:.3px';
+    document.body.prepend(bar);
+  }
 }
 
 // Si alguien llega por un link de referido, se personaliza el mensaje
@@ -1222,7 +1241,12 @@ async function submitOrder() {
       nombre, email, telefono, rutPasaporte: rut, packSlug: selectedPack.slug, referidoPor
     });
 
-    await initFlowPayment(orden);
+    const testSecret = sessionStorage.getItem('iac_test_secret');
+    if (testSecret) {
+      await confirmarPruebaInstantanea(orden, testSecret, { nombre, email });
+    } else {
+      await initFlowPayment(orden);
+    }
   } catch (e) {
     errEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
     console.error(e);
@@ -1250,6 +1274,24 @@ async function initFlowPayment(orden) {
     console.error(e);
     document.getElementById('formErr').textContent = 'No se pudo conectar con Flow. Intenta de nuevo o escríbenos por WhatsApp.';
   }
+}
+
+// Ventana de pruebas pre-lanzamiento (ver storeTestModeFromUrl): confirma
+// al instante vía test-simulate-purchase, sin pasar por Flow — mismo
+// resultado (folios reales, correo real) que tendrá un pago real.
+async function confirmarPruebaInstantanea(orden, secret, comprador) {
+  const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/test-simulate-purchase`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+    body: JSON.stringify({ ordenId: orden.orden_id, secret })
+  });
+  const data = await res.json();
+  if (!res.ok || !data.ok) {
+    document.getElementById('formErr').textContent = 'No se pudo simular el pago: ' + (data.error || res.status);
+    return;
+  }
+  closeCheckout();
+  showSuccess(orden, data.folios, comprador);
 }
 
 // El comprador vuelve aquí después de pagar en Flow (urlReturn).
