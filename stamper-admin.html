@@ -214,6 +214,9 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
           Estas órdenes se confirman solas apenas Flow avisa que el pago llegó — este panel es solo un respaldo
           por si ese aviso automático no llega. "Verificar pago en Flow" vuelve a preguntarle a Flow el estado real;
           <b>solo confirma la orden si Flow confirma el pago</b>, nunca a criterio del admin.
+          Mientras Flow no esté configurado, las órdenes de prueba (creadas desde stamper.html) no tienen pago Flow
+          asociado — para esas aparece "🧪 Simular pago (prueba)", que confirma sin pasar por Flow para poder
+          probar el sistema completo. No usar esa opción con compradores reales.
         </p>
         <div class="table-wrap">
           <table id="pendientesTable">
@@ -486,13 +489,15 @@ async function loadPendientes() {
         <td>
           ${o.flow_token
             ? `<button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Verificar pago en Flow</button>`
-            : `<span style="color:var(--muted);font-size:11.5px">Sin pago Flow asociado</span>`}
+            : `<button class="btn btn-ghost btn-sm" data-action="simular" data-id="${o.id}" title="Solo para pruebas — no confirma pagos reales">🧪 Simular pago (prueba)</button>`}
           <button class="btn btn-ghost btn-sm" data-action="rechazar" data-id="${o.id}">Rechazar</button>
         </td>
       </tr>
     `).join('');
     tbody.querySelectorAll('button[data-action="confirmar"]').forEach(b =>
       b.addEventListener('click', () => confirmarPedido(b.dataset.id)));
+    tbody.querySelectorAll('button[data-action="simular"]').forEach(b =>
+      b.addEventListener('click', () => simularPedido(b.dataset.id)));
     tbody.querySelectorAll('button[data-action="rechazar"]').forEach(b =>
       b.addEventListener('click', () => rechazarPedido(b.dataset.id)));
   } catch (e) {
@@ -528,6 +533,31 @@ async function confirmarPedido(ordenId) {
     }
   } catch (e) {
     alert('Error al verificar con Flow: ' + (e.message || e));
+  }
+}
+
+async function simularPedido(ordenId) {
+  const orden = pendCache.find(o => o.id === ordenId);
+  if (!orden) return;
+  if (!confirm(`[SOLO PRUEBA] Esto va a confirmar la orden de ${orden.nombre} SIN pasar por Flow — no usar con compradores reales, solo para probar el sistema. ¿Continuar?`)) return;
+  try {
+    const { data: sessionData } = await stamperAPI.client.auth.getSession();
+    const adminToken = sessionData?.session?.access_token;
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/admin-simulate-purchase`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+      body: JSON.stringify({ ordenId })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      alert('Error al simular: ' + (data.error || res.status));
+      return;
+    }
+    alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : '[PRUEBA] Orden confirmada sin Flow — folios generados y correo enviado.');
+    loadPendientes();
+    loadPendientesBadge();
+  } catch (e) {
+    alert('Error al simular: ' + (e.message || e));
   }
 }
 
