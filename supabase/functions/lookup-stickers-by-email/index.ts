@@ -56,7 +56,7 @@ Deno.serve(async (req: Request) => {
   try {
     const { data: ordenes, error: errOrdenes } = await supabase
       .from('ordenes')
-      .select('id, nombre, estado, cantidad_stickers, monto_total, created_at, vehicle_id, packs_config(nombre)')
+      .select('id, nombre, estado, tipo, cantidad_stickers, monto_total, created_at, vehicle_id, packs_config(nombre)')
       .eq('email', email)
       .order('created_at', { ascending: false });
 
@@ -99,6 +99,7 @@ Deno.serve(async (req: Request) => {
       ordenId: o.id,
       nombre: o.nombre,
       estado: o.estado,
+      tipo: o.tipo || 'comprado',
       pack: o.packs_config?.nombre || '',
       cantidad_stickers: o.cantidad_stickers,
       monto_total: o.monto_total,

@@ -134,6 +134,13 @@ const ESTADOS = {
   reembolsado: { label: 'Reembolsado', cls: 'pill-pend' }
 };
 
+// Distinción simple entre comprado / bono por referido / regalo por redes —
+// para que "Mis Stickers" no muestre "Sin pack · $0" en los que no son compras.
+const TIPOS = {
+  gratis_redes_sociales: '🎁 Regalo por redes sociales',
+  bonus_referido: '🎁 Bono por referido'
+};
+
 function renderResultado(email, ordenes) {
   const result = document.getElementById('result');
   result.innerHTML = ordenes.map((o, oi) => {
@@ -141,19 +148,23 @@ function renderResultado(email, ordenes) {
     const images = o.vehicleImages || [];
     const fecha = o.fecha ? new Date(o.fecha).toLocaleDateString('es-CL', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 
+    const esGratisOBono = o.tipo === 'gratis_redes_sociales' || o.tipo === 'bonus_referido';
+
     let folioListHtml;
     if (o.folios && o.folios.length) {
       folioListHtml = `<div class="folio-list">` + o.folios.map((f) => {
+        const marcado = f.es_bonus || esGratisOBono;
         const img = pickStickerImageForFolio(images, f.numero_folio);
-        const imgHtml = f.es_bonus
+        const imgHtml = marcado
           ? `<div class="gift-ico"><i class="fas fa-gift"></i></div>`
           : (img ? `<img src="${img}" alt="Foto de ${escapeHtml(o.vehicleName || 'tu premio')}">` : '');
         return `
-        <div class="folio-item ${f.es_bonus ? 'is-bonus' : ''}">
+        <div class="folio-item ${marcado ? 'is-bonus' : ''}">
           ${imgHtml}
           <div class="info">
             <span class="code">${escapeHtml(f.numero_folio)}</span>
             ${f.es_bonus ? '<span class="bonus">🎁 Gratis · Bono referido</span>' : ''}
+            ${(!f.es_bonus && o.tipo === 'gratis_redes_sociales') ? '<span class="bonus">🎁 Gratis · Regalo por redes</span>' : ''}
           </div>
         </div>`;
       }).join('') + `</div>`;
@@ -170,11 +181,14 @@ function renderResultado(email, ordenes) {
       <div class="resend-msg" id="resendMsg-${oi}"></div>
     ` : '';
 
+    const nombreOrden = TIPOS[o.tipo] || o.pack || 'Sticker Digital';
+    const montoTexto = esGratisOBono ? 'Sin costo' : `$${Number(o.monto_total).toLocaleString('es-CL')}`;
+
     return `
     <div class="order-card">
       <span class="pill ${info.cls}">${info.label}</span>
-      <div class="order-name">${escapeHtml(o.pack || 'Sticker Digital')}</div>
-      <div class="order-meta">${o.cantidad_stickers} stickers · $${Number(o.monto_total).toLocaleString('es-CL')} · ${fecha}</div>
+      <div class="order-name">${escapeHtml(nombreOrden)}</div>
+      <div class="order-meta">${o.cantidad_stickers} stickers · ${montoTexto} · ${fecha}</div>
       ${folioListHtml}
       ${resendHtml}
     </div>`;
