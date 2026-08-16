@@ -1241,6 +1241,10 @@ async function submitOrder() {
       nombre, email, telefono, rutPasaporte: rut, packSlug: selectedPack.slug, referidoPor
     });
 
+    if (orden.abuso_detectado) {
+      stamperAPI.reportClientError('suspicious_input_detected', { message: 'Patrón sospechoso detectado en el checkout' }, { email }).catch(() => {});
+    }
+
     const testSecret = sessionStorage.getItem('iac_test_secret');
     if (testSecret) {
       await confirmarPruebaInstantanea(orden, testSecret, { nombre, email });

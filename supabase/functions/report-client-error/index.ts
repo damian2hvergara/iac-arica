@@ -34,6 +34,7 @@ const ERROR_TYPES = new Set([
   'flow_payment_init_failed',
   'test_simulate_failed',
   'unexpected_exception',
+  'suspicious_input_detected',
 ]);
 
 // Códigos que create_pending_order() lanza a propósito por datos mal
@@ -122,6 +123,17 @@ Deno.serve(async (req: Request) => {
     await logEvent(supabase, {
       category: 'payment', severity: 'high', source: 'report-client-error',
       message: 'Un comprador no pudo iniciar el pago con Flow.', detail,
+    });
+    return json({ ok: true }, 200);
+  }
+
+  if (errorType === 'suspicious_input_detected') {
+    // create_pending_order() ya detectó y guardó esto en system_events
+    // (SQL puro no puede disparar el correo) — este reporte del cliente
+    // es lo que realmente activa la alerta inmediata.
+    await logEvent(supabase, {
+      category: 'abuse', severity: 'high', source: 'report-client-error',
+      message: 'Texto con forma de XSS/SQLi detectado en el checkout (confirmado por create_pending_order).', detail,
     });
     return json({ ok: true }, 200);
   }
