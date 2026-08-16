@@ -1010,13 +1010,26 @@ async function otorgarGratis() {
 
     // Correo de confirmación: reutiliza resend-stamp-email (ya pública,
     // ya verifica email+orden completada) — no hace falta una función nueva.
-    fetch(`${SUPABASE_CONFIG.url}/functions/v1/resend-stamp-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, ordenId: resultado.orden_id })
-    }).catch(e => console.warn('No se pudo enviar el correo de confirmación:', e));
+    let correoOk = true;
+    let correoError = '';
+    try {
+      const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/resend-stamp-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+        body: JSON.stringify({ email, ordenId: resultado.orden_id })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) { correoOk = false; correoError = data.error || res.status; }
+    } catch (e) {
+      correoOk = false;
+      correoError = e.message || e;
+    }
 
-    alert(`Sticker gratis otorgado — folio ${resultado.numero_folio}. Se envió el correo de confirmación a ${email}.`);
+    if (correoOk) {
+      alert(`Sticker gratis otorgado — folio ${resultado.numero_folio}. Se envió el correo de confirmación a ${email}.`);
+    } else {
+      alert(`Sticker gratis otorgado — folio ${resultado.numero_folio}. ATENCIÓN: el correo de confirmación NO se pudo enviar (${correoError}). Puedes reintentar el envío desde "Mis Stickers" en el sitio con este correo.`);
+    }
     ['gratisNombre','gratisRut','gratisEmail','gratisTelefono','gratisInstagram','gratisDinamica','gratisFecha'].forEach(id => document.getElementById(id).value = '');
     loadGratisRedes();
   } catch (e) {
