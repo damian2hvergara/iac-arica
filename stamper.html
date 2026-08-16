@@ -739,7 +739,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260816"></script>
+<script src="js/stamper-api.js?v=20260817"></script>
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
@@ -1250,6 +1250,7 @@ async function submitOrder() {
   } catch (e) {
     errEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
     console.error(e);
+    stamperAPI.reportClientError('create_pending_order_failed', e, { email }).catch(() => {});
   } finally {
     btn.disabled = false;
     btn.textContent = 'Pagar con Flow';
@@ -1273,6 +1274,7 @@ async function initFlowPayment(orden) {
   } catch (e) {
     console.error(e);
     document.getElementById('formErr').textContent = 'No se pudo conectar con Flow. Intenta de nuevo o escríbenos por WhatsApp.';
+    stamperAPI.reportClientError('flow_payment_init_failed', e, { email: orden?.email || null }).catch(() => {});
   }
 }
 
@@ -1288,6 +1290,7 @@ async function confirmarPruebaInstantanea(orden, secret, comprador) {
   const data = await res.json();
   if (!res.ok || !data.ok) {
     document.getElementById('formErr').textContent = 'No se pudo simular el pago: ' + (data.error || res.status);
+    stamperAPI.reportClientError('test_simulate_failed', { message: data.error || res.status }, { email: comprador?.email || null }).catch(() => {});
     return;
   }
   closeCheckout();

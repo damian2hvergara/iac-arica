@@ -10,6 +10,9 @@
  * Secrets necesarios: RESEND_API_KEY, RESEND_FROM
  */
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logEvent } from '../_shared/log-event.ts';
+
 function escapeHtml(str: unknown): string {
   return String(str ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -42,6 +45,11 @@ Deno.serve(async (req: Request) => {
 
   const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   if (req.headers.get('Authorization') !== `Bearer ${SERVICE_ROLE_KEY}`) {
+    const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SERVICE_ROLE_KEY);
+    await logEvent(supabase, {
+      category: 'security', severity: 'high', source: 'send-stamp-email',
+      message: 'Alguien llamó send-stamp-email sin la service role key — nada legítimo lo hace así.',
+    });
     return new Response(JSON.stringify({ error: 'No autorizado' }), {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

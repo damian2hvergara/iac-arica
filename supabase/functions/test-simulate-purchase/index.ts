@@ -22,6 +22,7 @@
  * send-referral-email, ya blindadas a service_role).
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logRepeatedAttempt } from '../_shared/log-event.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -49,10 +50,17 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: 'invalid_body' }, 400);
   }
   const { ordenId, secret } = body;
-  if (secret !== TEST_MODE_SECRET) return json({ ok: false, error: 'modo_prueba_desactivado' }, 403);
-  if (!ordenId) return json({ ok: false, error: 'falta_ordenId' }, 400);
-
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+  if (secret !== TEST_MODE_SECRET) {
+    const supabaseLog = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    await logRepeatedAttempt(supabaseLog, {
+      source: 'test-simulate-purchase',
+      message: 'Secreto incorrecto al intentar usar la ventana de pruebas.',
+      threshold: 3, windowMinutes: 10,
+    });
+    return json({ ok: false, error: 'modo_prueba_desactivado' }, 403);
+  }
+  if (!ordenId) return json({ ok: false, error: 'falta_ordenId' }, 400);
   const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 

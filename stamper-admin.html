@@ -78,6 +78,8 @@ tr:last-child td{border-bottom:none}
 .pill-pend{background:rgba(245,158,11,0.16);color:var(--orange)}
 .pill-ok{background:rgba(0,197,102,0.16);color:var(--green)}
 .pill-rej{background:rgba(255,59,48,0.16);color:var(--danger)}
+.pill-low{background:rgba(140,133,120,0.16);color:var(--muted)}
+.pill-critical{background:rgba(155,0,0,0.22);color:#ff6b5e}
 
 .empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:13px}
 
@@ -146,6 +148,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
     <button class="tab-btn" data-tab="pendientes" onclick="switchTab('pendientes')">Pedidos Pendientes <span class="badge" id="pendCount" style="display:none">0</span></button>
     <button class="tab-btn" data-tab="packs" onclick="switchTab('packs')">Packs</button>
     <button class="tab-btn" data-tab="sorteo" onclick="switchTab('sorteo')">Configuración Sorteo</button>
+    <button class="tab-btn" data-tab="monitoreo" onclick="switchTab('monitoreo')">Monitoreo <span class="badge" id="alertCount" style="display:none">0</span></button>
   </div>
 
   <main>
@@ -325,11 +328,56 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         </div>
       </div>
     </section>
+
+    <!-- ===== MONITOREO ===== -->
+    <section class="tab-panel" id="panel-monitoreo">
+      <div class="card">
+        <h2>Monitoreo del sistema</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Eventos automáticos: errores, pagos que no se procesaron bien, e intentos de vulnerar la seguridad o
+          meter datos maliciosos. Los de severidad alta/crítica ya te llegaron por correo al detectarse — acá
+          puedes revisar el historial completo y marcarlos como resueltos.
+        </p>
+        <div class="form-grid" style="margin-bottom:14px">
+          <div class="field">
+            <label>Categoría</label>
+            <select id="monCategoria" onchange="loadMonitoreo()" style="width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)">
+              <option value="">Todas</option>
+              <option value="error">Error</option>
+              <option value="payment">Pago</option>
+              <option value="security">Seguridad</option>
+              <option value="abuse">Abuso</option>
+              <option value="info">Info</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Severidad</label>
+            <select id="monSeveridad" onchange="loadMonitoreo()" style="width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)">
+              <option value="">Todas</option>
+              <option value="critical">Crítica</option>
+              <option value="high">Alta</option>
+              <option value="medium">Media</option>
+              <option value="low">Baja</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="toggle"><input type="checkbox" id="monSoloNoResueltos" checked onchange="loadMonitoreo()"> Solo no resueltos</label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="monitoreoTable">
+            <thead><tr><th>Fecha</th><th>Severidad</th><th>Categoría</th><th>Origen</th><th>Mensaje</th><th>Acciones</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="empty" id="monitoreoEmpty" style="display:none">Sin eventos con estos filtros.</div>
+      </div>
+    </section>
   </main>
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260816"></script>
+<script src="js/stamper-api.js?v=20260817"></script>
 <script>
 let currentUser = null;
 let pendCache = [];
@@ -375,11 +423,13 @@ function switchTab(name) {
   if (name === 'pendientes') loadPendientes();
   if (name === 'packs') loadPacks();
   if (name === 'sorteo') loadSorteoConfig();
+  if (name === 'monitoreo') loadMonitoreo();
 }
 
 function initApp() {
   loadDashboard();
   loadPendientesBadge();
+  loadAlertBadge();
 }
 
 /* ---------- Dashboard ---------- */
@@ -864,6 +914,69 @@ async function saveSorteoConfig() {
     alert('Configuración guardada.');
   } catch (e) {
     alert('Error al guardar: ' + (e.message || e));
+  }
+}
+
+/* ---------- Monitoreo ---------- */
+const SEVERIDAD_PILL = { low: 'pill-low', medium: 'pill-pend', high: 'pill-rej', critical: 'pill-critical' };
+const SEVERIDAD_LABEL = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' };
+const CATEGORIA_LABEL = { error: 'Error', payment: 'Pago', security: 'Seguridad', abuse: 'Abuso', info: 'Info' };
+
+async function loadAlertBadge() {
+  try {
+    const eventos = await stamperAPI.getSystemEvents({ resuelto: false });
+    const badge = document.getElementById('alertCount');
+    if (eventos.length > 0) { badge.style.display = 'inline-block'; badge.textContent = eventos.length; }
+    else badge.style.display = 'none';
+  } catch (e) { console.error(e); }
+}
+
+async function loadMonitoreo() {
+  try {
+    const categoria = document.getElementById('monCategoria').value || null;
+    const severidad = document.getElementById('monSeveridad').value || null;
+    const soloNoResueltos = document.getElementById('monSoloNoResueltos').checked;
+
+    const eventos = await stamperAPI.getSystemEvents({
+      categoria, severidad, resuelto: soloNoResueltos ? false : null
+    });
+
+    const tbody = document.querySelector('#monitoreoTable tbody');
+    const empty = document.getElementById('monitoreoEmpty');
+    if (!eventos.length) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    tbody.innerHTML = eventos.map(ev => `
+      <tr>
+        <td>${new Date(ev.created_at).toLocaleString('es-CL')}</td>
+        <td><span class="pill ${SEVERIDAD_PILL[ev.severity] || 'pill-low'}">${SEVERIDAD_LABEL[ev.severity] || ev.severity}</span></td>
+        <td>${escapeHtml(CATEGORIA_LABEL[ev.category] || ev.category)}</td>
+        <td><code>${escapeHtml(ev.source)}</code></td>
+        <td>${escapeHtml(ev.message)}</td>
+        <td>
+          ${ev.resolved
+            ? `<span style="color:var(--muted);font-size:11.5px">Resuelto</span>`
+            : `<button class="btn btn-ghost btn-sm" data-action="resolver" data-id="${ev.id}">Marcar resuelto</button>`}
+        </td>
+      </tr>
+    `).join('');
+    tbody.querySelectorAll('button[data-action="resolver"]').forEach(b =>
+      b.addEventListener('click', () => marcarResuelto(b.dataset.id)));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function marcarResuelto(eventId) {
+  try {
+    await stamperAPI.marcarEventoResuelto(eventId);
+    loadMonitoreo();
+    loadAlertBadge();
+  } catch (e) {
+    alert('Error al marcar como resuelto: ' + (e.message || e));
   }
 }
 

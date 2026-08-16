@@ -135,6 +135,30 @@ class StamperAPI {
         }
     }
 
+    // Avisa al sistema de monitoreo de un error real del checkout (nunca
+    // de una validación esperada, eso lo filtra el propio backend) — para
+    // que un problema como "permission denied for function
+    // create_pending_order" le llegue al dueño por correo en vez de
+    // quedar solo en la consola del navegador de quien lo sufrió.
+    // Nunca lanza ni bloquea el flujo real: si el reporte mismo falla,
+    // se ignora en silencio.
+    async reportClientError(errorType, error, extra = {}) {
+        try {
+            await fetch(`${SUPABASE_CONFIG.url}/functions/v1/report-client-error`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    errorType,
+                    code: error?.code || error?.message || String(error || ''),
+                    message: error?.message || String(error || ''),
+                    ...extra
+                })
+            });
+        } catch (e) {
+            console.warn('No se pudo reportar el error al monitoreo:', e);
+        }
+    }
+
     // Nombre del referente (sin email) para el banner "fulano te invitó"
     // en el checkout — el resto de la lógica de aviso al referente
     // (email, progreso, bono) corre server-side en flow-webhook.
@@ -232,6 +256,40 @@ class StamperAPI {
             return true;
         } catch (error) {
             console.error('Error rechazarOrden:', error);
+            throw error;
+        }
+    }
+
+    // filtros: { categoria, severidad, resuelto } — cualquiera puede ir
+    // null/undefined para no filtrar por ese campo. resuelto=false trae
+    // solo pendientes, null trae todo.
+    async getSystemEvents(filtros = {}) {
+        try {
+            let query = this.client
+                .from('system_events')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(200);
+            if (filtros.categoria) query = query.eq('category', filtros.categoria);
+            if (filtros.severidad) query = query.eq('severity', filtros.severidad);
+            if (filtros.resuelto === false) query = query.eq('resolved', false);
+            if (filtros.resuelto === true) query = query.eq('resolved', true);
+            const { data, error } = await query;
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error getSystemEvents:', error);
+            throw error;
+        }
+    }
+
+    async marcarEventoResuelto(eventId) {
+        try {
+            const { error } = await this.client.rpc('marcar_evento_resuelto', { p_id: eventId });
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Error marcarEventoResuelto:', error);
             throw error;
         }
     }

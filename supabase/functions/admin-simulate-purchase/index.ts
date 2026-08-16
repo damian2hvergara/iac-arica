@@ -17,6 +17,7 @@
  * Secrets necesarios: los mismos que send-stamp-email/send-referral-email.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logEvent, logRepeatedAttempt } from '../_shared/log-event.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,6 +36,7 @@ Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') return json({ ok: false, error: 'method_not_allowed' }, 405);
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+  const supabase = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   // --- Solo admin ---
   const authHeader = req.headers.get('Authorization') || '';
@@ -42,11 +44,23 @@ Deno.serve(async (req: Request) => {
   const anonClient = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_ANON_KEY')!);
   const { data: userData, error: userErr } = await anonClient.auth.getUser(callerToken);
   const callerEmail = userData?.user?.email?.toLowerCase();
-  if (userErr || !callerEmail) return json({ ok: false, error: 'no_autorizado' }, 401);
+  if (userErr || !callerEmail) {
+    await logRepeatedAttempt(supabase, {
+      source: 'admin-simulate-purchase',
+      message: 'Llamada sin sesión válida a admin-simulate-purchase.',
+    });
+    return json({ ok: false, error: 'no_autorizado' }, 401);
+  }
 
-  const supabase = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const { data: adminRow } = await supabase.from('admin_emails').select('email').eq('email', callerEmail).maybeSingle();
-  if (!adminRow) return json({ ok: false, error: 'no_autorizado' }, 403);
+  if (!adminRow) {
+    await logEvent(supabase, {
+      category: 'security', severity: 'high', source: 'admin-simulate-purchase',
+      message: 'Sesión válida pero fuera de admin_emails intentó usar admin-simulate-purchase.',
+      detail: { email: callerEmail },
+    });
+    return json({ ok: false, error: 'no_autorizado' }, 403);
+  }
 
   let body: any;
   try {

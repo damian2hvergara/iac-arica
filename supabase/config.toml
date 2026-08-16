@@ -6,3 +6,9 @@
 # empieza a fallar con 401 en silencio.
 [functions.flow-webhook]
 verify_jwt = false
+
+# report-client-error la llama el navegador del comprador sin sesión y
+# sin la anon key en el header (fire-and-forget) — mismo motivo que
+# flow-webhook arriba.
+[functions.report-client-error]
+verify_jwt = false

@@ -28,6 +28,7 @@
  * status: 1 pendiente · 2 pagada · 3 rechazada · 4 anulada
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logEvent } from '../_shared/log-event.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -65,10 +66,18 @@ Deno.serve(async (req: Request) => {
   }
   if (!token) return json({ ok: false, error: 'falta_token' }, 400);
 
+  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
   const FLOW_API_KEY = Deno.env.get('FLOW_API_KEY');
   const FLOW_SECRET_KEY = Deno.env.get('FLOW_SECRET_KEY');
   const FLOW_BASE_URL = Deno.env.get('FLOW_BASE_URL') ?? 'https://sandbox.flow.cl/api';
-  if (!FLOW_API_KEY || !FLOW_SECRET_KEY) return json({ ok: false, error: 'flow_no_configurado' }, 500);
+  if (!FLOW_API_KEY || !FLOW_SECRET_KEY) {
+    await logEvent(supabase, {
+      category: 'payment', severity: 'critical', source: 'flow-webhook',
+      message: 'Flow no está configurado (faltan FLOW_API_KEY/FLOW_SECRET_KEY) — nadie puede pagar.',
+    });
+    return json({ ok: false, error: 'flow_no_configurado' }, 500);
+  }
 
   const statusParams: Record<string, string> = { apiKey: FLOW_API_KEY, token };
   statusParams.s = await signParams(statusParams, FLOW_SECRET_KEY);
@@ -78,20 +87,29 @@ Deno.serve(async (req: Request) => {
   try {
     const flowRes = await fetch(`${FLOW_BASE_URL}/payment/getStatus?${qs}`);
     if (!flowRes.ok) {
-      console.error('Flow getStatus error:', await flowRes.text());
+      const detalle = await flowRes.text();
+      console.error('Flow getStatus error:', detalle);
+      await logEvent(supabase, {
+        category: 'payment', severity: 'high', source: 'flow-webhook',
+        message: 'Flow respondió con error al consultar el estado de un pago.',
+        detail: { status: flowRes.status, detalle: detalle.slice(0, 500) },
+      });
       return json({ ok: false, error: 'error_consultando_estado' }, 502);
     }
     flowData = await flowRes.json();
   } catch (e: any) {
     console.error('Error de red consultando Flow:', e);
+    await logEvent(supabase, {
+      category: 'payment', severity: 'high', source: 'flow-webhook',
+      message: 'No se pudo conectar con Flow para consultar el estado de un pago.',
+      detail: { error: String(e?.message || e) },
+    });
     return json({ ok: false, error: 'flow_unreachable' }, 502);
   }
 
   const ordenId = flowData.commerceOrder;
   const status = flowData.status;
   if (!ordenId) return json({ ok: false, error: 'commerceOrder_ausente' }, 400);
-
-  const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   if (status === 2) {
     const { data: folios, error } = await supabase.rpc('confirmar_orden', { p_orden_id: ordenId });
@@ -101,6 +119,15 @@ Deno.serve(async (req: Request) => {
         return json({ ok: true, confirmed: true, alreadyProcessed: true, status, message: 'La orden ya estaba confirmada.' }, 200);
       }
       console.error('confirmar_orden error:', error);
+      const esTopeSuperado = String(error.message).includes('tope_legal_superado');
+      await logEvent(supabase, {
+        category: 'payment', severity: 'critical', source: 'flow-webhook',
+        message: esTopeSuperado
+          ? 'Flow ya cobró esta orden pero se superó el tope legal de 10.000 estampillas — requiere reembolso manual en Flow.'
+          : 'Flow confirmó un pago pero confirmar_orden() falló — el pago quedó cobrado sin registrar en el sistema.',
+        detail: { error: error.message },
+        orderId: ordenId,
+      });
       return json({ ok: false, error: 'error_confirmando_orden' }, 500);
     }
 
@@ -162,7 +189,23 @@ Deno.serve(async (req: Request) => {
           monto: orden.monto_total,
           codigoReferido: orden.codigo_referido,
         }),
-      }).catch((e) => console.warn('send-stamp-email falló:', e));
+      }).then(async (res) => {
+        if (!res.ok) {
+          console.warn('send-stamp-email respondió', res.status);
+          await logEvent(supabase, {
+            category: 'error', severity: 'high', source: 'flow-webhook',
+            message: 'El comprador pagó pero el correo con sus estampillas no se pudo enviar.',
+            detail: { status: res.status, email: orden.email }, orderId: ordenId,
+          });
+        }
+      }).catch(async (e) => {
+        console.warn('send-stamp-email falló:', e);
+        await logEvent(supabase, {
+          category: 'error', severity: 'high', source: 'flow-webhook',
+          message: 'El comprador pagó pero el correo con sus estampillas no se pudo enviar.',
+          detail: { error: String(e?.message || e), email: orden.email }, orderId: ordenId,
+        });
+      });
 
       if (orden.referido_por) {
         const { data: infoRows } = await supabase.rpc('info_referido', { p_codigo_referido: orden.referido_por });
@@ -196,7 +239,23 @@ Deno.serve(async (req: Request) => {
               vehicleImg,
               fechaSorteo: fechaStr,
             }),
-          }).catch((e) => console.warn('send-referral-email falló:', e));
+          }).then(async (res) => {
+            if (!res.ok) {
+              console.warn('send-referral-email respondió', res.status);
+              await logEvent(supabase, {
+                category: 'error', severity: 'high', source: 'flow-webhook',
+                message: 'No se pudo avisar al referente por correo tras una compra confirmada.',
+                detail: { status: res.status, referenteEmail: info.referente_email }, orderId: ordenId,
+              });
+            }
+          }).catch(async (e) => {
+            console.warn('send-referral-email falló:', e);
+            await logEvent(supabase, {
+              category: 'error', severity: 'high', source: 'flow-webhook',
+              message: 'No se pudo avisar al referente por correo tras una compra confirmada.',
+              detail: { error: String(e?.message || e), referenteEmail: info.referente_email }, orderId: ordenId,
+            });
+          });
         }
       }
     } catch (e) {
@@ -204,6 +263,11 @@ Deno.serve(async (req: Request) => {
       // no se debe hacer fallar el webhook por esto (Flow reintentaría
       // innecesariamente). Solo se deja registrado en los logs.
       console.error('Error armando/enviando correos post-confirmación:', e);
+      await logEvent(supabase, {
+        category: 'error', severity: 'high', source: 'flow-webhook',
+        message: 'Error inesperado armando o enviando los correos después de confirmar un pago.',
+        detail: { error: String((e as any)?.message || e) }, orderId: ordenId,
+      });
     }
 
     return json({ ok: true, confirmed: true, status, message: 'Pago confirmado por Flow: estampillas generadas y correo enviado.' }, 200);

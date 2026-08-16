@@ -5,9 +5,10 @@
  * vía create_pending_order) y devuelve la URL a la que hay que
  * redirigir al comprador para que pague.
  *
- * NO ACTIVO todavía: stamper.html solo la llama cuando FLOW_MODE
- * pasa de 'simulation' a 'live'. Mientras tanto este código no se
- * ejecuta en producción.
+ * stamper.html llama esta función directo para cualquier visitante sin
+ * el link de pruebas (?modo_prueba=) — no hay ningún interruptor
+ * intermedio: en el momento en que FLOW_API_KEY/FLOW_SECRET_KEY estén
+ * configuradas, el cobro real se activa para todo el mundo.
  *
  * Secrets necesarios (Supabase → Edge Functions → Secrets):
  *   FLOW_API_KEY     → apiKey de tu cuenta Flow
@@ -19,6 +20,7 @@
  * Referencia: https://developers.flow.cl/en/docs/tutorial-basics/create-order
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logEvent } from '../_shared/log-event.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -57,18 +59,23 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+  const supabase = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
   const FLOW_API_KEY = Deno.env.get('FLOW_API_KEY');
   const FLOW_SECRET_KEY = Deno.env.get('FLOW_SECRET_KEY');
   const FLOW_BASE_URL = Deno.env.get('FLOW_BASE_URL') ?? 'https://sandbox.flow.cl/api';
 
   if (!FLOW_API_KEY || !FLOW_SECRET_KEY) {
+    await logEvent(supabase, {
+      category: 'payment', severity: 'critical', source: 'flow-create-payment',
+      message: 'Flow no está configurado (faltan FLOW_API_KEY/FLOW_SECRET_KEY) — nadie puede pagar.',
+      orderId: ordenId,
+    });
     return new Response(JSON.stringify({ error: 'Flow no está configurado (faltan FLOW_API_KEY / FLOW_SECRET_KEY como secrets).' }), {
       status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-
-  const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-  const supabase = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   const { data: orden, error } = await supabase
     .from('ordenes')
@@ -110,6 +117,11 @@ Deno.serve(async (req: Request) => {
     });
   } catch (e: any) {
     console.error('Error de red llamando a Flow:', e);
+    await logEvent(supabase, {
+      category: 'payment', severity: 'high', source: 'flow-create-payment',
+      message: 'No se pudo conectar con Flow para iniciar un cobro.',
+      detail: { error: String(e?.message || e) }, orderId: ordenId,
+    });
     return new Response(JSON.stringify({ error: 'flow_unreachable' }), {
       status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
@@ -118,6 +130,11 @@ Deno.serve(async (req: Request) => {
   if (!flowRes.ok) {
     const errText = await flowRes.text();
     console.error('Flow payment/create error:', errText);
+    await logEvent(supabase, {
+      category: 'payment', severity: 'high', source: 'flow-create-payment',
+      message: 'Flow rechazó la creación de un cobro.',
+      detail: { status: flowRes.status, detalle: errText.slice(0, 500) }, orderId: ordenId,
+    });
     return new Response(JSON.stringify({ error: 'flow_create_failed', detail: errText }), {
       status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
