@@ -148,6 +148,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
     <button class="tab-btn" data-tab="pendientes" onclick="switchTab('pendientes')">Pedidos Pendientes <span class="badge" id="pendCount" style="display:none">0</span></button>
     <button class="tab-btn" data-tab="packs" onclick="switchTab('packs')">Packs</button>
     <button class="tab-btn" data-tab="sorteo" onclick="switchTab('sorteo')">Configuración Sorteo</button>
+    <button class="tab-btn" data-tab="gratis" onclick="switchTab('gratis')">Stickers Gratis</button>
     <button class="tab-btn" data-tab="monitoreo" onclick="switchTab('monitoreo')">Monitoreo <span class="badge" id="alertCount" style="display:none">0</span></button>
   </div>
 
@@ -172,6 +173,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         <div class="kpi"><div class="lbl">Total estampillas emitidas</div><div class="val gold" id="kpiVendidas">—</div></div>
         <div class="kpi"><div class="lbl">Estampillas por venta</div><div class="val" id="kpiPorVenta">—</div></div>
         <div class="kpi"><div class="lbl">Estampillas regaladas (bono referido)</div><div class="val" id="kpiRegaladas">—</div></div>
+        <div class="kpi"><div class="lbl">Stickers gratis (redes sociales)</div><div class="val" id="kpiGratisRedes">—</div></div>
         <div class="kpi"><div class="lbl">Recaudación total</div><div class="val green" id="kpiRecaudacion">—</div></div>
         <div class="kpi">
           <div class="lbl">Estampillas compradas por referido</div>
@@ -187,6 +189,15 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         <div class="table-wrap">
           <table id="packsBreakdownTable"><thead><tr><th>Pack</th><th>Órdenes</th><th>Stickers</th><th>Recaudado</th></tr></thead><tbody></tbody></table>
         </div>
+      </div>
+
+      <div class="card">
+        <h2>Impresión de boletos (tómbola)</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Un folio por fila (comprados + bono + gratis, mismo pool — cláusula Décima), listo para imprimir
+          los boletos físicos de la tómbola.
+        </p>
+        <button class="btn btn-ghost btn-sm" onclick="exportarFoliosCSV()"><i class="fas fa-download"></i> Exportar folios CSV</button>
       </div>
 
       <div class="card">
@@ -329,6 +340,43 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       </div>
     </section>
 
+    <!-- ===== STICKERS GRATIS (cláusula Tercera) ===== -->
+    <section class="tab-panel" id="panel-gratis">
+      <div class="card">
+        <h2>Otorgar Sticker Digital gratis</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Para ganadores de dinámicas en redes sociales (cláusula Tercera de las bases) — sin compra, con
+          su propio código de referido, y sin afectar la Meta Mínima.
+        </p>
+        <div class="form-grid">
+          <div class="field"><label>Nombre completo</label><input id="gratisNombre"></div>
+          <div class="field"><label>RUT o pasaporte</label><input id="gratisRut" placeholder="18.853.935-1"></div>
+          <div class="field"><label>Correo electrónico</label><input id="gratisEmail" type="email"></div>
+          <div class="field"><label>Teléfono / WhatsApp</label><input id="gratisTelefono" placeholder="+56 9 1234 5678"></div>
+          <div class="field"><label>Usuario de Instagram</label><input id="gratisInstagram" placeholder="@usuario"></div>
+          <div class="field"><label>Dinámica de origen</label><input id="gratisDinamica" placeholder="Sorteo post 14-08"></div>
+          <div class="field"><label>Fecha de la dinámica</label><input type="date" id="gratisFecha"></div>
+        </div>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" id="btnOtorgarGratis" onclick="otorgarGratis()"><i class="fas fa-gift"></i> Otorgar sticker gratis</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Historial de Stickers gratis <button class="btn btn-ghost btn-sm" onclick="exportarGratisCSV()"><i class="fas fa-download"></i> Exportar CSV</button></h2>
+        <div class="form-grid" style="margin-bottom:14px">
+          <div class="field"><label>Filtrar por dinámica</label><input id="gratisFiltroDinamica" oninput="loadGratisRedes()" placeholder="Buscar..."></div>
+        </div>
+        <div class="table-wrap">
+          <table id="gratisTable">
+            <thead><tr><th>Fecha</th><th>Nombre</th><th>RUT</th><th>Folio</th><th>Instagram</th><th>Dinámica</th><th>Código referido</th><th>Referidos</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="empty" id="gratisEmpty" style="display:none">Sin stickers gratis otorgados todavía.</div>
+      </div>
+    </section>
+
     <!-- ===== MONITOREO ===== -->
     <section class="tab-panel" id="panel-monitoreo">
       <div class="card">
@@ -377,7 +425,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 </div>
 
 <script src="js/config.js?v=20260809"></script>
-<script src="js/stamper-api.js?v=20260817"></script>
+<script src="js/stamper-api.js?v=20260818"></script>
 <script>
 let currentUser = null;
 let pendCache = [];
@@ -423,6 +471,7 @@ function switchTab(name) {
   if (name === 'pendientes') loadPendientes();
   if (name === 'packs') loadPacks();
   if (name === 'sorteo') loadSorteoConfig();
+  if (name === 'gratis') loadGratisRedes();
   if (name === 'monitoreo') loadMonitoreo();
 }
 
@@ -435,48 +484,51 @@ function initApp() {
 /* ---------- Dashboard ---------- */
 async function loadDashboard() {
   try {
-    const { ordenes, sorteo, stickersVendidos, estampillasRegaladas } = await stamperAPI.getDashboardStats();
+    const { ordenes, sorteo, stickersVendidos, stickersComprados, estampillasRegaladas, estampillasGratisRedes } = await stamperAPI.getDashboardStats();
     const completadas = ordenes.filter(o => o.estado === 'completado');
     const pendientes = ordenes.filter(o => o.estado === 'pendiente_pago');
-    const recaudacion = completadas.reduce((s, o) => s + (o.monto_total || 0), 0);
-    const porVenta = stickersVendidos - estampillasRegaladas;
+    // Recaudación real: solo lo que efectivamente se cobró (comprado) —
+    // bono y gratis por redes tienen monto_total=0, así que ya no suman,
+    // pero se filtra explícito por claridad.
+    const recaudacion = completadas.filter(o => o.tipo === 'comprado').reduce((s, o) => s + (o.monto_total || 0), 0);
     const porReferidos = completadas
-      .filter(o => o.referido_por)
+      .filter(o => o.tipo === 'comprado' && o.referido_por)
       .reduce((s, o) => s + (o.cantidad_stickers || 0), 0);
-    const pctReferidos = porVenta > 0 ? Math.round((porReferidos / porVenta) * 100) : 0;
+    const pctReferidos = stickersComprados > 0 ? Math.round((porReferidos / stickersComprados) * 100) : 0;
 
     document.getElementById('kpiVendidas').textContent = stickersVendidos.toLocaleString('es-CL');
-    document.getElementById('kpiPorVenta').textContent = porVenta.toLocaleString('es-CL');
+    document.getElementById('kpiPorVenta').textContent = stickersComprados.toLocaleString('es-CL');
     document.getElementById('kpiRegaladas').textContent = estampillasRegaladas.toLocaleString('es-CL');
-    document.getElementById('kpiOrdenes').textContent = completadas.length.toLocaleString('es-CL');
+    document.getElementById('kpiOrdenes').textContent = completadas.filter(o => o.tipo === 'comprado').length.toLocaleString('es-CL');
     document.getElementById('kpiRecaudacion').textContent = '$' + recaudacion.toLocaleString('es-CL');
     document.getElementById('kpiPendientes').textContent = pendientes.length.toLocaleString('es-CL');
     document.getElementById('kpiPorReferidos').textContent = porReferidos.toLocaleString('es-CL');
-    document.getElementById('kpiPorReferidosPct').textContent = `${pctReferidos}% de las estampillas vendidas`;
+    document.getElementById('kpiPorReferidosPct').textContent = `${pctReferidos}% de las estampillas compradas`;
+    const gratisEl = document.getElementById('kpiGratisRedes');
+    if (gratisEl) gratisEl.textContent = estampillasGratisRedes.toLocaleString('es-CL');
 
-    // Barra de progreso: vendidas vs. el total de estampillas emitidas (10.000),
-    // con una marca en la meta mínima (6.500) que define si se cumple la
-    // cláusula Octavo (bajo esa meta, riesgo de reembolso).
-    const totalCap = sorteo.total_stickers_emitidos || 0;
+    // Barra de progreso: ya no hay tope de estampillas (bases legales,
+    // cláusula Octava — la venta cierra solo por fecha). La barra ahora
+    // muestra solo el avance hacia la Meta Mínima (cláusula Novena, 6.500),
+    // que cuenta ÚNICAMENTE estampillas tipo "comprado" — el 100% de la
+    // barra ES la meta, no un techo de ventas.
     const metaMin = sorteo.meta_minima_stickers || 0;
-    const pctVendido = totalCap > 0 ? Math.min(100, (stickersVendidos / totalCap) * 100) : 0;
-    const pctMeta = totalCap > 0 ? Math.min(100, (metaMin / totalCap) * 100) : 0;
-    const metaAlcanzada = metaMin > 0 && stickersVendidos >= metaMin;
+    const pctMeta = metaMin > 0 ? Math.min(100, (stickersComprados / metaMin) * 100) : 0;
+    const metaAlcanzada = metaMin > 0 && stickersComprados >= metaMin;
 
     const fillEl = document.getElementById('metaProgressFill');
-    fillEl.style.width = pctVendido.toFixed(1) + '%';
+    fillEl.style.width = pctMeta.toFixed(1) + '%';
     fillEl.classList.toggle('reached', metaAlcanzada);
-    document.getElementById('metaProgressMarker').style.left = pctMeta.toFixed(1) + '%';
-    document.getElementById('metaProgressMarkerLabel').textContent = `Meta mínima: ${metaMin.toLocaleString('es-CL')}`;
+    document.getElementById('metaProgressMarker').style.display = 'none'; // ya no hay techo contra el cual marcar la meta
     document.getElementById('metaProgressText').textContent =
-      `${stickersVendidos.toLocaleString('es-CL')} de ${totalCap.toLocaleString('es-CL')} estampillas emitidas (${pctVendido.toFixed(1)}%)`;
+      `${stickersComprados.toLocaleString('es-CL')} estampillas compradas de la meta mínima de ${metaMin.toLocaleString('es-CL')} (${pctMeta.toFixed(1)}%)`;
     document.getElementById('metaProgressStatus').innerHTML = metaAlcanzada
       ? `<span style="color:var(--green);font-weight:600">✅ Meta mínima alcanzada</span>`
-      : `<span style="color:var(--orange);font-weight:600">Faltan ${(metaMin - stickersVendidos).toLocaleString('es-CL')} para la meta mínima</span>`;
+      : `<span style="color:var(--orange);font-weight:600">Faltan ${(metaMin - stickersComprados).toLocaleString('es-CL')} para la meta mínima</span>`;
 
-    // Packs breakdown
+    // Packs breakdown (solo compradas — bono/gratis no tienen pack)
     const byPack = {};
-    completadas.forEach(o => {
+    completadas.filter(o => o.tipo === 'comprado').forEach(o => {
       const nombre = o.packs_config?.nombre || 'Sin pack';
       if (!byPack[nombre]) byPack[nombre] = { ordenes: 0, stickers: 0, monto: 0 };
       byPack[nombre].ordenes++;
@@ -917,6 +969,112 @@ async function saveSorteoConfig() {
   }
 }
 
+/* ---------- Stickers Gratis (cláusula Tercera) ---------- */
+function esFormatoRutChilenoAdmin(v) {
+  const clean = v.replace(/[.\s-]/g, '');
+  return /^[0-9]{7,8}[0-9kK]$/.test(clean);
+}
+function formatearRutChilenoAdmin(v) {
+  const clean = v.replace(/[.\s-]/g, '').toUpperCase();
+  const body = clean.slice(0, -1);
+  const dv = clean.slice(-1);
+  const conPuntos = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${conPuntos}-${dv}`;
+}
+document.getElementById('gratisRut').addEventListener('blur', () => {
+  const el = document.getElementById('gratisRut');
+  const v = el.value.trim();
+  if (v && esFormatoRutChilenoAdmin(v)) el.value = formatearRutChilenoAdmin(v);
+});
+
+async function otorgarGratis() {
+  const nombre = document.getElementById('gratisNombre').value.trim();
+  const rutPasaporte = document.getElementById('gratisRut').value.trim();
+  const email = document.getElementById('gratisEmail').value.trim();
+  const telefono = document.getElementById('gratisTelefono').value.trim();
+  const instagramHandle = document.getElementById('gratisInstagram').value.trim();
+  const dinamicaOrigen = document.getElementById('gratisDinamica').value.trim();
+  const fechaDinamica = document.getElementById('gratisFecha').value || null;
+
+  if (!nombre || !rutPasaporte || !email || !telefono || !dinamicaOrigen) {
+    alert('Completa nombre, RUT/pasaporte, correo, teléfono y dinámica de origen.');
+    return;
+  }
+
+  const btn = document.getElementById('btnOtorgarGratis');
+  btn.disabled = true;
+  try {
+    const resultado = await stamperAPI.otorgarStickerGratis({
+      nombre, email, telefono, rutPasaporte, instagramHandle, dinamicaOrigen, fechaDinamica
+    });
+
+    // Correo de confirmación: reutiliza resend-stamp-email (ya pública,
+    // ya verifica email+orden completada) — no hace falta una función nueva.
+    fetch(`${SUPABASE_CONFIG.url}/functions/v1/resend-stamp-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, ordenId: resultado.orden_id })
+    }).catch(e => console.warn('No se pudo enviar el correo de confirmación:', e));
+
+    alert(`Sticker gratis otorgado — folio ${resultado.numero_folio}. Se envió el correo de confirmación a ${email}.`);
+    ['gratisNombre','gratisRut','gratisEmail','gratisTelefono','gratisInstagram','gratisDinamica','gratisFecha'].forEach(id => document.getElementById(id).value = '');
+    loadGratisRedes();
+  } catch (e) {
+    alert('Error al otorgar el sticker: ' + (e.message || e));
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function loadGratisRedes() {
+  try {
+    const dinamica = document.getElementById('gratisFiltroDinamica').value.trim();
+    const filas = await stamperAPI.getGratisRedesSociales({ dinamica: dinamica || null });
+    const tbody = document.querySelector('#gratisTable tbody');
+    const empty = document.getElementById('gratisEmpty');
+    if (!filas.length) {
+      tbody.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    window.__gratisCache = filas;
+    tbody.innerHTML = filas.map(f => `
+      <tr>
+        <td>${new Date(f.created_at).toLocaleDateString('es-CL')}</td>
+        <td>${escapeHtml(f.nombre)}</td>
+        <td>${escapeHtml(f.rut_pasaporte)}</td>
+        <td><code>${escapeHtml(f.estampillas?.[0]?.numero_folio || '—')}</code></td>
+        <td>${escapeHtml(f.instagram_handle || '—')}</td>
+        <td>${escapeHtml(f.dinamica_origen)}</td>
+        <td><code>${escapeHtml(f.codigo_referido)}</code></td>
+        <td>${f.cantidad_referidos}</td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function exportarGratisCSV() {
+  const filas = window.__gratisCache || [];
+  if (!filas.length) { alert('No hay datos para exportar.'); return; }
+  const header = ['Fecha','Nombre','RUT/Pasaporte','Email','Telefono','Instagram','Dinamica','Fecha dinamica','Folio','Codigo referido','Cantidad referidos','Otorgado por'];
+  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = filas.map(f => [
+    new Date(f.created_at).toLocaleString('es-CL'), f.nombre, f.rut_pasaporte, f.email, f.telefono,
+    f.instagram_handle || '', f.dinamica_origen, f.fecha_dinamica || '', f.estampillas?.[0]?.numero_folio || '',
+    f.codigo_referido, f.cantidad_referidos, f.otorgado_por || ''
+  ]);
+  const csv = '﻿' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `stickers_gratis_redes_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 /* ---------- Monitoreo ---------- */
 const SEVERIDAD_PILL = { low: 'pill-low', medium: 'pill-pend', high: 'pill-rej', critical: 'pill-critical' };
 const SEVERIDAD_LABEL = { low: 'Baja', medium: 'Media', high: 'Alta', critical: 'Crítica' };
@@ -984,9 +1142,9 @@ async function marcarResuelto(eventId) {
 async function exportarCSV() {
   try {
     const ordenes = await stamperAPI.getOrdenesAll();
-    const header = ['Fecha','Nombre','Email','Telefono','RUT/Pasaporte','Pack','Cantidad','Monto','Estado','Modo Pago','Referido Por','Codigo Referido','Confirmado'];
+    const header = ['Fecha','Tipo','Nombre','Email','Telefono','RUT/Pasaporte','Pack','Cantidad','Monto','Estado','Modo Pago','Referido Por','Codigo Referido','Confirmado'];
     const rows = ordenes.map(o => [
-      new Date(o.created_at).toLocaleString('es-CL'),
+      new Date(o.created_at).toLocaleString('es-CL'), o.tipo || 'comprado',
       o.nombre, o.email, o.telefono, o.rut_pasaporte,
       o.packs_config?.nombre || '', o.cantidad_stickers, o.monto_total,
       o.estado, o.modo_pago, o.referido_por || '', o.codigo_referido,
@@ -1005,6 +1163,31 @@ async function exportarCSV() {
     URL.revokeObjectURL(url);
   } catch (e) {
     alert('Error al exportar: ' + (e.message || e));
+  }
+}
+
+async function exportarFoliosCSV() {
+  try {
+    const folios = await stamperAPI.getFoliosParaImprimir();
+    if (!folios.length) { alert('No hay folios emitidos todavía.'); return; }
+    const header = ['Numero de serie','Tipo','Nombre','RUT/Pasaporte','Email','Codigo referido','Es bono'];
+    const rows = folios.map(f => [
+      f.numero_folio, f.ordenes?.tipo || 'comprado', f.ordenes?.nombre || '', f.ordenes?.rut_pasaporte || '',
+      f.ordenes?.email || '', f.ordenes?.codigo_referido || '', f.es_bonus ? 'Si' : 'No'
+    ]);
+    const esc = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
+    const csv = '﻿' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `folios-tombola-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    alert('Error al exportar folios: ' + (e.message || e));
   }
 }
 

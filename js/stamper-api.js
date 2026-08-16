@@ -294,6 +294,89 @@ class StamperAPI {
         }
     }
 
+    // Cláusula Tercera de las bases: sticker gratis para ganadores de
+    // dinámicas de Instagram — sin compra, con su propio código de
+    // referido. Admin-only (is_admin() lo valida server-side).
+    async otorgarStickerGratis({ nombre, email, telefono, rutPasaporte, instagramHandle, dinamicaOrigen, fechaDinamica }) {
+        try {
+            const { data, error } = await this.client.rpc('otorgar_sticker_gratis', {
+                p_nombre: nombre,
+                p_email: email,
+                p_telefono: telefono,
+                p_rut_pasaporte: rutPasaporte,
+                p_instagram_handle: instagramHandle || null,
+                p_dinamica_origen: dinamicaOrigen,
+                p_fecha_dinamica: fechaDinamica || null
+            });
+            if (error) throw error;
+            return data && data[0];
+        } catch (error) {
+            console.error('Error otorgarStickerGratis:', error);
+            throw error;
+        }
+    }
+
+    async getStickersComprados(sorteoId = null) {
+        try {
+            const { data, error } = await this.client.rpc('stickers_comprados_count', { p_sorteo_id: sorteoId });
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error getStickersComprados:', error);
+            throw error;
+        }
+    }
+
+    // filtros opcionales: { dinamica } — filtra por texto en dinamica_origen.
+    async getGratisRedesSociales(filtros = {}) {
+        try {
+            let query = this.client
+                .from('ordenes')
+                .select('id, nombre, email, telefono, rut_pasaporte, instagram_handle, dinamica_origen, fecha_dinamica, otorgado_por, codigo_referido, created_at, estampillas(numero_folio)')
+                .eq('tipo', 'gratis_redes_sociales')
+                .order('created_at', { ascending: false });
+            if (filtros.dinamica) query = query.ilike('dinamica_origen', `%${filtros.dinamica}%`);
+            const { data, error } = await query;
+            if (error) throw error;
+
+            // Cantidad de referidos generados por cada uno (compras completadas
+            // que usaron su código) — una sola consulta extra, no N+1.
+            const codigos = (data || []).map(o => o.codigo_referido).filter(Boolean);
+            let referidosPorCodigo = {};
+            if (codigos.length) {
+                const { data: referidos } = await this.client
+                    .from('ordenes')
+                    .select('referido_por')
+                    .eq('estado', 'completado')
+                    .in('referido_por', codigos);
+                (referidos || []).forEach(r => {
+                    referidosPorCodigo[r.referido_por] = (referidosPorCodigo[r.referido_por] || 0) + 1;
+                });
+            }
+            return (data || []).map(o => ({ ...o, cantidad_referidos: referidosPorCodigo[o.codigo_referido] || 0 }));
+        } catch (error) {
+            console.error('Error getGratisRedesSociales:', error);
+            throw error;
+        }
+    }
+
+    // Un folio por fila, con su titular y tipo — para el CSV de impresión
+    // de boletos físicos (cláusula Décima: mismo pool para todos los tipos).
+    async getFoliosParaImprimir() {
+        try {
+            const { data, error } = await this.client
+                .from('estampillas')
+                .select('numero_folio, hash_seguridad, es_bonus, ordenes!inner(nombre, rut_pasaporte, email, tipo, codigo_referido, estado)')
+                .eq('ordenes.estado', 'completado')
+                .order('numero_folio', { ascending: true });
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error getFoliosParaImprimir:', error);
+            throw error;
+        }
+    }
+
     async getEstampillasPorOrden(ordenId) {
         try {
             const { data, error } = await this.client
@@ -313,7 +396,7 @@ class StamperAPI {
         try {
             const { data: ordenes, error } = await this.client
                 .from('ordenes')
-                .select('estado, monto_total, cantidad_stickers, pack_id, referido_por, created_at, packs_config(nombre)');
+                .select('estado, monto_total, cantidad_stickers, pack_id, referido_por, tipo, created_at, packs_config(nombre)');
             if (error) throw error;
 
             const { data: sorteoRows, error: errSorteo } = await this.client
@@ -329,6 +412,12 @@ class StamperAPI {
                 .rpc('stickers_vendidos_count', { p_sorteo_id: null });
             if (errCount) throw errCount;
 
+            // Meta Mínima (cláusula Novena): solo cuenta comprado, nunca
+            // bono por referido ni gratis por redes sociales.
+            const { data: stickersComprados, error: errComprados } = await this.client
+                .rpc('stickers_comprados_count', { p_sorteo_id: null });
+            if (errComprados) throw errComprados;
+
             const { count: estampillasRegaladas, error: errBonus } = await this.client
                 .from('estampillas')
                 .select('id, ordenes!inner(estado)', { count: 'exact', head: true })
@@ -336,7 +425,18 @@ class StamperAPI {
                 .eq('ordenes.estado', 'completado');
             if (errBonus) throw errBonus;
 
-            return { ordenes, sorteo, stickersVendidos, estampillasRegaladas: estampillasRegaladas || 0 };
+            const { count: gratisRedesCount, error: errGratis } = await this.client
+                .from('ordenes')
+                .select('id', { count: 'exact', head: true })
+                .eq('tipo', 'gratis_redes_sociales')
+                .eq('estado', 'completado');
+            if (errGratis) throw errGratis;
+
+            return {
+                ordenes, sorteo, stickersVendidos, stickersComprados,
+                estampillasRegaladas: estampillasRegaladas || 0,
+                estampillasGratisRedes: gratisRedesCount || 0
+            };
         } catch (error) {
             console.error('Error getDashboardStats:', error);
             throw error;
