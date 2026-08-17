@@ -1356,7 +1356,7 @@ async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
     initialization: {
       amount: monto,
       preferenceId: preferenceId,
-      payer: { email: comprador?.email || undefined },
+      payer: { email: comprador?.email || undefined, entityType: 'individual' },
     },
     customization: {
       paymentMethods: {
