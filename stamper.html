@@ -1197,6 +1197,15 @@ function formatearRutChileno(v) {
   const conPuntos = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return `${conPuntos}-${dv}`;
 }
+
+// Identificación que espera Mercado Pago para el pagador — solo se
+// arma cuando es un RUT chileno reconocible; para pasaporte extranjero
+// se omite en vez de adivinar un tipo de documento que MP podría
+// rechazar de plano.
+function identificacionParaMercadoPago(rut) {
+  if (!rut || !esFormatoRutChileno(rut)) return null;
+  return { type: 'RUT', number: rut.replace(/[.\s-]/g, '').toUpperCase() };
+}
 document.getElementById('inRut').addEventListener('blur', () => {
   const el = document.getElementById('inRut');
   const v = el.value.trim();
@@ -1294,7 +1303,7 @@ async function submitOrder() {
     if (testSecret) {
       await confirmarPruebaInstantanea(orden, testSecret, { nombre, email });
     } else {
-      await iniciarPagoMercadoPago(orden, { nombre, email });
+      await iniciarPagoMercadoPago(orden, { nombre, email, rut });
     }
   } catch (e) {
     errEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
@@ -1347,6 +1356,7 @@ async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
     initialization: {
       amount: monto,
       preferenceId: preferenceId,
+      payer: { email: comprador?.email || undefined },
     },
     customization: {
       paymentMethods: {
@@ -1363,10 +1373,26 @@ async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
       onReady: () => {},
       onSubmit: ({ formData }) => {
         return new Promise((resolve, reject) => {
+          // El Brick a veces no completa payer.email/identification en el
+          // formData (se vio en pruebas reales: llegaban null y el pago
+          // quedaba "en revisión" en Mercado Pago por no poder verificar
+          // al pagador) — se fuerzan acá con los datos que el comprador ya
+          // llenó en el paso 1 del checkout, sobrescribiendo lo que traiga
+          // formData en vez de confiar en que venga completo.
+          const identificacion = identificacionParaMercadoPago(comprador?.rut);
+          const payload = {
+            ...formData,
+            payer: {
+              ...(formData?.payer || {}),
+              email: comprador?.email,
+              ...(identificacion ? { identification: identificacion } : {}),
+            },
+            orden_id: orden.orden_id,
+          };
           fetch(`${SUPABASE_CONFIG.url}/functions/v1/mp-process-payment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
-            body: JSON.stringify({ ...formData, orden_id: orden.orden_id }),
+            body: JSON.stringify(payload),
           })
             .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
             .then(async ({ ok, data }) => {
