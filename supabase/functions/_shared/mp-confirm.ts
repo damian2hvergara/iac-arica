@@ -182,7 +182,9 @@ export async function marcarPagoRechazado(
   await supabase.from('ordenes').update({
     mp_payment_id: opts.mpPaymentId, mp_payment_status: opts.mpPaymentStatus, mp_payment_type: opts.mpPaymentType,
   }).eq('id', opts.ordenId);
-  await supabase
-    .rpc('rechazar_orden', { p_orden_id: opts.ordenId, p_nota: `Mercado Pago: status=${opts.mpPaymentStatus}` })
-    .catch((e: any) => console.warn('rechazar_orden falló (puede que ya estuviera procesada):', e));
+  try {
+    await supabase.rpc('rechazar_orden', { p_orden_id: opts.ordenId, p_nota: `Mercado Pago: status=${opts.mpPaymentStatus}` });
+  } catch (e: any) {
+    console.warn('rechazar_orden falló (puede que ya estuviera procesada):', e);
+  }
 }

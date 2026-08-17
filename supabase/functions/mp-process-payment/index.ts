@@ -52,6 +52,25 @@ Deno.serve(async (req: Request) => {
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
   const supabase = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
+  // Red de seguridad: cualquier excepción no prevista de acá para abajo
+  // (antes se escapaba como un 500 genérico de la plataforma, sin
+  // rastro del motivo real) queda registrada en system_events con el
+  // error real, en vez de perderse.
+  try {
+    return await procesarPago(req, ordenId, formData, supabase);
+  } catch (e: any) {
+    console.error('mp-process-payment: excepción no capturada:', e);
+    await logEvent(supabase, {
+      category: 'error', severity: 'critical', source: 'mp-process-payment',
+      message: 'Excepción no capturada procesando un pago.',
+      detail: { error: String(e?.message || e), stack: String(e?.stack || '').slice(0, 800) }, orderId: ordenId,
+    });
+    return json({ error: 'error_inesperado' }, 500);
+  }
+});
+
+async function procesarPago(req: Request, ordenId: string, formData: any, supabase: any): Promise<Response> {
+
   const MP_ACCESS_TOKEN = Deno.env.get('MP_ACCESS_TOKEN');
   if (!MP_ACCESS_TOKEN) {
     await logEvent(supabase, {
@@ -85,6 +104,11 @@ Deno.serve(async (req: Request) => {
         ...formData,
         external_reference: String(ordenId),
         metadata: { orden_id: ordenId },
+        // Sin esto, Mercado Pago puede dejar el pago "in_process" en
+        // revisión por tiempo indefinido en vez de resolverlo al toque
+        // — con binary_mode el resultado SIEMPRE es approved o rejected,
+        // nunca queda en limbo (lo que rompía la confirmación automática).
+        binary_mode: true,
       }),
     });
   } catch (e: any) {
@@ -135,4 +159,4 @@ Deno.serve(async (req: Request) => {
   }).eq('id', ordenId);
 
   return json({ status: 'pending' }, 200);
-});
+}
