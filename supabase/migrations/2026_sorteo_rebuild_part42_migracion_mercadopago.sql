@@ -19,7 +19,10 @@ CREATE INDEX IF NOT EXISTS idx_ordenes_mp_payment_id ON ordenes(mp_payment_id) W
 
 -- modo_pago: reemplaza 'flow' por 'mercadopago' en el CHECK (se busca
 -- el nombre real de la constraint en vez de asumirlo, mismo patrón
--- ya usado en la parte 35).
+-- ya usado en la parte 35). El UPDATE va ANTES de agregar la
+-- constraint nueva — Postgres valida un CHECK contra las filas ya
+-- existentes al crearlo, así que si todavía quedan filas en 'flow'
+-- en ese momento, el ALTER TABLE falla.
 DO $$
 DECLARE v_conname text;
 BEGIN
@@ -27,9 +30,10 @@ BEGIN
   WHERE conrelid = 'ordenes'::regclass AND pg_get_constraintdef(oid) ILIKE '%modo_pago%';
   IF v_conname IS NOT NULL THEN EXECUTE format('ALTER TABLE ordenes DROP CONSTRAINT %I', v_conname); END IF;
 END $$;
-ALTER TABLE ordenes ADD CONSTRAINT ordenes_modo_pago_check CHECK (modo_pago IN ('transferencia','mercadopago','gratis'));
 
 UPDATE ordenes SET modo_pago = 'mercadopago' WHERE modo_pago = 'flow';
+
+ALTER TABLE ordenes ADD CONSTRAINT ordenes_modo_pago_check CHECK (modo_pago IN ('transferencia','mercadopago','gratis'));
 
 -- confirmar_orden_simulado: mismo cuerpo de la parte 41, solo cambia
 -- el valor de modo_pago que deja al confirmar una compra simulada.
