@@ -20,6 +20,16 @@ const SUPABASE_CONFIG = {
 };
 
 // ====================================
+// MERCADO PAGO (Payment Brick) — reemplaza a Flow.cl
+// La Public Key NO es secreta (va embebida en el navegador, igual que
+// el anonKey de arriba) — el Access Token real vive solo como secret
+// en Supabase Edge Functions, nunca acá.
+// ====================================
+const MP_CONFIG = {
+    publicKey: 'PENDIENTE_REEMPLAZAR_CON_PUBLIC_KEY_DE_PRUEBA'
+};
+
+// ====================================
 // CLOUDINARY
 // ====================================
 const CLOUDINARY_CONFIG = {

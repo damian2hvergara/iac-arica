@@ -225,12 +225,12 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       <div class="card">
         <h2>Pedidos pendientes de confirmar pago</h2>
         <p class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
-          Estas órdenes se confirman solas apenas Flow avisa que el pago llegó — este panel es solo un respaldo
-          por si ese aviso automático no llega. "Verificar pago en Flow" vuelve a preguntarle a Flow el estado real;
-          <b>solo confirma la orden si Flow confirma el pago</b>, nunca a criterio del admin.
-          Mientras Flow no esté configurado, las órdenes de prueba (creadas desde stamper.html) no tienen pago Flow
-          asociado — para esas aparece "🧪 Simular pago (prueba)", que confirma sin pasar por Flow para poder
-          probar el sistema completo. No usar esa opción con compradores reales.
+          Estas órdenes se confirman solas apenas Mercado Pago avisa que el pago llegó — este panel es solo un
+          respaldo por si ese aviso automático no llega. "Verificar pago en Mercado Pago" vuelve a preguntarle a
+          Mercado Pago el estado real; <b>solo confirma la orden si Mercado Pago confirma el pago</b>, nunca a
+          criterio del admin. Mientras Mercado Pago no esté configurado, las órdenes de prueba (creadas desde
+          stamper.html) no tienen pago asociado — para esas aparece "🧪 Simular pago (prueba)", que confirma sin
+          pasar por Mercado Pago para poder probar el sistema completo. No usar esa opción con compradores reales.
         </p>
         <div class="table-wrap">
           <table id="pendientesTable">
@@ -424,7 +424,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
   </main>
 </div>
 
-<script src="js/config.js?v=20260809"></script>
+<script src="js/config.js?v=20260817"></script>
 <script src="js/stamper-api.js?v=20260818"></script>
 <script>
 let currentUser = null;
@@ -589,8 +589,8 @@ async function loadPendientes() {
         <td>${escapeHtml(o.packs_config?.nombre || '')} (${o.cantidad_stickers})</td>
         <td>$${(o.monto_total||0).toLocaleString('es-CL')}</td>
         <td>
-          ${o.flow_token
-            ? `<button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Verificar pago en Flow</button>`
+          ${o.mp_payment_id
+            ? `<button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Verificar pago en Mercado Pago</button>`
             : `<button class="btn btn-ghost btn-sm" data-action="simular" data-id="${o.id}" title="Solo para pruebas — no confirma pagos reales">🧪 Simular pago (prueba)</button>`}
           <button class="btn btn-ghost btn-sm" data-action="rechazar" data-id="${o.id}">Rechazar</button>
         </td>
@@ -610,38 +610,38 @@ async function loadPendientes() {
 async function confirmarPedido(ordenId) {
   const orden = pendCache.find(o => o.id === ordenId);
   if (!orden) return;
-  if (!orden.flow_token) {
-    alert('Esta orden no tiene un pago de Flow asociado, así que no hay nada que verificar. Ya no es posible confirmar órdenes a mano — solo Flow puede confirmar un pago real.');
+  if (!orden.mp_payment_id) {
+    alert('Esta orden no tiene un pago de Mercado Pago asociado, así que no hay nada que verificar. Ya no es posible confirmar órdenes a mano — solo Mercado Pago puede confirmar un pago real.');
     return;
   }
-  if (!confirm(`Se le va a preguntar a Flow el estado real del pago de ${orden.nombre} ($${(orden.monto_total||0).toLocaleString('es-CL')}). Solo se confirmará la orden si Flow confirma que el pago fue recibido. ¿Continuar?`)) return;
+  if (!confirm(`Se le va a preguntar a Mercado Pago el estado real del pago de ${orden.nombre} ($${(orden.monto_total||0).toLocaleString('es-CL')}). Solo se confirmará la orden si Mercado Pago confirma que el pago fue recibido. ¿Continuar?`)) return;
   try {
-    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/flow-webhook`, {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/mp-webhook`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ token: orden.flow_token }).toString()
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'payment', data: { id: orden.mp_payment_id } })
     });
     const data = await res.json();
     if (!res.ok || !data.ok) {
-      alert('Error al verificar con Flow: ' + (data.error || res.status));
+      alert('Error al verificar con Mercado Pago: ' + (data.error || res.status));
       return;
     }
     if (data.confirmed) {
-      alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : 'Flow confirmó el pago: la orden quedó confirmada y el correo con las estampillas ya se envió.');
+      alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : 'Mercado Pago confirmó el pago: la orden quedó confirmada y el correo con las estampillas ya se envió.');
       loadPendientes();
       loadPendientesBadge();
     } else {
-      alert('Flow todavía no confirma este pago (estado Flow: ' + data.status + ').\n' + (data.message || '') + '\nLa orden sigue pendiente — no se confirmó nada.');
+      alert('Mercado Pago todavía no confirma este pago (estado: ' + data.status + ').\nLa orden sigue pendiente — no se confirmó nada.');
     }
   } catch (e) {
-    alert('Error al verificar con Flow: ' + (e.message || e));
+    alert('Error al verificar con Mercado Pago: ' + (e.message || e));
   }
 }
 
 async function simularPedido(ordenId) {
   const orden = pendCache.find(o => o.id === ordenId);
   if (!orden) return;
-  if (!confirm(`[SOLO PRUEBA] Esto va a confirmar la orden de ${orden.nombre} SIN pasar por Flow — no usar con compradores reales, solo para probar el sistema. ¿Continuar?`)) return;
+  if (!confirm(`[SOLO PRUEBA] Esto va a confirmar la orden de ${orden.nombre} SIN pasar por Mercado Pago — no usar con compradores reales, solo para probar el sistema. ¿Continuar?`)) return;
   try {
     const { data: sessionData } = await stamperAPI.client.auth.getSession();
     const adminToken = sessionData?.session?.access_token;
@@ -655,7 +655,7 @@ async function simularPedido(ordenId) {
       alert('Error al simular: ' + (data.error || res.status));
       return;
     }
-    alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : '[PRUEBA] Orden confirmada sin Flow — folios generados y correo enviado.');
+    alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : '[PRUEBA] Orden confirmada sin Mercado Pago — folios generados y correo enviado.');
     loadPendientes();
     loadPendientesBadge();
   } catch (e) {

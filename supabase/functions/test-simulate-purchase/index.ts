@@ -3,9 +3,9 @@
  *
  * SOLO PARA LA VENTANA DE PRUEBAS antes del lanzamiento (venta real
  * arranca 2026-08-17). Deja que testers invitados vivan el checkout
- * público de punta a punta exactamente como será con Flow real
+ * público de punta a punta exactamente como será con Mercado Pago real
  * (pantalla de éxito instantánea, folios reales, correo real), pero
- * SIN pasar por Flow — usa confirmar_orden_simulado() server-side.
+ * SIN pasar por Mercado Pago — usa confirmar_orden_simulado() server-side.
  *
  * A diferencia de cómo funcionaba esto ANTES de la auditoría de
  * seguridad (RPC abierto a "anon", cualquiera lo podía llamar), acá

@@ -12,9 +12,10 @@
  * Secrets necesarios: RESEND_API_KEY, RESEND_FROM (los mismos que
  * usa send-stamp-email).
  *
- * Solo la llama flow-webhook (server-side, con la service role key) —
- * antes cualquiera con la anon key podía mandar este correo con
- * cifras y folios de bono 100% inventados a cualquier destinatario.
+ * Solo la llaman mp-webhook, mp-process-payment y admin-simulate-purchase
+ * (server-side, con la service role key) — antes cualquiera con la anon
+ * key podía mandar este correo con cifras y folios de bono 100%
+ * inventados a cualquier destinatario.
  */
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';

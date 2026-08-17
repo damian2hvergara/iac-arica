@@ -1,9 +1,10 @@
 /**
  * send-stamp-email — IAC Arica
  * Envía el correo con las estampillas de una orden REAL, ya
- * confirmada. Solo la llaman flow-webhook y resend-stamp-email
- * (ambos server-side, con la service role key) — nunca el navegador
- * directo. Antes cualquiera con la anon key podía mandar este correo
+ * confirmada. Solo la llaman mp-webhook, mp-process-payment,
+ * admin-simulate-purchase y resend-stamp-email (todas server-side, con
+ * la service role key) — nunca el navegador directo. Antes cualquiera
+ * con la anon key podía mandar este correo
  * con contenido 100% inventado (folios falsos, montos falsos) a
  * cualquier destinatario, usando el dominio real de la empresa —
  * ahora se exige que el llamador tenga la service role key.

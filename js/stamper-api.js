@@ -91,8 +91,8 @@ class StamperAPI {
     }
 
     // Estado mínimo de una orden por su UUID — usado en la pantalla de
-    // "verificando tu pago" al volver desde Flow. No requiere email
-    // porque el UUID de la orden no es adivinable.
+    // "verificando tu pago" mientras se confirma con Mercado Pago. No
+    // requiere email porque el UUID de la orden no es adivinable.
     async estadoOrdenPublico(ordenId) {
         try {
             const { data, error } = await this.client
@@ -161,7 +161,7 @@ class StamperAPI {
 
     // Nombre del referente (sin email) para el banner "fulano te invitó"
     // en el checkout — el resto de la lógica de aviso al referente
-    // (email, progreso, bono) corre server-side en flow-webhook.
+    // (email, progreso, bono) corre server-side en mp-webhook/mp-process-payment.
     async referenteNombrePublico(codigoReferido) {
         try {
             const { data, error } = await this.client

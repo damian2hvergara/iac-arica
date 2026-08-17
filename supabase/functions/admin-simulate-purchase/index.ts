@@ -1,18 +1,18 @@
 /**
  * admin-simulate-purchase — IAC Arica 2026
  *
- * SOLO PARA PRUEBAS. Confirma una orden pendiente SIN pasar por Flow
- * — útil mientras FLOW_API_KEY/FLOW_SECRET_KEY no estén configurados
- * y no se pueda probar el sistema completo de otra forma. Hace
- * exactamente lo mismo que flow-webhook hace tras un pago real
- * (genera folios, aplica bono de referido, manda los correos), pero
- * en vez de verificar con Flow, usa confirmar_orden_simulado().
+ * SOLO PARA PRUEBAS. Confirma una orden pendiente SIN pasar por
+ * Mercado Pago — útil mientras MP_ACCESS_TOKEN no esté configurada y
+ * no se pueda probar el sistema completo de otra forma. Hace
+ * exactamente lo mismo que mp-webhook hace tras un pago real (genera
+ * folios, aplica bono de referido, manda los correos), pero en vez de
+ * verificar con Mercado Pago, usa confirmar_orden_simulado().
  *
  * Por eso mismo NUNCA debe quedar accesible para el público: exige
  * una sesión real de Supabase Auth cuyo email esté en admin_emails
  * (mismo criterio que send-referral-nudge, ver parte 27/29). No
- * reemplaza a flow-webhook para pagos reales — confirmar_orden()
- * sigue sin permiso para nadie salvo service_role.
+ * reemplaza a mp-webhook para pagos reales — confirmar_orden() sigue
+ * sin permiso para nadie salvo service_role.
  *
  * Secrets necesarios: los mismos que send-stamp-email/send-referral-email.
  */
@@ -180,5 +180,5 @@ Deno.serve(async (req: Request) => {
     console.error('Error armando/enviando correos post-simulación:', e);
   }
 
-  return json({ ok: true, confirmed: true, folios, message: '[PRUEBA] Orden confirmada sin Flow — folios generados y correo enviado.' }, 200);
+  return json({ ok: true, confirmed: true, folios, message: '[PRUEBA] Orden confirmada sin Mercado Pago — folios generados y correo enviado.' }, 200);
 });

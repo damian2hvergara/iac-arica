@@ -31,7 +31,7 @@ function json(body: unknown, status: number) {
 
 const ERROR_TYPES = new Set([
   'create_pending_order_failed',
-  'flow_payment_init_failed',
+  'payment_init_failed',
   'test_simulate_failed',
   'unexpected_exception',
   'suspicious_input_detected',
@@ -119,10 +119,10 @@ Deno.serve(async (req: Request) => {
     return json({ ok: true }, 200);
   }
 
-  if (errorType === 'flow_payment_init_failed') {
+  if (errorType === 'payment_init_failed') {
     await logEvent(supabase, {
       category: 'payment', severity: 'high', source: 'report-client-error',
-      message: 'Un comprador no pudo iniciar el pago con Flow.', detail,
+      message: 'Un comprador no pudo iniciar o completar el pago con Mercado Pago.', detail,
     });
     return json({ ok: true }, 200);
   }

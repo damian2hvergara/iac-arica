@@ -311,6 +311,9 @@ main{padding-top:56px}
 .submit-btn{width:100%;padding:14px;background:var(--red);color:#fff;border-radius:var(--r-full);font-family:var(--font-h);font-size:16px;font-weight:700;text-transform:uppercase;margin-top:16px}
 .submit-btn:disabled{opacity:.5}
 .form-err{color:var(--danger);font-size:12.5px;margin-top:10px;text-align:center}
+.back-link{display:flex;align-items:center;gap:8px;background:none;color:var(--muted);font-size:13px;font-weight:600;padding:0 0 14px;margin:0}
+#mpBrick_container{margin-top:14px;min-height:220px}
+#mpBrick_container:empty::before{content:'Cargando el pago…';display:block;text-align:center;color:var(--muted);font-size:13px;padding:40px 0}
 
 .pending-icon{width:56px;height:56px;border-radius:50%;background:rgba(245,158,11,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--orange);margin:0 auto 14px}
 .success-icon{width:56px;height:56px;border-radius:50%;background:rgba(0,197,102,0.16);display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--green);margin:0 auto 14px}
@@ -545,7 +548,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="step-card">
         <div class="step-num">02</div>
         <div class="step-icon"><i class="fas fa-lock"></i></div>
-        <h3>Paga con Flow</h3>
+        <h3>Paga con tarjeta</h3>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
@@ -702,23 +705,34 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 <div class="overlay" id="checkoutOverlay">
   <div class="sheet">
     <button class="sheet-close" onclick="closeCheckout()"><i class="fas fa-times"></i></button>
-    <h2>Completa tu compra</h2>
-    <div class="checkout-pack-preview" id="checkoutPackPreview">
-      <img id="checkoutPackImg" alt="">
-      <p class="sub" id="checkoutPackLabel"></p>
+
+    <div id="checkoutFormStep">
+      <h2>Completa tu compra</h2>
+      <div class="checkout-pack-preview" id="checkoutPackPreview">
+        <img id="checkoutPackImg" alt="">
+        <p class="sub" id="checkoutPackLabel"></p>
+      </div>
+
+      <div class="field"><label>Nombre completo</label><input id="inNombre" placeholder="Juan Pérez"><div class="field-err" id="errNombre"></div></div>
+      <div class="field"><label>RUT o pasaporte</label><input id="inRut" placeholder="12.345.678-9"><div class="field-err" id="errRut"></div></div>
+      <div class="field"><label>Correo electrónico</label><input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com"><div class="field-err" id="errEmail"></div></div>
+      <div class="field"><label>WhatsApp</label><input id="inTelefono" type="tel" placeholder="+56 9 1234 5678"><div class="field-err" id="errTelefono"></div></div>
+
+      <div class="summary-row"><span>Pack</span><span id="sumPack">—</span></div>
+      <div class="summary-row"><span>Stickers</span><span id="sumQty">—</span></div>
+      <div class="summary-row total"><span>Total</span><span id="sumTotal">—</span></div>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitOrder()"><i class="fas fa-lock"></i> Continuar al pago</button>
+      <div class="form-err" id="formErr"></div>
     </div>
 
-    <div class="field"><label>Nombre completo</label><input id="inNombre" placeholder="Juan Pérez"><div class="field-err" id="errNombre"></div></div>
-    <div class="field"><label>RUT o pasaporte</label><input id="inRut" placeholder="12.345.678-9"><div class="field-err" id="errRut"></div></div>
-    <div class="field"><label>Correo electrónico</label><input id="inEmail" type="email" placeholder="tucorreo@ejemplo.com"><div class="field-err" id="errEmail"></div></div>
-    <div class="field"><label>WhatsApp</label><input id="inTelefono" type="tel" placeholder="+56 9 1234 5678"><div class="field-err" id="errTelefono"></div></div>
-
-    <div class="summary-row"><span>Pack</span><span id="sumPack">—</span></div>
-    <div class="summary-row"><span>Stickers</span><span id="sumQty">—</span></div>
-    <div class="summary-row total"><span>Total</span><span id="sumTotal">—</span></div>
-
-    <button class="submit-btn" id="submitBtn" onclick="submitOrder()"><i class="fas fa-lock"></i> Pagar con Flow</button>
-    <div class="form-err" id="formErr"></div>
+    <div id="checkoutPaymentStep" style="display:none">
+      <button class="back-link" id="backToFormBtn" onclick="volverAFormulario()"><i class="fas fa-arrow-left"></i> Volver</button>
+      <h2>Paga con tarjeta</h2>
+      <div class="summary-row total"><span>Total a pagar</span><span id="sumTotalPago">—</span></div>
+      <div id="mpBrick_container"></div>
+      <div class="form-err" id="paymentErr"></div>
+    </div>
   </div>
 </div>
 
@@ -749,20 +763,22 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
   </div>
 </div>
 
-<script src="js/config.js?v=20260809"></script>
+<script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="js/config.js?v=20260817"></script>
 <script src="js/stamper-api.js?v=20260818"></script>
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
 let galleryImages = [], galleryIndex = 0, galleryAutoTimer = null;
 
-// Único método de pago: Flow.cl. El checkout SIEMPRE pasa por Flow real
-// (initFlowPayment) — el "modo simulación" que existía acá antes
+// Único método de pago: Mercado Pago (Payment Brick, embebido en este
+// mismo checkout). El checkout SIEMPRE pasa por Mercado Pago real
+// (iniciarPagoMercadoPago) — el "modo simulación" que existía acá antes
 // (confirmar_orden_simulado) se sacó de producción: dejaba que cualquier
 // visitante confirmara una compra sin pagar nada llamando el RPC directo
-// por REST, sin pasar por esta página. Mientras no estén cargados
-// FLOW_API_KEY/FLOW_SECRET_KEY en Supabase, el checkout público
-// simplemente no puede completarse — eso es intencional.
+// por REST, sin pasar por esta página. Mientras no esté cargado
+// MP_ACCESS_TOKEN en Supabase, el checkout público simplemente no puede
+// completarse — eso es intencional.
 
 document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
@@ -784,7 +800,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   storeReferralFromUrl();
   storeTestModeFromUrl();
   renderRefBanner();
-  checkFlowReturn();
+  checkMpReturn();
 
   try {
     sorteo = await stamperAPI.getSorteoPublico();
@@ -842,7 +858,7 @@ function storeReferralFromUrl() {
 
 // Ventana de pruebas pre-lanzamiento (antes del 17-08-2026): con
 // ?modo_prueba=<secreto> en la URL, el checkout confirma al instante
-// vía test-simulate-purchase en vez de redirigir a Flow — mismo folio
+// vía test-simulate-purchase en vez de pasar por Mercado Pago — mismo folio
 // real, mismo correo real, sin pagar. Solo funciona si el secreto
 // coincide con TEST_MODE_SECRET en Supabase; se cierra borrando ese
 // secret. Nadie sin el link puede activarlo por accidente.
@@ -1225,10 +1241,28 @@ function openCheckout() {
     document.getElementById(id).classList.remove('invalid');
     document.getElementById(FIELD_VALIDATORS[id].errId).textContent = '';
   });
+  volverAFormulario();
   document.getElementById('checkoutOverlay').classList.add('show');
 }
-function closeCheckout() { document.getElementById('checkoutOverlay').classList.remove('show'); }
+async function closeCheckout() {
+  document.getElementById('checkoutOverlay').classList.remove('show');
+  await unmontarPaymentBrick();
+}
 function closeSuccess() { document.getElementById('successOverlay').classList.remove('show'); }
+
+async function unmontarPaymentBrick() {
+  if (window.__mpBrickController) {
+    try { await window.__mpBrickController.unmount(); } catch (e) { console.warn('Error al desmontar el Payment Brick:', e); }
+    window.__mpBrickController = null;
+  }
+}
+
+async function volverAFormulario() {
+  await unmontarPaymentBrick();
+  document.getElementById('checkoutPaymentStep').style.display = 'none';
+  document.getElementById('checkoutFormStep').style.display = 'block';
+  document.getElementById('paymentErr').textContent = '';
+}
 
 async function submitOrder() {
   const errEl = document.getElementById('formErr');
@@ -1244,7 +1278,7 @@ async function submitOrder() {
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = 'Procesando pago…';
+  btn.textContent = 'Procesando…';
 
   try {
     const referidoPor = sessionStorage.getItem('iac_ref') || null;
@@ -1260,7 +1294,7 @@ async function submitOrder() {
     if (testSecret) {
       await confirmarPruebaInstantanea(orden, testSecret, { nombre, email });
     } else {
-      await initFlowPayment(orden);
+      await iniciarPagoMercadoPago(orden, { nombre, email });
     }
   } catch (e) {
     errEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
@@ -1268,34 +1302,121 @@ async function submitOrder() {
     stamperAPI.reportClientError('create_pending_order_failed', e, { email }).catch(() => {});
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Pagar con Flow';
+    btn.textContent = 'Continuar al pago';
   }
 }
 
-// Hook para cuando se conecte Flow.cl de verdad: crear el pago en Flow,
-// redirigir al checkout de Flow, y dejar que el webhook confirme la orden.
-async function initFlowPayment(orden) {
+// Crea la preferencia de pago en Mercado Pago y muestra el Payment
+// Brick embebido en el mismo checkout (sin redirigir a otro dominio).
+async function iniciarPagoMercadoPago(orden, comprador) {
+  const errEl = document.getElementById('formErr');
   try {
-    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/flow-create-payment`, {
+    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/mp-create-preference`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
       body: JSON.stringify({ ordenId: orden.orden_id })
     });
     const data = await res.json();
-    if (!res.ok || !data.redirectUrl) {
-      throw new Error(data.error || 'No se pudo iniciar el pago con Flow.');
+    if (!res.ok || !data.preferenceId) {
+      throw new Error(data.error || 'No se pudo iniciar el pago con Mercado Pago.');
     }
-    window.location.href = data.redirectUrl;
+
+    document.getElementById('checkoutFormStep').style.display = 'none';
+    document.getElementById('checkoutPaymentStep').style.display = 'block';
+    document.getElementById('sumTotalPago').textContent = '$' + Number(data.monto).toLocaleString('es-CL');
+
+    await montarPaymentBrick(data.preferenceId, data.monto, orden, comprador);
   } catch (e) {
     console.error(e);
-    document.getElementById('formErr').textContent = 'No se pudo conectar con Flow. Intenta de nuevo o escríbenos por WhatsApp.';
-    stamperAPI.reportClientError('flow_payment_init_failed', e, { email: orden?.email || null }).catch(() => {});
+    errEl.textContent = 'No se pudo conectar con Mercado Pago. Intenta de nuevo o escríbenos por WhatsApp.';
+    stamperAPI.reportClientError('payment_init_failed', e, { email: orden?.email || null }).catch(() => {});
   }
 }
 
+async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
+  await unmontarPaymentBrick();
+  const paymentErrEl = document.getElementById('paymentErr');
+  paymentErrEl.textContent = '';
+
+  if (!window.__mp) {
+    window.__mp = new MercadoPago(MP_CONFIG.publicKey, { locale: 'es-CL' });
+  }
+  const bricksBuilder = window.__mp.bricks();
+
+  const settings = {
+    initialization: {
+      amount: monto,
+      preferenceId: preferenceId,
+    },
+    customization: {
+      paymentMethods: {
+        creditCard: 'all',
+        debitCard: 'all',
+        prepaidCard: 'all',
+        mercadoPago: 'all',
+        // A propósito NO se incluye "ticket" (efectivo) ni transferencia:
+        // CV North Capital declaró ante el SII el modelo "no emito boleta
+        // si no hay pago electrónico" — solo tarjeta/Cuenta MP califican.
+      },
+    },
+    callbacks: {
+      onReady: () => {},
+      onSubmit: ({ formData }) => {
+        return new Promise((resolve, reject) => {
+          fetch(`${SUPABASE_CONFIG.url}/functions/v1/mp-process-payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+            body: JSON.stringify({ ...formData, orden_id: orden.orden_id }),
+          })
+            .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
+            .then(async ({ ok, data }) => {
+              if (!ok || data.status === 'error') {
+                paymentErrEl.textContent = 'No pudimos procesar tu pago. Intenta con otra tarjeta o escríbenos por WhatsApp.';
+                stamperAPI.reportClientError('payment_init_failed', { message: data.error || 'mp_process_payment_error' }, { email: comprador?.email || null }).catch(() => {});
+                reject();
+                return;
+              }
+              resolve();
+              if (data.status === 'approved') {
+                await unmontarPaymentBrick();
+                closeCheckoutOverlaySinDesmontar();
+                showSuccess(orden, data.folios, comprador);
+              } else if (data.status === 'rejected') {
+                paymentErrEl.textContent = 'Tu banco rechazó el pago' + (data.statusDetail ? ` (${data.statusDetail})` : '') + '. Prueba con otra tarjeta.';
+              } else {
+                await unmontarPaymentBrick();
+                closeCheckoutOverlaySinDesmontar();
+                mostrarEsperandoConfirmacion(orden.orden_id, 'mercadopago');
+              }
+            })
+            .catch((e) => {
+              console.error(e);
+              paymentErrEl.textContent = 'No pudimos procesar tu pago. Intenta de nuevo o escríbenos por WhatsApp.';
+              stamperAPI.reportClientError('payment_init_failed', e, { email: comprador?.email || null }).catch(() => {});
+              reject();
+            });
+        });
+      },
+      onError: (error) => {
+        console.error('Payment Brick error:', error);
+        paymentErrEl.textContent = 'Ocurrió un error con el formulario de pago. Recarga e intenta de nuevo.';
+      },
+    },
+  };
+
+  window.__mpBrickController = await bricksBuilder.create('payment', 'mpBrick_container', settings);
+}
+
+// closeCheckout() normal además desmonta el Brick — acá ya se desmontó
+// a mano justo antes (según el resultado del pago), así que solo se
+// oculta el overlay para no desmontarlo dos veces.
+function closeCheckoutOverlaySinDesmontar() {
+  document.getElementById('checkoutOverlay').classList.remove('show');
+}
+
 // Ventana de pruebas pre-lanzamiento (ver storeTestModeFromUrl): confirma
-// al instante vía test-simulate-purchase, sin pasar por Flow — mismo
-// resultado (folios reales, correo real) que tendrá un pago real.
+// al instante vía test-simulate-purchase, sin pasar por Mercado Pago —
+// mismo resultado (folios reales, correo real) que tendrá un pago real.
 async function confirmarPruebaInstantanea(orden, secret, comprador) {
   const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/test-simulate-purchase`, {
     method: 'POST',
@@ -1308,22 +1429,18 @@ async function confirmarPruebaInstantanea(orden, secret, comprador) {
     stamperAPI.reportClientError('test_simulate_failed', { message: data.error || res.status }, { email: comprador?.email || null }).catch(() => {});
     return;
   }
-  closeCheckout();
+  closeCheckoutOverlaySinDesmontar();
   showSuccess(orden, data.folios, comprador);
 }
 
-// El comprador vuelve aquí después de pagar en Flow (urlReturn).
-// Como el webhook de Flow puede tardar unos segundos más que la
-// redirección, se consulta el estado cada 2s hasta confirmar.
-async function checkFlowReturn() {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('flow_return') !== '1') return;
-  const ordenId = params.get('orden');
-  if (!ordenId) return;
-
+// Pantalla de "esperando confirmación" — se usa tanto si Mercado Pago
+// devuelve el pago en pending/in_process al enviar el Brick, como si el
+// comprador vuelve a la página después de un redirect de MP (algunos
+// medios de pago, como Cuenta Mercado Pago, redirigen antes de volver).
+async function mostrarEsperandoConfirmacion(ordenId, metodo) {
   document.getElementById('noSorteoCard').style.display = 'none';
   const overlay = document.getElementById('successOverlay');
-  document.getElementById('stampCards').innerHTML = '<p style="text-align:center;color:var(--muted)">Verificando tu pago con Flow…</p>';
+  document.getElementById('stampCards').innerHTML = '<p style="text-align:center;color:var(--muted)">Verificando tu pago con Mercado Pago…</p>';
   document.getElementById('pendRefCode').textContent = '—';
   overlay.classList.add('show');
 
@@ -1349,6 +1466,17 @@ async function checkFlowReturn() {
   }
   document.getElementById('stampCards').innerHTML =
     '<p style="text-align:center;color:var(--muted)">Tu pago está tomando más de lo normal en confirmarse. Te avisaremos por correo apenas esté listo — o revisa <a href="mi-cuenta.html" style="color:var(--gold-hi)">Mis Stickers</a> más tarde.</p>';
+}
+
+// El comprador vuelve aquí después de un redirect de Mercado Pago
+// (algunos medios, como Cuenta Mercado Pago, redirigen antes de volver
+// — la mayoría de tarjetas se resuelven sin salir del Payment Brick).
+async function checkMpReturn() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mp_return') !== '1') return;
+  const ordenId = params.get('orden');
+  if (!ordenId) return;
+  await mostrarEsperandoConfirmacion(ordenId, 'mercadopago');
 }
 
 function showSuccess(orden, folios, comprador) {
