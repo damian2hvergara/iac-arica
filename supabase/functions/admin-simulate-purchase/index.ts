@@ -52,7 +52,16 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, error: 'no_autorizado' }, 401);
   }
 
-  const { data: adminRow } = await supabase.from('admin_emails').select('email').eq('email', callerEmail).maybeSingle();
+  const { data: adminRow, error: adminErr } = await supabase.from('admin_emails').select('email').eq('email', callerEmail).maybeSingle();
+  if (adminErr) {
+    console.error('admin-simulate-purchase: error consultando admin_emails:', adminErr);
+    await logEvent(supabase, {
+      category: 'error', severity: 'critical', source: 'admin-simulate-purchase',
+      message: 'La consulta a admin_emails falló (no es que el email no esté en la lista) — revisar SUPABASE_SERVICE_ROLE_KEY.',
+      detail: { email: callerEmail, error: adminErr.message, code: adminErr.code },
+    });
+    return json({ ok: false, error: 'error_verificando_admin' }, 500);
+  }
   if (!adminRow) {
     await logEvent(supabase, {
       category: 'security', severity: 'high', source: 'admin-simulate-purchase',

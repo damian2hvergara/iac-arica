@@ -10,6 +10,7 @@
  * disponibles automáticamente en Edge Functions de Supabase).
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { logEvent } from '../_shared/log-event.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -139,12 +140,25 @@ Deno.serve(async (req: Request) => {
     if (!sendRes.ok) {
       const err = await sendRes.text();
       console.error('resend-stamp-email: error delegando a send-stamp-email:', err);
+      await logEvent(supabase, {
+        category: 'error', severity: 'critical', source: 'resend-stamp-email',
+        message: 'send-stamp-email rechazó la delegación al reenviar un correo.',
+        detail: { status: sendRes.status, body: err.slice(0, 500), ordenId, email },
+      });
       return jsonResponse({ ok: false, error: 'No pudimos reenviar el correo. Intenta de nuevo.' }, 500);
     }
 
     return jsonResponse({ ok: true }, 200);
   } catch (e) {
     console.error('resend-stamp-email error:', e);
+    try {
+      const supabaseLog = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+      await logEvent(supabaseLog, {
+        category: 'error', severity: 'critical', source: 'resend-stamp-email',
+        message: 'Excepción inesperada reenviando un correo.',
+        detail: { error: String((e as any)?.message || e), ordenId, email },
+      });
+    } catch {}
     return jsonResponse({ ok: false, error: 'No pudimos reenviar el correo. Intenta de nuevo.' }, 500);
   }
 });

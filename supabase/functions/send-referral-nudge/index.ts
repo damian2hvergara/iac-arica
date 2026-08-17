@@ -49,7 +49,18 @@ Deno.serve(async (req: Request) => {
       status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-  const { data: adminRow } = await adminClient.from('admin_emails').select('email').eq('email', callerEmail).maybeSingle();
+  const { data: adminRow, error: adminErr } = await adminClient.from('admin_emails').select('email').eq('email', callerEmail).maybeSingle();
+  if (adminErr) {
+    console.error('send-referral-nudge: error consultando admin_emails:', adminErr);
+    await logEvent(adminClient, {
+      category: 'error', severity: 'critical', source: 'send-referral-nudge',
+      message: 'La consulta a admin_emails falló (no es que el email no esté en la lista) — revisar SUPABASE_SERVICE_ROLE_KEY.',
+      detail: { email: callerEmail, error: adminErr.message, code: adminErr.code },
+    });
+    return new Response(JSON.stringify({ error: 'error_verificando_admin' }), {
+      status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
   if (!adminRow) {
     await logEvent(adminClient, {
       category: 'security', severity: 'high', source: 'send-referral-nudge',
