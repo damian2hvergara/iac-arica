@@ -1296,10 +1296,10 @@ async function exportarFoliosCSV() {
   try {
     const folios = await stamperAPI.getFoliosParaImprimir();
     if (!folios.length) { alert('No hay folios emitidos todavía.'); return; }
-    const header = ['Numero de serie','Tipo','Nombre','RUT/Pasaporte','Email','Codigo referido','Es bono'];
+    const header = ['Numero de serie','Tipo','Nombre','RUT/Pasaporte','Email','Telefono','Codigo referido','Es bono'];
     const rows = folios.map(f => [
       f.numero_folio, f.ordenes?.tipo || 'comprado', f.ordenes?.nombre || '', f.ordenes?.rut_pasaporte || '',
-      f.ordenes?.email || '', f.ordenes?.codigo_referido || '', f.es_bonus ? 'Si' : 'No'
+      f.ordenes?.email || '', f.ordenes?.telefono || '', f.ordenes?.codigo_referido || '', f.es_bonus ? 'Si' : 'No'
     ]);
     const esc = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
     // "sep=," fuerza a Excel a usar coma como separador de columnas aunque

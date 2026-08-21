@@ -383,7 +383,7 @@ class StamperAPI {
         try {
             const { data, error } = await this.client
                 .from('estampillas')
-                .select('numero_folio, hash_seguridad, es_bonus, ordenes!inner(nombre, rut_pasaporte, email, tipo, codigo_referido, estado)')
+                .select('numero_folio, hash_seguridad, es_bonus, ordenes!inner(nombre, rut_pasaporte, email, telefono, tipo, codigo_referido, estado)')
                 .eq('ordenes.estado', 'completado')
                 .order('numero_folio', { ascending: true });
             if (error) throw error;
