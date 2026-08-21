@@ -1079,7 +1079,10 @@ function exportarGratisCSV() {
     f.instagram_handle || '', f.dinamica_origen, f.fecha_dinamica || '', f.estampillas?.[0]?.numero_folio || '',
     f.codigo_referido, f.cantidad_referidos, f.otorgado_por || ''
   ]);
-  const csv = '﻿' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+  // "sep=," fuerza a Excel a usar coma como separador de columnas aunque
+  // la configuración regional (Chile/español) espere punto y coma —
+  // sin esto, Excel mete cada fila entera en una sola celda con comillas.
+  const csv = '﻿sep=,\r\n' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -1164,7 +1167,10 @@ async function exportarCSV() {
       o.confirmado_at ? new Date(o.confirmado_at).toLocaleString('es-CL') : ''
     ]);
     const esc = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
-    const csv = '﻿' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+    // "sep=," fuerza a Excel a usar coma como separador de columnas aunque
+    // la configuración regional (Chile/español) espere punto y coma —
+    // sin esto, Excel mete cada fila entera en una sola celda con comillas.
+    const csv = '﻿sep=,\r\n' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1189,7 +1195,10 @@ async function exportarFoliosCSV() {
       f.ordenes?.email || '', f.ordenes?.codigo_referido || '', f.es_bonus ? 'Si' : 'No'
     ]);
     const esc = (v) => `"${String(v ?? '').replace(/"/g,'""')}"`;
-    const csv = '﻿' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+    // "sep=," fuerza a Excel a usar coma como separador de columnas aunque
+    // la configuración regional (Chile/español) espere punto y coma —
+    // sin esto, Excel mete cada fila entera en una sola celda con comillas.
+    const csv = '﻿sep=,\r\n' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
