@@ -1287,6 +1287,7 @@ async function enviarRecordatoriosReferidos() {
     }
 
     let enviados = 0, fallidos = 0;
+    const fallosDetalle = [];
     resultado.textContent = `Enviando 0 / ${compradores.length}…`;
 
     const { data: sessionData } = await stamperAPI.client.auth.getSession();
@@ -1299,15 +1300,35 @@ async function enviarRecordatoriosReferidos() {
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
           body: JSON.stringify({ nombre: c.nombre, email: c.email, codigoReferido: c.codigo_referido })
         });
-        if (res.ok) enviados++; else fallidos++;
+        if (res.ok) {
+          enviados++;
+        } else {
+          fallidos++;
+          // Antes se descartaba el motivo real del error (solo se contaba
+          // el fallo) — sin esto era imposible saber si era Resend en modo
+          // sandbox, dominio no verificado, rate limit, etc.
+          let motivo = `HTTP ${res.status}`;
+          try {
+            const errBody = await res.json();
+            motivo = errBody?.error ? String(errBody.error).slice(0, 200) : motivo;
+          } catch { /* respuesta no era JSON */ }
+          fallosDetalle.push({ email: c.email, motivo });
+        }
       } catch (e) {
         fallidos++;
+        fallosDetalle.push({ email: c.email, motivo: 'Error de red: ' + (e.message || e) });
       }
       resultado.textContent = `Enviando ${enviados + fallidos} / ${compradores.length}…`;
       await new Promise(r => setTimeout(r, 300)); // no saturar el servicio de correo
     }
 
-    resultado.textContent = `Listo: ${enviados} correo(s) enviados${fallidos ? `, ${fallidos} fallaron` : ''}.`;
+    let resumenHtml = `Listo: ${enviados} correo(s) enviados${fallidos ? `, ${fallidos} fallaron` : ''}.`;
+    if (fallosDetalle.length) {
+      resumenHtml += '<ul style="margin:8px 0 0;padding-left:18px">' +
+        fallosDetalle.map(f => `<li>${escapeHtml(f.email)} — ${escapeHtml(f.motivo)}</li>`).join('') +
+        '</ul>';
+    }
+    resultado.innerHTML = resumenHtml;
   } catch (e) {
     alert('Error al enviar recordatorios: ' + (e.message || e));
   } finally {
