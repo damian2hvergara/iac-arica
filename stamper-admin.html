@@ -59,6 +59,27 @@ main{padding:22px;max-width:1200px;margin:0 auto}
 .kpi .val.gold{color:var(--gold)}
 .kpi .val.green{color:var(--green)}
 
+/* ---- Desglose de estampillas: dinero vs gratis ---- */
+.sb-total{text-align:center;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--border)}
+.sb-total-lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.sb-total-val{font-family:var(--font-h);font-size:42px;font-weight:700;color:var(--gold)}
+.sb-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.sb-group{border-radius:12px;padding:16px 18px;border:1px solid var(--border-hi)}
+.sb-money{background:rgba(0,197,102,0.08);border-color:rgba(0,197,102,0.35)}
+.sb-free{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.35)}
+.sb-group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sb-group-lbl{font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.sb-money .sb-group-lbl{color:var(--green)}
+.sb-free .sb-group-lbl{color:var(--orange)}
+.sb-group-pct{font-size:11.5px;color:var(--muted);font-weight:600}
+.sb-group-val{font-family:var(--font-h);font-size:30px;font-weight:700;margin-bottom:2px}
+.sb-money .sb-group-val{color:var(--green)}
+.sb-free .sb-group-val{color:var(--orange)}
+.sb-group-sub{font-size:11.5px;color:var(--muted)}
+.sb-group-detail{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-hi);display:flex;flex-direction:column;gap:6px}
+.sb-group-detail div{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text)}
+.sb-group-detail span{color:var(--muted)}
+
 .meta-progress-track{position:relative;height:30px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:15px;overflow:hidden;margin:18px 0 30px}
 .meta-progress-fill{height:100%;background:linear-gradient(90deg,var(--orange),var(--gold));border-radius:15px 0 0 15px;transition:width .5s ease;min-width:2px}
 .meta-progress-fill.reached{background:linear-gradient(90deg,var(--green),#00e589)}
@@ -169,19 +190,45 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         </div>
       </div>
 
+      <div class="card">
+        <h2>Estampillas emitidas — cuáles generan dinero</h2>
+        <div class="sb-total">
+          <div class="sb-total-lbl">Total estampillas emitidas</div>
+          <div class="sb-total-val" id="kpiVendidas">—</div>
+        </div>
+        <div class="sb-split">
+          <div class="sb-group sb-money">
+            <div class="sb-group-head">
+              <span class="sb-group-lbl">💰 Generan dinero</span>
+              <span class="sb-group-pct" id="kpiPorVentaPct"></span>
+            </div>
+            <div class="sb-group-val" id="kpiPorVenta">—</div>
+            <div class="sb-group-sub">Compradas (packs o unitaria)</div>
+          </div>
+          <div class="sb-group sb-free">
+            <div class="sb-group-head">
+              <span class="sb-group-lbl">🎁 NO generan dinero</span>
+              <span class="sb-group-pct" id="kpiGratisTotalPct"></span>
+            </div>
+            <div class="sb-group-val" id="kpiGratisTotal">—</div>
+            <div class="sb-group-sub">Regaladas — no aportan a la recaudación</div>
+            <div class="sb-group-detail">
+              <div><span>Bono por referido</span><b id="kpiRegaladas">—</b></div>
+              <div><span>Gratis (redes sociales)</span><b id="kpiGratisRedes">—</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="kpi-grid" id="kpiGrid">
-        <div class="kpi"><div class="lbl">Total estampillas emitidas</div><div class="val gold" id="kpiVendidas">—</div></div>
-        <div class="kpi"><div class="lbl">Estampillas por venta</div><div class="val" id="kpiPorVenta">—</div></div>
-        <div class="kpi"><div class="lbl">Estampillas regaladas (bono referido)</div><div class="val" id="kpiRegaladas">—</div></div>
-        <div class="kpi"><div class="lbl">Stickers gratis (redes sociales)</div><div class="val" id="kpiGratisRedes">—</div></div>
         <div class="kpi"><div class="lbl">Recaudación total</div><div class="val green" id="kpiRecaudacion">—</div></div>
+        <div class="kpi"><div class="lbl">Órdenes completadas</div><div class="val" id="kpiOrdenes">—</div></div>
+        <div class="kpi"><div class="lbl">Pendientes de confirmar</div><div class="val" id="kpiPendientes">—</div></div>
         <div class="kpi">
-          <div class="lbl">Estampillas compradas por referido</div>
+          <div class="lbl">De las compradas, cuántas vinieron por referido</div>
           <div class="val" id="kpiPorReferidos">—</div>
           <div style="font-size:11px;color:var(--muted);margin-top:4px" id="kpiPorReferidosPct"></div>
         </div>
-        <div class="kpi"><div class="lbl">Órdenes completadas</div><div class="val" id="kpiOrdenes">—</div></div>
-        <div class="kpi"><div class="lbl">Pendientes de confirmar</div><div class="val" id="kpiPendientes">—</div></div>
       </div>
 
       <div class="card">
@@ -496,8 +543,18 @@ async function loadDashboard() {
       .reduce((s, o) => s + (o.cantidad_stickers || 0), 0);
     const pctReferidos = stickersComprados > 0 ? Math.round((porReferidos / stickersComprados) * 100) : 0;
 
+    // Desglose: de todo lo emitido, cuánto generó plata (comprado) y
+    // cuánto fue regalado (bono por referido + gratis redes sociales) —
+    // separado a propósito para que quede imposible de confundir.
+    const gratisTotal = estampillasRegaladas + estampillasGratisRedes;
+    const pctComprado = stickersVendidos > 0 ? Math.round((stickersComprados / stickersVendidos) * 100) : 0;
+    const pctGratisTotal = stickersVendidos > 0 ? Math.round((gratisTotal / stickersVendidos) * 100) : 0;
+
     document.getElementById('kpiVendidas').textContent = stickersVendidos.toLocaleString('es-CL');
     document.getElementById('kpiPorVenta').textContent = stickersComprados.toLocaleString('es-CL');
+    document.getElementById('kpiPorVentaPct').textContent = `${pctComprado}% del total`;
+    document.getElementById('kpiGratisTotal').textContent = gratisTotal.toLocaleString('es-CL');
+    document.getElementById('kpiGratisTotalPct').textContent = `${pctGratisTotal}% del total`;
     document.getElementById('kpiRegaladas').textContent = estampillasRegaladas.toLocaleString('es-CL');
     document.getElementById('kpiOrdenes').textContent = completadas.filter(o => o.tipo === 'comprado').length.toLocaleString('es-CL');
     document.getElementById('kpiRecaudacion').textContent = '$' + recaudacion.toLocaleString('es-CL');
