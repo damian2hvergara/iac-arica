@@ -232,6 +232,23 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       </div>
 
       <div class="card">
+        <h2>🏆 Ranking de Referenciadores <span style="font-weight:400;color:var(--muted);font-size:12px">— cláusula Décimo Séptima</span></h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+          Los 3 con más Compras Referidas al cierre del período de venta ganan dinero en efectivo:
+          <b style="color:var(--gold)">1° $300.000</b> · <b style="color:var(--gold)">2° $150.000</b> · <b style="color:var(--gold)">3° $50.000</b>,
+          pagados por transferencia el mismo día del sorteo. En caso de empate, gana quien alcanzó su total primero.
+          Esta tabla ya agrupa por persona (no por código individual) — es la que hay que usar para decidir a quién pagar, nunca el ranking público.
+        </p>
+        <div class="table-wrap">
+          <table id="rankingReferidosTable">
+            <thead><tr><th>#</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Referidas</th><th>Última</th><th>Premio</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="empty" id="rankingReferidosEmpty" style="display:none">Todavía nadie tiene Compras Referidas.</div>
+      </div>
+
+      <div class="card">
         <h2>Packs — desglose <button class="btn btn-ghost btn-sm" onclick="exportarCSV()"><i class="fas fa-download"></i> Exportar CSV</button></h2>
         <div class="table-wrap">
           <table id="packsBreakdownTable"><thead><tr><th>Pack</th><th>Órdenes</th><th>Stickers</th><th>Recaudado</th></tr></thead><tbody></tbody></table>
@@ -596,6 +613,39 @@ async function loadDashboard() {
     tbody.innerHTML = Object.entries(byPack).map(([nombre, d]) => `
       <tr><td>${escapeHtml(nombre)}</td><td>${d.ordenes}</td><td>${d.stickers}</td><td>$${d.monto.toLocaleString('es-CL')}</td></tr>
     `).join('') || '<tr><td colspan="4" class="empty">Sin datos aún</td></tr>';
+
+    // Ranking de Referenciadores (Top 10 en pantalla — el premio en
+    // efectivo solo es para el Top 3, pero mostrar hasta el 10 ayuda a
+    // ver quién viene empujando).
+    try {
+      const ranking = await stamperAPI.rankingReferenciadoresAdmin(10);
+      const PREMIOS_RANKING = { 1: '$300.000', 2: '$150.000', 3: '$50.000' };
+      const rkBody = document.querySelector('#rankingReferidosTable tbody');
+      const rkEmpty = document.getElementById('rankingReferidosEmpty');
+      if (!ranking.length) {
+        rkBody.innerHTML = '';
+        rkEmpty.style.display = 'block';
+      } else {
+        rkEmpty.style.display = 'none';
+        rkBody.innerHTML = ranking.map(r => {
+          const premio = PREMIOS_RANKING[r.posicion];
+          const medalla = r.posicion === 1 ? '🥇' : r.posicion === 2 ? '🥈' : r.posicion === 3 ? '🥉' : '';
+          const filaEstilo = r.posicion <= 3 ? 'background:rgba(240,208,128,0.06)' : '';
+          return `
+            <tr style="${filaEstilo}">
+              <td>${medalla} ${r.posicion}</td>
+              <td>${escapeHtml(r.nombre)}</td>
+              <td>${escapeHtml(r.email)}</td>
+              <td>${escapeHtml(r.telefono || '')}</td>
+              <td><b>${r.total_referido}</b></td>
+              <td>${new Date(r.ultima_referida).toLocaleDateString('es-CL')}</td>
+              <td>${premio ? `<span class="pill pill-ok">${premio}</span>` : '—'}</td>
+            </tr>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.error('Error cargando ranking de referenciadores:', e);
+    }
 
     // Últimas
     const ultimas = completadas.slice().sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10);

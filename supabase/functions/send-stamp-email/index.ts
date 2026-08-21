@@ -156,8 +156,8 @@ Deno.serve(async (req: Request) => {
   <tr><td style="background:#161616;border-left:1px solid #2a2a2a;border-right:1px solid #2a2a2a;padding:0 20px 24px;">
     <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(233,200,118,0.08);border:1px solid rgba(233,200,118,0.3);border-radius:10px;padding:16px;">
       <tr><td style="text-align:center;">
-        <p style="font-family:'Arial Black',sans-serif;font-size:13px;font-weight:900;color:#F0D080;margin:0 0 6px;text-transform:uppercase;">🎁 Invita y gana</p>
-        <p style="font-size:12.5px;color:#F2F2F2;margin:0 0 12px;line-height:1.5;">Cada 4 estampillas que tus amigos compren con tu link, ganas 1 estampilla gratis. Guarda este correo — tu link para referir siempre es este:</p>
+        <p style="font-family:'Arial Black',sans-serif;font-size:13px;font-weight:900;color:#F0D080;margin:0 0 6px;text-transform:uppercase;">🏆 Invita y gana hasta $300.000</p>
+        <p style="font-size:12.5px;color:#F2F2F2;margin:0 0 8px;line-height:1.5;">Los <strong style="color:#F0D080;">3 que más refieran</strong> se llevan dinero en efectivo el mismo día del sorteo: <strong style="color:#F0D080;">1° $300.000 · 2° $150.000 · 3° $50.000</strong>. Y de paso, cada 4 estampillas que tus amigos compren con tu link, te ganas 1 gratis. Guarda este correo — tu link para referir siempre es este:</p>
         <a href="${refLink}" style="display:inline-block;background:#202020;border:1px solid #2a2a2a;border-radius:8px;padding:10px 16px;font-family:monospace;font-size:12px;color:#F0D080;text-decoration:none;word-break:break-all;">${refLink}</a>
       </td></tr>
     </table>

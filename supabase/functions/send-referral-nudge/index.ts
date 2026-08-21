@@ -101,12 +101,14 @@ Deno.serve(async (req: Request) => {
   <tr><td style="background:linear-gradient(135deg,#161616,#1a0a02);border:1px solid #2a2a2a;border-radius:16px 16px 0 0;padding:32px 28px 24px;text-align:center;">
     <p style="font-family:'Arial Black',sans-serif;font-size:22px;font-weight:900;color:#fff;margin:0 0 6px;"><span style="color:#9B0000;">Import</span> American Cars</p>
     <p style="font-family:monospace;font-size:10px;color:rgba(201,168,76,0.7);letter-spacing:2px;text-transform:uppercase;margin:0 0 24px;">ARICA · CHILE</p>
-    <div style="width:64px;height:64px;border-radius:50%;background:rgba(240,208,128,0.15);border:2px solid rgba(240,208,128,0.4);margin:0 auto 16px;text-align:center;line-height:62px;font-size:28px;">🎁</div>
-    <h1 style="font-family:'Arial Black',sans-serif;font-size:22px;font-weight:900;color:#fff;margin:0 0 8px;">Te falta activar tu regalo</h1>
+    <div style="width:64px;height:64px;border-radius:50%;background:rgba(240,208,128,0.15);border:2px solid rgba(240,208,128,0.4);margin:0 auto 16px;text-align:center;line-height:62px;font-size:28px;">🏆</div>
+    <h1 style="font-family:'Arial Black',sans-serif;font-size:22px;font-weight:900;color:#fff;margin:0 0 8px;">Podrías estar ganando $300.000</h1>
     <p style="font-size:14px;color:#6E6E6E;margin:0;line-height:1.6;">
       Hola <strong style="color:#F2F2F2;">${nombre}</strong>, todavía no has compartido tu link de
-      referidos — y cada 4 estampillas que compren tus amigos con él, te ganas 1 gratis.
-      Compártelo y activa tu primera estampilla de regalo.
+      referidos — y los <strong style="color:#F2F2F2;">3 que más refieran</strong> se llevan dinero en
+      efectivo el mismo día del sorteo: <strong style="color:#F0D080;">1° $300.000 · 2° $150.000 · 3° $50.000</strong>.
+      Encima, cada 4 estampillas que compren tus amigos con tu link, te ganas 1 gratis.
+      Compártelo ahora y empieza a subir en el ranking.
     </p>
   </td></tr>
 
@@ -137,7 +139,7 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         from: `Import American Cars <${RESEND_FROM}>`,
         to: [email],
-        subject: '🎁 Aún puedes ganar una estampilla gratis — comparte tu link',
+        subject: '🏆 Podrías ganar $300.000 en efectivo — comparte tu link',
         html,
       }),
     });

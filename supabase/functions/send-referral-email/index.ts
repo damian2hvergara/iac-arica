@@ -142,7 +142,8 @@ Deno.serve(async (req: Request) => {
       <tr><td>
         <p style="font-size:13px;color:#F2F2F2;margin:0 0 10px;">Llevas <strong style="color:#F0D080;">${totalAcumulado}</strong> estampilla${totalAcumulado === 1 ? '' : 's'} referidas en total.</p>
         <p style="font-size:13px;color:#F2F2F2;margin:0 0 10px;">${bonoLinea}</p>
-        <p style="font-size:13px;color:#00C566;font-weight:700;margin:0;">Te faltan ${faltanParaProximo} estampilla${faltanParaProximo === 1 ? '' : 's'} más para tu próxima estampilla gratis.</p>
+        <p style="font-size:13px;color:#00C566;font-weight:700;margin:0 0 10px;">Te faltan ${faltanParaProximo} estampilla${faltanParaProximo === 1 ? '' : 's'} más para tu próxima estampilla gratis.</p>
+        <p style="font-size:12.5px;color:#F0D080;margin:0;border-top:1px dashed #3a3a3a;padding-top:10px;">🏆 Y no lo olvides: los <strong>3 que más refieran</strong> ganan dinero en efectivo el día del sorteo — <strong>1° $300.000 · 2° $150.000 · 3° $50.000</strong>. Cada referido te acerca al podio.</p>
       </td></tr>
     </table>
   </td></tr>

@@ -208,6 +208,23 @@ class StamperAPI {
     // ADMIN — requiere sesión autenticada
     // ====================================
 
+    // Ranking de Referenciadores (cláusula Décimo Séptima) agrupado por
+    // PERSONA, no por código individual — a diferencia de topReferidores
+    // (público, cosmético), este es el que determina a quién se le paga
+    // el premio en efectivo del Top 3, así que no puede fragmentar a
+    // nadie en dos filas por tener más de un codigo_referido.
+    async rankingReferenciadoresAdmin(limite = null) {
+        try {
+            const { data, error } = await this.client
+                .rpc('ranking_referenciadores_admin', { p_limit: limite });
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error rankingReferenciadoresAdmin:', error);
+            throw error;
+        }
+    }
+
     async compradoresSinReferir() {
         try {
             const { data, error } = await this.client.rpc('compradores_sin_referir');
