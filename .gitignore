@@ -1,1 +1,13 @@
 supabase/.temp/
+
+# Vault de Obsidian (notas de proyecto: arquitectura, specs, bitácora) —
+# vive en esta misma carpeta a propósito (código + notas juntos, ver
+# CLAUDE.md), pero nunca se sube al repo: puede contener info sensible
+# de negocio/legal que no pertenece a un historial git público.
+.obsidian/
+00-Inbox/
+01-Arquitectura/
+02-Specs/
+03-Modelo-Datos/
+04-API/
+05-Progreso/
