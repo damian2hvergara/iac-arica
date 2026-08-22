@@ -784,6 +784,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
   document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
 
+  // Inicializa el SDK de Mercado Pago apenas carga la página en vez de
+  // esperar a que el comprador llegue al paso de pago — el constructor
+  // hace su propio trabajo async (fingerprinting/sesión) que si no queda
+  // escondido detrás del tiempo que la persona ya se toma en llenar el
+  // formulario, se suma al tiempo de espera visible antes de ver la
+  // tarjeta. montarPaymentBrick() reutiliza este objeto si ya existe.
+  if (typeof MercadoPago !== 'undefined' && MP_CONFIG?.publicKey) {
+    try { window.__mp = new MercadoPago(MP_CONFIG.publicKey, { locale: 'es-CL' }); } catch (e) { console.warn('No se pudo pre-inicializar Mercado Pago:', e); }
+  }
+
   const topbarBurger = document.getElementById('topbarBurger');
   const topbarDropdown = document.getElementById('topbarDropdown');
   topbarBurger.addEventListener('click', () => {

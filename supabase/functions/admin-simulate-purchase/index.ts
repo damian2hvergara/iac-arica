@@ -14,7 +14,18 @@
  * reemplaza a mp-webhook para pagos reales — confirmar_orden() sigue
  * sin permiso para nadie salvo service_role.
  *
- * Secrets necesarios: los mismos que send-stamp-email/send-referral-email.
+ * Candado de ambiente (2026-08-22): igual que test-simulate-purchase,
+ * exige TEST_MODE_SECRET configurado. El botón "🧪 Simular pago" del
+ * panel admin aparece para CUALQUIER orden sin mp_payment_id — con
+ * Mercado Pago ya en producción, eso incluye carritos abandonados de
+ * compradores reales, así que confirmar "a mano" generaría folios y
+ * correos reales sin que haya entrado plata. Sin el secret, esta
+ * función queda cerrada por defecto; si alguna vez hace falta
+ * reabrirla para pruebas controladas, basta con volver a setear
+ * TEST_MODE_SECRET.
+ *
+ * Secrets necesarios: TEST_MODE_SECRET (candado), más los mismos que
+ * send-stamp-email/send-referral-email.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { logEvent, logRepeatedAttempt } from '../_shared/log-event.ts';
@@ -37,6 +48,10 @@ Deno.serve(async (req: Request) => {
 
   const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
   const supabase = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+
+  if (!Deno.env.get('TEST_MODE_SECRET')) {
+    return json({ ok: false, error: 'simulacion_desactivada' }, 403);
+  }
 
   // --- Solo admin ---
   const authHeader = req.headers.get('Authorization') || '';

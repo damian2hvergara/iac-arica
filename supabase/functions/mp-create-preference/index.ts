@@ -129,7 +129,18 @@ Deno.serve(async (req: Request) => {
 
   const mpData = await mpRes.json();
 
-  await supabase.from('ordenes').update({ mp_preference_id: mpData.id }).eq('id', ordenId);
+  // No es necesario esperar este UPDATE antes de responder — mp_preference_id
+  // es solo informativo (nada lo lee antes de que el comprador pague), así que
+  // se guarda en segundo plano para no sumarle otro round-trip a la latencia
+  // que el comprador sí percibe. EdgeRuntime.waitUntil asegura que la
+  // promesa corra hasta el final aunque la respuesta ya se haya mandado —
+  // sin esto el runtime podría cortar el isolate antes de que el UPDATE
+  // llegue a Postgres.
+  const guardarPreferenceId = supabase
+    .from('ordenes').update({ mp_preference_id: mpData.id }).eq('id', ordenId)
+    .then(({ error }) => { if (error) console.error('No se pudo guardar mp_preference_id:', error); });
+  // @ts-ignore — EdgeRuntime es un global que provee Supabase Edge Functions, no Deno estándar
+  EdgeRuntime.waitUntil(guardarPreferenceId);
 
   return json({ preferenceId: mpData.id, monto: orden.monto_total }, 200);
 });
