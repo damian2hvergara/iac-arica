@@ -26,7 +26,7 @@ const SUPABASE_CONFIG = {
 // en Supabase Edge Functions, nunca acá.
 // ====================================
 const MP_CONFIG = {
-    publicKey: 'TEST-ba72a6ab-89cf-40be-aba4-17bb1ec9444a'
+    publicKey: 'APP_USR-d43b39cc-5148-4b31-a4cc-18a8eb676d27'
 };
 
 // ====================================
