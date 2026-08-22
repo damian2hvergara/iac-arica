@@ -29,9 +29,19 @@ relacionadas al feature/módulo específico en cuestión (`01-Arquitectura/`,
 `03-Modelo-Datos/`, `04-API/`, `02-Specs/`). Si una nota contradice el código actual,
 señálalo explícitamente antes de continuar — no asumas cuál es la fuente correcta.
 
-**Al terminar una tarea no trivial**, ofrece un resumen breve en Markdown compatible con
-Obsidian (wikilinks `[[nota]]`, tags) para pegar en `05-Progreso/`. Si se tomó una decisión
-de arquitectura nueva, ofrece crear una nota en `01-Arquitectura/`.
+**Al terminar una tarea no trivial**, escribe/actualiza vos mismo las notas del vault que
+correspondan — no te limites a ofrecerlo, hazlo por defecto (es información local, nunca
+se sube a git, así que no hace falta permiso caso a caso):
+- Agrega o actualiza la entrada del día en `05-Progreso/` (crear `AAAA-MM-DD.md` si no
+  existe todavía uno para hoy; si ya existe, añadir a esa misma nota en vez de crear otra).
+- Si se tomó una decisión de arquitectura, se descubrió una trampa/bug de fondo, o cambió
+  el modelo de datos/API, refleja eso en la nota correspondiente de `01-Arquitectura/`,
+  `03-Modelo-Datos/` o `04-API/` (actualizar la existente si el tema ya está cubierto, no
+  duplicar).
+- Usa criterio: un typo o un ajuste cosmético no necesita bitácora. Un fix con causa raíz
+  no obvia, una feature nueva, o un cambio de modelo de datos, sí.
+- Avisa en el chat qué quedó registrado y dónde — la escritura es automática, pero el
+  usuario debe poder ver qué se guardó sin tener que abrir Obsidian.
 
 ## Stack real (no asumir framework)
 
