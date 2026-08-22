@@ -548,7 +548,7 @@ function initApp() {
 /* ---------- Dashboard ---------- */
 async function loadDashboard() {
   try {
-    const { ordenes, sorteo, stickersVendidos, stickersComprados, estampillasRegaladas, estampillasGratisRedes } = await stamperAPI.getDashboardStats();
+    const { ordenes, sorteo, stickersComprados, estampillasRegaladas, estampillasGratisRedes } = await stamperAPI.getDashboardStats();
     const completadas = ordenes.filter(o => o.estado === 'completado');
     const pendientes = ordenes.filter(o => o.estado === 'pendiente_pago');
     // Recaudación real: solo lo que efectivamente se cobró (comprado) —
@@ -563,11 +563,18 @@ async function loadDashboard() {
     // Desglose: de todo lo emitido, cuánto generó plata (comprado) y
     // cuánto fue regalado (bono por referido + gratis redes sociales) —
     // separado a propósito para que quede imposible de confundir.
+    // OJO: el total NO sale de stickersVendidos (stickers_vendidos_count) —
+    // esa función excluye a propósito las estampillas de bono desde la
+    // parte 6 (la usa otra métrica pública distinta). Si se usara acá,
+    // "generan dinero" + "NO generan dinero" sumaba más que el total
+    // mostrado, porque el bono quedaba contado en un lado pero no en el
+    // total. El total real de lo emitido es la suma de las 3 categorías.
     const gratisTotal = estampillasRegaladas + estampillasGratisRedes;
-    const pctComprado = stickersVendidos > 0 ? Math.round((stickersComprados / stickersVendidos) * 100) : 0;
-    const pctGratisTotal = stickersVendidos > 0 ? Math.round((gratisTotal / stickersVendidos) * 100) : 0;
+    const totalEmitidas = stickersComprados + gratisTotal;
+    const pctComprado = totalEmitidas > 0 ? Math.round((stickersComprados / totalEmitidas) * 100) : 0;
+    const pctGratisTotal = totalEmitidas > 0 ? Math.round((gratisTotal / totalEmitidas) * 100) : 0;
 
-    document.getElementById('kpiVendidas').textContent = stickersVendidos.toLocaleString('es-CL');
+    document.getElementById('kpiVendidas').textContent = totalEmitidas.toLocaleString('es-CL');
     document.getElementById('kpiPorVenta').textContent = stickersComprados.toLocaleString('es-CL');
     document.getElementById('kpiPorVentaPct').textContent = `${pctComprado}% del total`;
     document.getElementById('kpiGratisTotal').textContent = gratisTotal.toLocaleString('es-CL');
