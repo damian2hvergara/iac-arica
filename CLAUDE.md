@@ -61,10 +61,11 @@ se sube a git, así que no hace falta permiso caso a caso):
 ## Convención de migraciones — IMPORTANTE
 
 Las migraciones SQL viven en `supabase/migrations/` numeradas como
-`2026_sorteo_rebuild_partN_descripcion.sql`, en orden estrictamente creciente. **Este
-proyecto NUNCA usa `supabase db push`** — la tabla de historial de migraciones del CLI en
-remoto está vacía (todo se aplicó a mano). Un `db push` intentaría re-ejecutar las ~45
-migraciones desde cero sobre datos reales.
+`2026_sorteo_rebuild_partN_descripcion.sql`, en orden estrictamente creciente (van por la
+parte 46 al momento de escribir esto — verificar `ls supabase/migrations/` para el número
+real, no asumir). **Este proyecto NUNCA usa `supabase db push`** — la tabla de historial de
+migraciones del CLI en remoto está vacía (todo se aplicó a mano). Un `db push` intentaría
+re-ejecutar todas las migraciones desde cero sobre datos reales.
 
 **Flujo correcto para cualquier cambio de esquema/función/RPC**: escribir el archivo nuevo
 `partN+1_descripcion.sql`, commitear al repo (queda como registro histórico), y pedirle al
