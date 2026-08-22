@@ -5,6 +5,7 @@ supabase/.temp/
 # CLAUDE.md), pero nunca se sube al repo: puede contener info sensible
 # de negocio/legal que no pertenece a un historial git público.
 .obsidian/
+00-Proyecto.md
 00-Inbox/
 01-Arquitectura/
 02-Specs/
