@@ -909,6 +909,20 @@ async function deletePackConfirm(id) {
     await stamperAPI.deletePack(id);
     loadPacks();
   } catch (e) {
+    // Un pack con compras reales asociadas no se puede borrar (rompería
+    // el historial de esas órdenes) — se ofrece desactivarlo en su lugar,
+    // que lo saca de la tienda sin perder nada.
+    if (e.code === '23503') {
+      if (confirm('Este pack ya tiene compras asociadas, así que no se puede eliminar sin perder ese historial.\n\n¿Quieres desactivarlo en su lugar? Dejará de aparecer en la tienda, pero las compras ya hechas con él se mantienen intactas.')) {
+        try {
+          await stamperAPI.desactivarPack(id);
+          loadPacks();
+        } catch (e2) {
+          alert('Error al desactivar: ' + (e2.message || e2));
+        }
+      }
+      return;
+    }
     alert('Error al eliminar: ' + (e.message || e));
   }
 }

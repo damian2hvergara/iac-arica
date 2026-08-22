@@ -505,6 +505,20 @@ class StamperAPI {
         }
     }
 
+    // Un pack con órdenes reales asociadas no se puede borrar (rompería
+    // el historial de esas compras vía ordenes_pack_id_fkey) — desactivarlo
+    // lo saca de la tienda sin tocar las órdenes ya hechas con él.
+    async desactivarPack(id) {
+        try {
+            const { error } = await this.client.from('packs_config').update({ activo: false }).eq('id', id);
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Error desactivarPack:', error);
+            throw error;
+        }
+    }
+
     // Sorteo config — lectura/escritura admin.
     // Devuelve null (no lanza error) si todavía no existe ningún sorteo —
     // caso normal la primera vez que se configura el admin.
