@@ -19,9 +19,15 @@ Convenciones globales compartidas con otros proyectos viven un nivel arriba, en
 `../_global/` (Templates, Convenciones, Snippets-reutilizables) — no son específicas de
 iac-arica.
 
-**Antes de proponer o escribir código**, revisa las notas relevantes del vault relacionadas
-al feature/módulo en cuestión. Si una nota contradice el código actual, señálalo
-explícitamente antes de continuar — no asumas cuál es la fuente correcta.
+**Al iniciar cada sesión**, lee `00-Proyecto.md` (misión/visión/objetivos del proyecto,
+qué NO es, principios no negociables) y la entrada más reciente de `05-Progreso/` (qué se
+hizo últimamente y qué quedó pendiente) — así el contexto de negocio y el estado de avance
+no dependen de que el usuario los repita cada vez.
+
+**Antes de proponer o escribir código**, revisa además las notas relevantes del vault
+relacionadas al feature/módulo específico en cuestión (`01-Arquitectura/`,
+`03-Modelo-Datos/`, `04-API/`, `02-Specs/`). Si una nota contradice el código actual,
+señálalo explícitamente antes de continuar — no asumas cuál es la fuente correcta.
 
 **Al terminar una tarea no trivial**, ofrece un resumen breve en Markdown compatible con
 Obsidian (wikilinks `[[nota]]`, tags) para pegar en `05-Progreso/`. Si se tomó una decisión
