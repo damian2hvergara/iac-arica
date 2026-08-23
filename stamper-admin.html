@@ -166,7 +166,6 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">Dashboard</button>
-    <button class="tab-btn" data-tab="pendientes" onclick="switchTab('pendientes')">Pedidos Pendientes <span class="badge" id="pendCount" style="display:none">0</span></button>
     <button class="tab-btn" data-tab="packs" onclick="switchTab('packs')">Packs</button>
     <button class="tab-btn" data-tab="sorteo" onclick="switchTab('sorteo')">Configuración Sorteo</button>
     <button class="tab-btn" data-tab="gratis" onclick="switchTab('gratis')">Stickers Gratis</button>
@@ -281,28 +280,6 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
           <i class="fas fa-paper-plane"></i> Enviar recordatorio a quienes no han referido
         </button>
         <div id="recordatoriosResultado" style="margin-top:12px;font-size:12.5px;color:var(--muted)"></div>
-      </div>
-    </section>
-
-    <!-- ===== PEDIDOS PENDIENTES ===== -->
-    <section class="tab-panel" id="panel-pendientes">
-      <div class="card">
-        <h2>Pedidos pendientes de confirmar pago</h2>
-        <p class="sub" style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
-          Estas órdenes se confirman solas apenas Mercado Pago avisa que el pago llegó — este panel es solo un
-          respaldo por si ese aviso automático no llega. "Verificar pago en Mercado Pago" vuelve a preguntarle a
-          Mercado Pago el estado real; <b>solo confirma la orden si Mercado Pago confirma el pago</b>, nunca a
-          criterio del admin. Mientras Mercado Pago no esté configurado, las órdenes de prueba (creadas desde
-          stamper.html) no tienen pago asociado — para esas aparece "🧪 Simular pago (prueba)", que confirma sin
-          pasar por Mercado Pago para poder probar el sistema completo. No usar esa opción con compradores reales.
-        </p>
-        <div class="table-wrap">
-          <table id="pendientesTable">
-            <thead><tr><th>Fecha</th><th>Referencia</th><th>Nombre</th><th>Email</th><th>Teléfono</th><th>RUT/Pasaporte</th><th>Pack</th><th>Monto</th><th>Acciones</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="empty" id="pendientesEmpty" style="display:none">No hay pedidos pendientes.</div>
       </div>
     </section>
 
@@ -492,7 +469,6 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 <script src="js/stamper-api.js?v=20260818"></script>
 <script>
 let currentUser = null;
-let pendCache = [];
 
 /* ---------- Auth ---------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -532,7 +508,6 @@ function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
   if (name === 'dashboard') loadDashboard();
-  if (name === 'pendientes') loadPendientes();
   if (name === 'packs') loadPacks();
   if (name === 'sorteo') loadSorteoConfig();
   if (name === 'gratis') loadGratisRedes();
@@ -541,7 +516,6 @@ function switchTab(name) {
 
 function initApp() {
   loadDashboard();
-  loadPendientesBadge();
   loadAlertBadge();
 }
 
@@ -668,123 +642,6 @@ async function loadDashboard() {
   } catch (e) {
     console.error(e);
     alert('Error al cargar el dashboard: ' + (e.message || e));
-  }
-}
-
-async function loadPendientesBadge() {
-  try {
-    const pend = await stamperAPI.getOrdenesPendientes();
-    const badge = document.getElementById('pendCount');
-    if (pend.length > 0) { badge.style.display = 'inline-block'; badge.textContent = pend.length; }
-    else badge.style.display = 'none';
-  } catch (e) { console.error(e); }
-}
-
-/* ---------- Pedidos pendientes ---------- */
-async function loadPendientes() {
-  try {
-    pendCache = await stamperAPI.getOrdenesPendientes();
-    const tbody = document.querySelector('#pendientesTable tbody');
-    const empty = document.getElementById('pendientesEmpty');
-    if (pendCache.length === 0) {
-      tbody.innerHTML = '';
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-    tbody.innerHTML = pendCache.map(o => `
-      <tr>
-        <td>${new Date(o.created_at).toLocaleString('es-CL')}</td>
-        <td><code>IAC-ORD-${escapeHtml(o.id.slice(0,8).toUpperCase())}</code></td>
-        <td>${escapeHtml(o.nombre)}</td>
-        <td>${escapeHtml(o.email)}</td>
-        <td>${escapeHtml(o.telefono)}</td>
-        <td>${escapeHtml(o.rut_pasaporte)}</td>
-        <td>${escapeHtml(o.packs_config?.nombre || '')} (${o.cantidad_stickers})</td>
-        <td>$${(o.monto_total||0).toLocaleString('es-CL')}</td>
-        <td>
-          ${o.mp_payment_id
-            ? `<button class="btn btn-primary btn-sm" data-action="confirmar" data-id="${o.id}">Verificar pago en Mercado Pago</button>`
-            : `<button class="btn btn-ghost btn-sm" data-action="simular" data-id="${o.id}" title="Solo para pruebas — no confirma pagos reales">🧪 Simular pago (prueba)</button>`}
-          <button class="btn btn-ghost btn-sm" data-action="rechazar" data-id="${o.id}">Rechazar</button>
-        </td>
-      </tr>
-    `).join('');
-    tbody.querySelectorAll('button[data-action="confirmar"]').forEach(b =>
-      b.addEventListener('click', () => confirmarPedido(b.dataset.id)));
-    tbody.querySelectorAll('button[data-action="simular"]').forEach(b =>
-      b.addEventListener('click', () => simularPedido(b.dataset.id)));
-    tbody.querySelectorAll('button[data-action="rechazar"]').forEach(b =>
-      b.addEventListener('click', () => rechazarPedido(b.dataset.id)));
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-async function confirmarPedido(ordenId) {
-  const orden = pendCache.find(o => o.id === ordenId);
-  if (!orden) return;
-  if (!orden.mp_payment_id) {
-    alert('Esta orden no tiene un pago de Mercado Pago asociado, así que no hay nada que verificar. Ya no es posible confirmar órdenes a mano — solo Mercado Pago puede confirmar un pago real.');
-    return;
-  }
-  if (!confirm(`Se le va a preguntar a Mercado Pago el estado real del pago de ${orden.nombre} ($${(orden.monto_total||0).toLocaleString('es-CL')}). Solo se confirmará la orden si Mercado Pago confirma que el pago fue recibido. ¿Continuar?`)) return;
-  try {
-    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/mp-webhook`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'payment', data: { id: orden.mp_payment_id } })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.ok) {
-      alert('Error al verificar con Mercado Pago: ' + (data.error || res.status));
-      return;
-    }
-    if (data.confirmed) {
-      alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : 'Mercado Pago confirmó el pago: la orden quedó confirmada y el correo con las estampillas ya se envió.');
-      loadPendientes();
-      loadPendientesBadge();
-    } else {
-      alert('Mercado Pago todavía no confirma este pago (estado: ' + data.status + ').\nLa orden sigue pendiente — no se confirmó nada.');
-    }
-  } catch (e) {
-    alert('Error al verificar con Mercado Pago: ' + (e.message || e));
-  }
-}
-
-async function simularPedido(ordenId) {
-  const orden = pendCache.find(o => o.id === ordenId);
-  if (!orden) return;
-  if (!confirm(`[SOLO PRUEBA] Esto va a confirmar la orden de ${orden.nombre} SIN pasar por Mercado Pago — no usar con compradores reales, solo para probar el sistema. ¿Continuar?`)) return;
-  try {
-    const { data: sessionData } = await stamperAPI.client.auth.getSession();
-    const adminToken = sessionData?.session?.access_token;
-    const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/admin-simulate-purchase`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
-      body: JSON.stringify({ ordenId })
-    });
-    const data = await res.json();
-    if (!res.ok || !data.ok) {
-      alert('Error al simular: ' + (data.error || res.status));
-      return;
-    }
-    alert(data.alreadyProcessed ? 'Esta orden ya estaba confirmada.' : '[PRUEBA] Orden confirmada sin Mercado Pago — folios generados y correo enviado.');
-    loadPendientes();
-    loadPendientesBadge();
-  } catch (e) {
-    alert('Error al simular: ' + (e.message || e));
-  }
-}
-
-async function rechazarPedido(ordenId) {
-  const nota = prompt('Motivo del rechazo (opcional):') || null;
-  try {
-    await stamperAPI.rechazarOrden(ordenId, nota);
-    loadPendientes();
-    loadPendientesBadge();
-  } catch (e) {
-    alert('Error al rechazar: ' + (e.message || e));
   }
 }
 
