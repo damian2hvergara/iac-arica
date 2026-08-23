@@ -62,7 +62,7 @@ se sube a git, así que no hace falta permiso caso a caso):
 
 Las migraciones SQL viven en `supabase/migrations/` numeradas como
 `2026_sorteo_rebuild_partN_descripcion.sql`, en orden estrictamente creciente (van por la
-parte 46 al momento de escribir esto — verificar `ls supabase/migrations/` para el número
+parte 48 al momento de escribir esto — verificar `ls supabase/migrations/` para el número
 real, no asumir). **Este proyecto NUNCA usa `supabase db push`** — la tabla de historial de
 migraciones del CLI en remoto está vacía (todo se aplicó a mano). Un `db push` intentaría
 re-ejecutar todas las migraciones desde cero sobre datos reales.
@@ -77,17 +77,27 @@ toca la base de datos, es seguro).
 
 Las reglas del sorteo (premio, meta mínima, sistema de referidos, ranking de
 referenciadores, plazos) están en las bases legales firmadas — el PDF real vive fuera de
-este repo, en `C:\Users\damia\OneDrive\Escritorio\Bases_Legales_Sorteo_IAC_Arica_5.pdf`
-(hay una copia del texto en `bases.html`, que debe reflejarlo fielmente). Ante cualquier
-cambio que toque premios, plazos o condiciones de venta: leer el PDF real primero, nunca
-inventar términos legales.
+este repo, en `C:\Users\damia\OneDrive\Escritorio\Bases_Legales_Sorteo_IAC_Arica_5_actualizado.pdf`
+(actualizado 23-08-2026 — reemplazó a la versión firmada 17-08-2026; hay una copia del
+texto en `bases.html`, que debe reflejarlo fielmente). Ante cualquier cambio que toque
+premios, plazos o condiciones de venta: leer el PDF real primero, nunca inventar términos
+legales.
 
 Puntos clave ya vigentes:
 - Premio: Dodge Challenger 2018, sorteo por tómbola física.
-- Meta mínima: 6.500 Stickers Digitales **comprados** (no cuenta bono ni gratis redes).
+- Meta mínima: 6.500 Stickers Digitales **comprados** (no cuenta bono ni gratis redes) — es
+  un número fijo, no un porcentaje de los emitidos (hubo un error así en `faq.html`,
+  corregido el 23-ago).
 - Sistema de referidos: cada 4 Compras Referidas = 1 sticker de regalo. Top 3 del Ranking
   de Referenciadores ganan dinero en efectivo: 1° $300.000, 2° $150.000, 3° $50.000.
-- Precio piso legal: $4.500/sticker en packs (no se puede guardar un pack más barato).
+- **Precio: sin piso legal desde el 23-ago-2026** (antes era $4.500/sticker mínimo en
+  packs — cláusula Octava de las bases). El precio queda íntegramente a criterio del
+  Organizador; el `CHECK precio_floor` de `packs_config` se eliminó en la parte 48. Los
+  únicos límites que quedan son de sanidad de datos (`precio_total > 0`,
+  `cantidad_stickers > 0`), no de negocio.
+- Venta: se reinició el 23-ago-2026 (antes 17-ago), cierra el 22-sep-2026 (30 días corridos
+  desde el reinicio) salvo prórroga por Meta Mínima — ver `sorteo_config.fecha_venta_inicio`
+  / `fecha_venta_cierre`, editable también desde stamper-admin.html → Configuración Sorteo.
 
 ## Convenciones observadas en el historial de commits
 

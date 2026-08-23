@@ -288,7 +288,8 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       <div class="card">
         <h2>Packs de venta</h2>
         <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
-          Precio base $5.700/unidad. El sistema no permite guardar un pack por debajo de $4.500/unidad (piso legal).
+          El precio de cada pack queda a criterio del Organizador (cláusula Octava de las bases legales,
+          actualizada 23-ago-2026) — ya no hay un piso legal fijo.
         </p>
         <div id="packsList"></div>
       </div>
@@ -732,8 +733,8 @@ async function savePackForm() {
   const warn = document.getElementById('packFloorWarn');
 
   if (!cantidad || !precio) { alert('Completa cantidad y precio.'); return; }
-  if (precio < cantidad * 4500) {
-    warn.textContent = `El precio no puede ser menor a $${(cantidad*4500).toLocaleString('es-CL')} ($4.500/unidad, piso legal). La base de datos rechazará este guardado.`;
+  if (precio <= 0 || cantidad <= 0) {
+    warn.textContent = 'La cantidad y el precio deben ser mayores a 0.';
     warn.style.display = 'block';
     return;
   }
