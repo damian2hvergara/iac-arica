@@ -70,17 +70,24 @@ Deno.serve(async (req: Request) => {
   if (error || !orden) return json({ error: 'orden_no_encontrada' }, 404);
   if (orden.estado !== 'pendiente_pago') return json({ error: 'orden_ya_procesada' }, 400);
 
-  const unitPrice = Math.round(orden.monto_total / orden.cantidad_stickers);
   const title = orden.packs_config?.nombre
-    ? `Sticker Digital IAC Arica — ${orden.packs_config.nombre}`
+    ? `Sticker Digital IAC Arica — ${orden.packs_config.nombre} (${orden.cantidad_stickers} stickers)`
     : 'Sticker Digital IAC Arica 2026';
 
   const preference = {
+    // Un solo ítem por el monto total exacto de la orden — nunca
+    // "precio por unidad × cantidad". Repartir monto_total entre
+    // cantidad_stickers y redondear podía hacer que Mercado Pago
+    // cobrara unos pesos distinto de lo que el comprador vio en
+    // pantalla cuando la división no era exacta (ahora que no hay piso
+    // legal de precio, cualquier combinación de precio/cantidad es
+    // posible — antes los packs siempre daban una división exacta,
+    // pero eso era casualidad, no una garantía).
     items: [{
       id: `sticker-${orden.id}`,
       title,
-      quantity: orden.cantidad_stickers,
-      unit_price: unitPrice,
+      quantity: 1,
+      unit_price: orden.monto_total,
       currency_id: 'CLP',
     }],
     payer: { email: orden.email },
