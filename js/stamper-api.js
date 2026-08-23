@@ -117,7 +117,15 @@ class StamperAPI {
         }
     }
 
-    async crearOrdenPendiente({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor }) {
+    // El 2026-08-23 create_pending_order() estuvo devolviendo "permission
+    // denied" (código Postgres 42501) de forma intermitente durante casi 3
+    // horas — no un error de código ni de datos, el mismo pedido volvía a
+    // funcionar segundos u minutos después (ver 05-Progreso/2026-08-23.md).
+    // Reintentar automáticamente ante ESE código puntual absorbe el
+    // parpadeo sin tocarle la experiencia a nadie que se equivocó
+    // escribiendo un dato — esos otros errores (nombre_invalido, etc.)
+    // nunca traen código 42501, así que no se reintentan de más.
+    async crearOrdenPendiente({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor }, intento = 1) {
         try {
             const { data, error } = await this.client.rpc('create_pending_order', {
                 p_nombre: nombre,
@@ -130,6 +138,10 @@ class StamperAPI {
             if (error) throw error;
             return data && data[0];
         } catch (error) {
+            if (error?.code === '42501' && intento < 3) {
+                await new Promise((r) => setTimeout(r, intento * 500));
+                return this.crearOrdenPendiente({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor }, intento + 1);
+            }
             console.error('Error crearOrdenPendiente:', error);
             throw error;
         }
