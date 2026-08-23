@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Generador de Links UTM | IAC Arica</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{--red:#9B0000;--bg:#0C0C0C;--surface:#161616;--surface-2:#1d1d1d;--border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);--text:#F2F2F2;--muted:#9c9689;--gold:#F0D080;--green:#3fb950;--font-h:'Barlow Condensed',sans-serif;--font-b:'DM Sans',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.6;font-size:15px}
+a{color:var(--gold)}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(12,12,12,0.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:14px 18px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:var(--font-h);font-weight:700;font-size:16px}
+.brand span{color:var(--red)}
+.back{font-size:13px;color:var(--muted);text-decoration:none}
+.wrap{max-width:640px;margin:0 auto;padding:36px 20px 70px}
+h1{font-family:var(--font-h);font-size:clamp(24px,5vw,32px);text-transform:uppercase;text-align:center;line-height:1.1}
+.subtitle{text-align:center;color:var(--muted);font-size:13.5px;margin-top:10px;margin-bottom:28px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px 20px;margin-bottom:16px}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px}
+.field select, .field input{width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);font-size:14.5px;font-family:var(--font-b)}
+.field select:focus, .field input:focus{outline:none;border-color:var(--gold)}
+.field .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.result-label{font-size:12.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:8px}
+.result-box{display:flex;gap:8px;align-items:stretch}
+.result-url{flex:1;padding:13px 14px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--gold);font-family:monospace;font-size:12.5px;word-break:break-all;user-select:all}
+.copy-btn{flex-shrink:0;padding:0 18px;background:var(--red);color:#fff;border:none;border-radius:8px;font-family:var(--font-h);font-weight:700;font-size:13px;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:7px}
+.copy-btn:active{transform:scale(.97)}
+.copy-btn.copied{background:var(--green)}
+.preset-hint{font-size:12px;color:var(--muted);margin-top:14px;padding-top:14px;border-top:1px dashed var(--border)}
+.preset-hint b{color:var(--text)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">IAC <span>Arica</span></div>
+  <a class="back" href="stamper.html"><i class="fas fa-arrow-left"></i> Volver al sitio</a>
+</div>
+
+<div class="wrap">
+  <h1>Generador de Links UTM</h1>
+  <p class="subtitle">Uso interno — arma el link con seguimiento correcto antes de publicarlo en redes, para que Google Analytics sepa exactamente de dónde vino cada visita y cada venta.</p>
+
+  <div class="card">
+    <div class="field">
+      <label>Página de destino</label>
+      <select id="destino">
+        <option value="https://iac-arica.cl/stamper.html">Sorteo — Sticker Digital (stamper.html)</option>
+        <option value="https://iac-arica.cl/">Inicio — venta de vehículos (index.html)</option>
+        <option value="custom">Otra URL (pegar abajo)</option>
+      </select>
+      <input id="destinoCustom" type="text" placeholder="https://iac-arica.cl/..." style="margin-top:8px;display:none">
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Origen (utm_source)</label>
+        <select id="source">
+          <option value="instagram">Instagram</option>
+          <option value="tiktok">TikTok</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="facebook">Facebook</option>
+          <option value="custom">Otro…</option>
+        </select>
+        <input id="sourceCustom" type="text" placeholder="ej: youtube" style="margin-top:8px;display:none">
+      </div>
+      <div class="field">
+        <label>Medio (utm_medium)</label>
+        <select id="medium">
+          <option value="bio">Bio del perfil</option>
+          <option value="story">Historia</option>
+          <option value="post">Publicación</option>
+          <option value="video">Video</option>
+          <option value="directo">Mensaje directo</option>
+          <option value="custom">Otro…</option>
+        </select>
+        <input id="mediumCustom" type="text" placeholder="ej: reel" style="margin-top:8px;display:none">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Campaña (utm_campaign)</label>
+      <input id="campaign" type="text" placeholder="sorteo_iac_arica_2026" value="sorteo_iac_arica_2026">
+      <div class="hint">Usá el mismo nombre de campaña en todas las publicaciones que sean parte de la misma tanda, para poder sumarlas juntas en los reportes.</div>
+    </div>
+
+    <div class="field">
+      <label>Código de referido (opcional)</label>
+      <input id="ref" type="text" placeholder="ej: a1b2c3d4 — solo si este link es de una persona específica">
+      <div class="hint">Dejalo vacío para links institucionales (los que publica la marca). Completalo solo si estás armando el link personal de un comprador.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="result-label">Link final</div>
+    <div class="result-box">
+      <div class="result-url" id="resultUrl">—</div>
+      <button class="copy-btn" id="copyBtn" type="button"><i class="fas fa-copy"></i> Copiar</button>
+    </div>
+    <div class="preset-hint">
+      Convención del sitio: <b>sorteo_iac_arica_2026</b> para todo lo que promociona el sorteo,
+      <b>iac_reserva_vehiculo</b> para lo que promociona la venta de camionetas. No inventes
+      nombres nuevos de campaña sin necesidad — así los reportes de Analytics quedan
+      comparables entre publicaciones.
+    </div>
+  </div>
+</div>
+
+<script>
+function val(selectId, customId) {
+  const sel = document.getElementById(selectId);
+  if (sel.value === 'custom') return document.getElementById(customId).value.trim();
+  return sel.value;
+}
+
+function toggleCustom(selectId, customId) {
+  const sel = document.getElementById(selectId);
+  const custom = document.getElementById(customId);
+  custom.style.display = sel.value === 'custom' ? 'block' : 'none';
+}
+
+function buildUrl() {
+  const destinoSel = document.getElementById('destino');
+  const base = destinoSel.value === 'custom'
+    ? document.getElementById('destinoCustom').value.trim()
+    : destinoSel.value;
+
+  const source = val('source', 'sourceCustom');
+  const medium = val('medium', 'mediumCustom');
+  const campaign = document.getElementById('campaign').value.trim();
+  const ref = document.getElementById('ref').value.trim();
+
+  const box = document.getElementById('resultUrl');
+  if (!base || !source || !medium || !campaign) {
+    box.textContent = 'Completa origen, medio y campaña para generar el link.';
+    return;
+  }
+
+  let url;
+  try {
+    url = new URL(base);
+  } catch (e) {
+    box.textContent = 'La URL de destino no es válida.';
+    return;
+  }
+  url.searchParams.set('utm_source', source);
+  url.searchParams.set('utm_medium', medium);
+  url.searchParams.set('utm_campaign', campaign);
+  if (ref) url.searchParams.set('ref', ref);
+
+  box.textContent = url.toString();
+}
+
+['destino', 'source', 'medium'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (id === 'destino') toggleCustom('destino', 'destinoCustom');
+    if (id === 'source') toggleCustom('source', 'sourceCustom');
+    if (id === 'medium') toggleCustom('medium', 'mediumCustom');
+    buildUrl();
+  });
+});
+['destinoCustom', 'sourceCustom', 'mediumCustom', 'campaign', 'ref'].forEach(id => {
+  document.getElementById(id).addEventListener('input', buildUrl);
+});
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const text = document.getElementById('resultUrl').textContent;
+  if (!text || text.startsWith('Completa') || text.startsWith('La URL')) return;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (e) {
+    // Fallback para navegadores/contextos sin permiso del portapapeles.
+    const range = document.createRange();
+    range.selectNode(document.getElementById('resultUrl'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+  }
+  const btn = document.getElementById('copyBtn');
+  const original = btn.innerHTML;
+  btn.innerHTML = '<i class="fas fa-check"></i> Copiado';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 1600);
+});
+
+buildUrl();
+</script>
+</body>
+</html>
