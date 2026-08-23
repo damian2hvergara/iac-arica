@@ -76,12 +76,16 @@ toca la base de datos, es seguro).
 ## Bases legales — fuente de verdad del negocio
 
 Las reglas del sorteo (premio, meta mínima, sistema de referidos, ranking de
-referenciadores, plazos) están en las bases legales firmadas — el PDF real vive fuera de
-este repo, en `C:\Users\damia\OneDrive\Escritorio\Bases_Legales_Sorteo_IAC_Arica_5_actualizado.pdf`
-(actualizado 23-08-2026 — reemplazó a la versión firmada 17-08-2026; hay una copia del
-texto en `bases.html`, que debe reflejarlo fielmente). Ante cualquier cambio que toque
-premios, plazos o condiciones de venta: leer el PDF real primero, nunca inventar términos
-legales.
+referenciadores, plazos) están en las bases legales firmadas — el PDF real vive en el vault
+de este mismo repo (gitignoreado, nunca se sube), en
+`00-Inbox/Bases_Legales_Sorteo_IAC_Arica_5_actualizado.pdf` (actualizado 23-08-2026 —
+reemplazó a la versión firmada 17-08-2026, que vivía suelta en el Escritorio; se movió
+adentro del proyecto para no depender de una ruta fuera del repo). Aparte, hay una copia
+pública descargable del mismo PDF, sí versionada en git, en `bases-legales-sorteo-2026.pdf`
+(raíz del repo) — esa es la que se enlaza desde `bases.html` vía
+`sorteo_config.bases_url`. Y hay una copia del texto en `bases.html` mismo, que debe
+reflejar fielmente el PDF. Ante cualquier cambio que toque premios, plazos o condiciones de
+venta: leer el PDF real primero, nunca inventar términos legales.
 
 Puntos clave ya vigentes:
 - Premio: Dodge Challenger 2018, sorteo por tómbola física.
