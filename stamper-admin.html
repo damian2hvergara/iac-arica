@@ -1114,7 +1114,12 @@ async function loadMonitoreo() {
         <td><span class="pill ${SEVERIDAD_PILL[ev.severity] || 'pill-low'}">${SEVERIDAD_LABEL[ev.severity] || ev.severity}</span></td>
         <td>${escapeHtml(CATEGORIA_LABEL[ev.category] || ev.category)}</td>
         <td><code>${escapeHtml(ev.source)}</code></td>
-        <td>${escapeHtml(ev.message)}</td>
+        <td>
+          ${escapeHtml(ev.message)}
+          ${ev.order_id ? `<div style="color:var(--muted);font-size:11px;margin-top:4px">Orden: <code>${escapeHtml(ev.order_id)}</code></div>` : ''}
+          ${ev.detail ? `<pre style="margin-top:6px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:6px;font-size:11px;color:var(--gold-hi,#F0D080);white-space:pre-wrap;word-break:break-word;max-height:180px;overflow-y:auto">${escapeHtml(JSON.stringify(ev.detail, null, 2))}</pre>` : ''}
+          ${ev.resolved ? `<div style="color:var(--muted);font-size:11px;margin-top:4px">Resuelto por ${escapeHtml(ev.resolved_by || '—')} el ${new Date(ev.resolved_at).toLocaleString('es-CL')}</div>` : ''}
+        </td>
         <td>
           ${ev.resolved
             ? `<span style="color:var(--muted);font-size:11.5px">Resuelto</span>`
