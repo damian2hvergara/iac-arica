@@ -180,6 +180,10 @@ function scrollToElement(elementId) {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// trackEvent/trackConversion alimentan GA4 y Meta Pixel desde un solo
+// lugar — nadie llama a fbq() directo desde el resto del código, así
+// que agregar una plataforma nueva (ej. TikTok) es tocar esta única
+// función, no cada botón del sitio.
 function trackEvent(eventName, eventCategory, eventLabel, value) {
     if (typeof gtag !== 'undefined') {
         const params = {
@@ -188,6 +192,13 @@ function trackEvent(eventName, eventCategory, eventLabel, value) {
         };
         if (value !== undefined) params.value = value;
         gtag('event', eventName, params);
+    }
+    // Meta no tiene equivalente estándar para la mayoría de estos
+    // eventos de engagement (filtros, scroll, redes) — van como
+    // evento personalizado, agrupables por category/label en Events
+    // Manager.
+    if (typeof fbq !== 'undefined') {
+        fbq('trackCustom', eventName, { category: eventCategory, label: eventLabel, value });
     }
 }
 
@@ -199,6 +210,14 @@ function trackConversion(eventName, vehicleName, vehiclePrice) {
             value: vehiclePrice ? Math.round(vehiclePrice / 1000) : 0,
             currency: 'CLP'
         });
+    }
+    // Lead es el evento estándar de Meta para "mostró intención de
+    // compra sin pagar online" — encaja con el contacto por WhatsApp
+    // del flujo IAC. Va con el valor real en pesos (no /1000 como
+    // arriba — ese ajuste es una convención vieja solo de GA4, no
+    // tocar los números que ya viene reportando).
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'Lead', { value: vehiclePrice || 0, currency: 'CLP', content_name: vehicleName });
     }
 }
 

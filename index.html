@@ -9,6 +9,23 @@
   gtag('js', new Date());
   gtag('config', 'G-3YY9ZD334W');
 </script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1387273560050045');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1387273560050045&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="description" content="Camionetas americanas importadas desde USA. Silverado, RAM, F-150 en Arica, Chile. Reserva con 10-30% del valor.">
@@ -2104,10 +2121,13 @@ document.addEventListener('keydown', e => {
   }
 });
 
-/* — GA helper — */
-function trackEvent(name, cat, label) {
-  if (typeof gtag !== 'undefined') gtag('event', name, {event_category:cat, event_label:label});
-}
+/* trackEvent() vive en js/config.js — este archivo tenía su propia
+   copia local con el mismo nombre (definida más abajo en el DOM, así
+   que ganaba ella). Sí llegaba a GA4, pero con params distintos
+   (event_category/event_label en vez de category/label) y sin la
+   parte de Meta Pixel que se agregó en config.js. Se saca la copia
+   local para que los ~30 trackEvent(...) de esta página usen la
+   compartida. */
 </script>
 
 </body>

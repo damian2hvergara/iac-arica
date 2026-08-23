@@ -9,6 +9,23 @@
   gtag('js', new Date());
   gtag('config', 'G-3YY9ZD334W');
 </script>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1387273560050045');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1387273560050045&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>No Sueñes, Gánatelo | Sorteo Dodge Challenger — IAC Arica</title>
@@ -1093,6 +1110,33 @@ function tierForIndex(i, total) {
 // ====================================
 function gaEcommerce(eventName, params) {
   if (typeof gtag === 'function') gtag('event', eventName, params);
+  fireMetaCommerce(eventName, params);
+}
+
+// Traduce el mismo evento a los eventos estándar de Meta Pixel — un
+// solo punto de entrada (gaEcommerce) alimenta GA4 y Meta a la vez,
+// nadie llama a fbq() directo en los 6 puntos del checkout.
+function fireMetaCommerce(eventName, params) {
+  if (typeof fbq !== 'function') return;
+  const items = params.items || [];
+  const contentIds = items.map(i => i.item_id).filter(Boolean);
+  const contentName = items.map(i => i.item_name).filter(Boolean).join(', ');
+  const numItems = items.reduce((sum, i) => sum + (i.quantity || 0), 0);
+  const base = {
+    value: params.value,
+    currency: params.currency || 'CLP',
+    content_type: 'product',
+    content_ids: contentIds,
+    content_name: contentName || undefined,
+    num_items: numItems || undefined,
+  };
+
+  if (eventName === 'select_item') fbq('track', 'ViewContent', base);
+  else if (eventName === 'begin_checkout') fbq('track', 'InitiateCheckout', base);
+  else if (eventName === 'add_payment_info') fbq('track', 'AddPaymentInfo', base);
+  else if (eventName === 'purchase') fbq('track', 'Purchase', base);
+  else if (eventName === 'view_item_list') fbq('trackCustom', 'ViewItemList', base);
+  else if (eventName === 'share_referral_link') fbq('trackCustom', 'ShareReferralLink', { method: params.method });
 }
 // Evita mandar `purchase` dos veces para la misma orden en la misma
 // pestaña (recarga de la pantalla de confirmación, o volver atrás) —
