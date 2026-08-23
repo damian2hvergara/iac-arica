@@ -9,7 +9,11 @@
 -- email ni por rango) — mismo criterio que el resto de la función.
 -- ============================================================
 
-CREATE OR REPLACE FUNCTION estado_orden_publico(p_orden_id uuid)
+-- CREATE OR REPLACE no permite cambiar las columnas de salida (OUT
+-- params) de una función existente — hay que borrarla primero.
+DROP FUNCTION IF EXISTS estado_orden_publico(uuid);
+
+CREATE FUNCTION estado_orden_publico(p_orden_id uuid)
 RETURNS TABLE(estado text, cantidad_stickers integer, codigo_referido text, monto_total integer)
 LANGUAGE sql SECURITY DEFINER STABLE
 SET search_path = public
