@@ -1084,6 +1084,26 @@ function tierForIndex(i, total) {
   return 'plata';
 }
 
+// ====================================
+// GA4 — e-commerce del embudo Stamper (gtag nativo, no trackEvent()
+// de config.js: ese wrapper no soporta el array `items` que necesita
+// el informe de Monetización). gtag() ya es seguro de llamar en
+// cualquier punto — el snippet del <head> define un dataLayer-queue
+// síncrono antes de que el script async termine de cargar.
+// ====================================
+function gaEcommerce(eventName, params) {
+  if (typeof gtag === 'function') gtag('event', eventName, params);
+}
+// Evita mandar `purchase` dos veces para la misma orden en la misma
+// pestaña (recarga de la pantalla de confirmación, o volver atrás) —
+// GA4 igual dedupea por transaction_id, esto es una segunda capa.
+function yaRegistradaCompra(ordenId) {
+  const key = 'ga_purchase_' + ordenId;
+  if (sessionStorage.getItem(key)) return true;
+  sessionStorage.setItem(key, '1');
+  return false;
+}
+
 function renderPacks() {
   const grid = document.getElementById('packsGrid');
   if (!packs.length) { grid.innerHTML = '<p style="color:var(--muted);text-align:center">No hay packs disponibles por ahora.</p>'; return; }
@@ -1132,8 +1152,20 @@ function renderPacks() {
     </div>`;
   }).join('');
 
+  gaEcommerce('view_item_list', {
+    item_list_name: 'packs_stamper',
+    items: sorted.map(p => ({ item_id: p.slug, item_name: p.nombre, price: p.precio_total, quantity: p.cantidad_stickers })),
+  });
+
   grid.querySelectorAll('.plate').forEach(card => {
     card.addEventListener('click', () => {
+      const p = packs.find(pk => pk.slug === card.dataset.slug);
+      if (p) {
+        gaEcommerce('select_item', {
+          item_list_name: 'packs_stamper',
+          items: [{ item_id: p.slug, item_name: p.nombre, price: p.precio_total, quantity: p.cantidad_stickers }],
+        });
+      }
       selectPack(card.dataset.slug);
       openCheckout();
     });
@@ -1247,6 +1279,11 @@ Object.keys(FIELD_VALIDATORS).forEach(id => {
 /* ---------- Checkout ---------- */
 function openCheckout() {
   if (!selectedPack) return;
+  gaEcommerce('begin_checkout', {
+    value: selectedPack.precio_total,
+    currency: 'CLP',
+    items: [{ item_id: selectedPack.slug, item_name: selectedPack.nombre, price: selectedPack.precio_total, quantity: selectedPack.cantidad_stickers }],
+  });
   const packImg = selectedPack.imagen_url || galleryImages[0] || '';
   const imgEl = document.getElementById('checkoutPackImg');
   if (packImg) { imgEl.src = packImg; imgEl.alt = selectedPack.nombre; } else { imgEl.removeAttribute('src'); }
@@ -1382,6 +1419,12 @@ async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
     callbacks: {
       onReady: () => {},
       onSubmit: ({ formData }) => {
+        gaEcommerce('add_payment_info', {
+          value: orden.monto_total,
+          currency: 'CLP',
+          payment_type: 'mercado_pago',
+          items: [{ item_id: selectedPack?.slug, item_name: selectedPack?.nombre, price: orden.monto_total, quantity: orden.cantidad_stickers }],
+        });
         return new Promise((resolve, reject) => {
           // El Brick a veces no completa payer.email/identification en el
           // formData (se vio en pruebas reales: llegaban null y el pago
@@ -1414,6 +1457,16 @@ async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
               }
               resolve();
               if (data.status === 'approved') {
+                if (!yaRegistradaCompra(orden.orden_id)) {
+                  gaEcommerce('purchase', {
+                    transaction_id: orden.orden_id,
+                    value: orden.monto_total,
+                    currency: 'CLP',
+                    referral_code: orden.codigo_referido,
+                    referred_by: sessionStorage.getItem('iac_ref') || null,
+                    items: [{ item_id: selectedPack?.slug, item_name: selectedPack?.nombre, price: orden.monto_total, quantity: orden.cantidad_stickers }],
+                  });
+                }
                 await unmontarPaymentBrick();
                 closeCheckoutOverlaySinDesmontar();
                 showSuccess(orden, data.folios, comprador);
@@ -1422,7 +1475,13 @@ async function montarPaymentBrick(preferenceId, monto, orden, comprador) {
               } else {
                 await unmontarPaymentBrick();
                 closeCheckoutOverlaySinDesmontar();
-                mostrarEsperandoConfirmacion(orden.orden_id, 'mercadopago');
+                mostrarEsperandoConfirmacion(orden.orden_id, 'mercadopago', {
+                  monto_total: orden.monto_total,
+                  cantidad_stickers: orden.cantidad_stickers,
+                  codigo_referido: orden.codigo_referido,
+                  pack_slug: selectedPack?.slug,
+                  pack_nombre: selectedPack?.nombre,
+                });
               }
             })
             .catch((e) => {
@@ -1473,7 +1532,7 @@ async function confirmarPruebaInstantanea(orden, secret, comprador) {
 // devuelve el pago en pending/in_process al enviar el Brick, como si el
 // comprador vuelve a la página después de un redirect de MP (algunos
 // medios de pago, como Cuenta Mercado Pago, redirigen antes de volver).
-async function mostrarEsperandoConfirmacion(ordenId, metodo) {
+async function mostrarEsperandoConfirmacion(ordenId, metodo, ordenData = null) {
   document.getElementById('noSorteoCard').style.display = 'none';
   const overlay = document.getElementById('successOverlay');
   document.getElementById('stampCards').innerHTML = '<p style="text-align:center;color:var(--muted)">Verificando tu pago con Mercado Pago…</p>';
@@ -1488,6 +1547,26 @@ async function mostrarEsperandoConfirmacion(ordenId, metodo) {
         document.getElementById('stampCards').innerHTML =
           '<p style="text-align:center;color:var(--green);font-weight:700">✅ ¡Pago confirmado! Revisa tu correo para ver tus estampillas numeradas.</p>' +
           '<p style="text-align:center;color:var(--muted);font-size:12.5px;margin-top:8px">También puedes verlas en <a href="mi-cuenta.html" style="color:var(--gold-hi)">Mis Stickers</a>.</p>';
+        if (!yaRegistradaCompra(ordenId)) {
+          // ordenData viene completo cuando esta pantalla se abrió en la misma
+          // carga de página (el pago quedó "pending" al tiro); si el comprador
+          // vuelve acá por un redirect externo (checkMpReturn), monto_total lo
+          // trae estado_orden_publico — el resto del detalle del pack no está
+          // disponible en ese caso, así que el item queda sin nombre/slug.
+          gaEcommerce('purchase', {
+            transaction_id: ordenId,
+            value: ordenData?.monto_total ?? estado.monto_total ?? undefined,
+            currency: 'CLP',
+            referral_code: ordenData?.codigo_referido ?? estado.codigo_referido,
+            referred_by: sessionStorage.getItem('iac_ref') || null,
+            items: [{
+              item_id: ordenData?.pack_slug,
+              item_name: ordenData?.pack_nombre,
+              price: ordenData?.monto_total ?? estado.monto_total ?? undefined,
+              quantity: estado.cantidad_stickers,
+            }],
+          });
+        }
         return;
       }
       if (estado?.estado === 'rechazado') {
@@ -1534,8 +1613,9 @@ function showSuccess(orden, folios, comprador) {
   document.getElementById('pendRefCode').textContent = orden.codigo_referido;
 
   const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(orden.codigo_referido)}`;
-  document.getElementById('shareWaBtn').href =
-    `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
+  const waBtn = document.getElementById('shareWaBtn');
+  waBtn.href = `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
+  waBtn.onclick = () => gaEcommerce('share_referral_link', { method: 'whatsapp' });
   window.__shareUrl = shareUrl;
   window.__codigoReferido = orden.codigo_referido;
 
@@ -1572,6 +1652,7 @@ function roundRect(ctx, x, y, w, h, r) {
 async function shareImage() {
   const codigo = window.__codigoReferido;
   if (!codigo) return;
+  gaEcommerce('share_referral_link', { method: 'image' });
   const shareUrl = window.__shareUrl || `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(codigo)}`;
 
   const canvas = document.createElement('canvas');
@@ -1656,6 +1737,7 @@ async function shareImage() {
 
 function copyRefLink() {
   navigator.clipboard?.writeText(window.__shareUrl || window.location.href);
+  gaEcommerce('share_referral_link', { method: 'copy' });
   showToast('Link copiado');
 }
 
