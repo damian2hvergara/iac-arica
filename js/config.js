@@ -9,7 +9,19 @@
    también el número en "?v=" del <script src="js/config.js?v=...">
    en TODOS los HTML que lo cargan — si no, algunos visitantes van a
    seguir ejecutando la versión vieja hasta que limpien caché a mano.
+
+   Ese "?v=" arregla la caché en la PRÓXIMA visita, pero un celular con
+   la pestaña ya abierta en segundo plano (muy común en mobile) se
+   queda corriendo el JS viejo indefinidamente hasta que la cierre y
+   reabra a mano — no hay Service Worker en este sitio que le avise.
+   SITE_VERSION + chequearActualizacionDisponible() (al final de este
+   archivo) resuelven eso: comparan la versión corriendo contra la del
+   servidor cuando la pestaña vuelve a foco, y muestran un aviso para
+   actualizar con un toque en vez de dejarlo a criterio del usuario.
+   Subir también SITE_VERSION cada vez que se edite este archivo.
    ======================================== */
+
+const SITE_VERSION = '20260823a';
 
 // ====================================
 // SUPABASE
@@ -323,5 +335,71 @@ window.showError = showError;
 window.escapeHtml = escapeHtml;
 window.compressImage = compressImage;
 window.uploadImageToCloudinary = uploadImageToCloudinary;
+
+// ====================================
+// AVISO DE ACTUALIZACIÓN DISPONIBLE
+// Sin esto, un celular con la pestaña ya abierta se queda corriendo el
+// JS viejo indefinidamente (no hay Service Worker que lo fuerce a
+// refrescar). Compara SITE_VERSION contra la versión real del servidor
+// (pide config.js con cache:'no-store', nunca confía en la copia
+// cacheada) al volver a foco la pestaña, y cada 5 minutos mientras
+// sigue abierta. Nunca interrumpe un checkout en curso — solo muestra
+// un aviso, el reload lo dispara la persona.
+// ====================================
+let actualizacionYaAvisada = false;
+
+async function chequearActualizacionDisponible() {
+    if (actualizacionYaAvisada) return;
+    try {
+        const res = await fetch(`js/config.js?check=${Date.now()}`, { cache: 'no-store' });
+        const texto = await res.text();
+        const match = texto.match(/const SITE_VERSION = '([^']+)'/);
+        if (match && match[1] !== SITE_VERSION) {
+            mostrarAvisoActualizacion();
+        }
+    } catch (e) {
+        // Sin conexión momentánea u otro error de red — no molestar por esto.
+    }
+}
+
+function mostrarAvisoActualizacion() {
+    if (actualizacionYaAvisada || document.getElementById('siteUpdateBanner')) return;
+    actualizacionYaAvisada = true;
+
+    const banner = document.createElement('div');
+    banner.id = 'siteUpdateBanner';
+    banner.innerHTML = `
+        <span>Hay una versión nueva del sitio disponible.</span>
+        <button type="button" id="siteUpdateBannerBtn">Actualizar ahora</button>
+    `;
+    Object.assign(banner.style, {
+        position: 'fixed', left: '0', right: '0', bottom: '0', zIndex: '99999',
+        background: '#9B0000', color: '#fff', padding: '12px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px',
+        fontSize: '13.5px', fontWeight: '500', flexWrap: 'wrap', textAlign: 'center',
+        boxShadow: '0 -2px 12px rgba(0,0,0,0.3)'
+    });
+    const btn = banner.querySelector('#siteUpdateBannerBtn');
+    Object.assign(btn.style, {
+        background: '#fff', color: '#9B0000', border: 'none', borderRadius: '8px',
+        padding: '6px 14px', fontWeight: '700', cursor: 'pointer', fontSize: '13px'
+    });
+    btn.addEventListener('click', () => location.reload());
+    document.body.appendChild(banner);
+}
+
+function iniciarChequeoActualizaciones() {
+    // No interrumpir un checkout en curso — se vuelve a intentar en el
+    // próximo chequeo (visibilitychange o el intervalo de 5 min).
+    const checkoutEnCurso = () => document.getElementById('checkoutOverlay')?.classList.contains('show');
+
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !checkoutEnCurso()) chequearActualizacionDisponible();
+    });
+    setInterval(() => {
+        if (!checkoutEnCurso()) chequearActualizacionDisponible();
+    }, 5 * 60 * 1000);
+}
+iniciarChequeoActualizaciones();
 
 console.log('✅ Configuración cargada');
