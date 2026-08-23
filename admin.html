@@ -13,7 +13,7 @@
     
     <!-- CSS -->
     <link rel="stylesheet" href="css/variables.css?v=20260809">
-    <link rel="stylesheet" href="css/components.css?v=20260809">
+    <link rel="stylesheet" href="css/components.css?v=20260823a">
     
     <style>
     /* ========================================
@@ -674,7 +674,15 @@
                     <!-- Imágenes -->
                     <div class="form-section">
                         <h3 class="section-header">Imágenes (Máximo 10)</h3>
-                        
+
+                        <div id="existingImagesSection" style="display:none">
+                            <p style="color:var(--text-muted,#888);font-size:var(--font-sm);margin-bottom:8px">
+                                Imágenes actuales — <i class="fas fa-times" style="color:var(--red)"></i> para eliminar,
+                                <i class="fas fa-star"></i> para marcar como principal.
+                            </p>
+                            <div class="image-preview" id="existingImagesPreview"></div>
+                        </div>
+
                         <div class="image-upload-area" id="imageUploadArea">
                             <div class="upload-icon">
                                 <i class="fas fa-cloud-upload-alt"></i>
@@ -714,6 +722,6 @@
     <!-- Scripts -->
     <script src="js/config.js?v=20260823a"></script>
     <script src="js/api.js?v=20260809"></script>
-    <script src="js/admin.js?v=20260809"></script>
+    <script src="js/admin.js?v=20260823a"></script>
 </body>
 </html>

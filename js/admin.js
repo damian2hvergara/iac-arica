@@ -6,6 +6,7 @@
 let currentUser = null;
 let uploadedImages = [];
 let currentEditingVehicle = null;
+let currentVehicleImages = []; // Imágenes ya guardadas del vehículo en edición (tabla vehicle_images)
 
 // ====================================
 // INICIALIZACIÓN
@@ -376,6 +377,76 @@ function removeImage(index) {
 }
 
 // ====================================
+// IMÁGENES YA GUARDADAS (editar vehículo)
+// editVehicle() traía los datos del vehículo pero nunca mostraba sus
+// vehicle_images existentes — así que no había forma de borrar una
+// foto vieja desde el admin, solo de agregar más encima. La API
+// (deleteImage/setMainImage en vehicleAPI) ya existía y no se usaba.
+// ====================================
+
+function renderExistingImages() {
+    const section = document.getElementById('existingImagesSection');
+    const container = document.getElementById('existingImagesPreview');
+    if (!section || !container) return;
+
+    if (!currentVehicleImages.length) {
+        section.style.display = 'none';
+        container.innerHTML = '';
+        return;
+    }
+
+    section.style.display = 'block';
+    container.innerHTML = currentVehicleImages.map((img) => `
+        <div class="image-preview-item">
+            <img src="${img.image_url}" alt="Imagen del vehículo">
+            <button
+                type="button"
+                class="image-preview-star ${img.is_main ? 'is-main' : ''}"
+                onclick="hacerImagenPrincipal('${img.id}')"
+                title="${img.is_main ? 'Imagen principal' : 'Marcar como principal'}"
+            >
+                <i class="fas fa-star"></i>
+            </button>
+            <button
+                type="button"
+                class="image-preview-remove"
+                onclick="eliminarImagenExistente('${img.id}')"
+                title="Eliminar esta imagen"
+            >
+                <i class="fas fa-times"></i>
+            </button>
+            ${img.is_main ? '<div class="main-badge">Principal</div>' : ''}
+        </div>
+    `).join('');
+}
+
+async function eliminarImagenExistente(imageId) {
+    if (!confirm('¿Eliminar esta imagen? No se puede deshacer.')) return;
+    try {
+        await vehicleAPI.deleteImage(imageId);
+        currentVehicleImages = currentVehicleImages.filter((img) => img.id !== imageId);
+        renderExistingImages();
+        showNotification('Imagen eliminada', 'success');
+    } catch (error) {
+        console.error('Error al eliminar imagen:', error);
+        showNotification('Error al eliminar la imagen', 'error');
+    }
+}
+
+async function hacerImagenPrincipal(imageId) {
+    if (!currentEditingVehicle) return;
+    try {
+        await vehicleAPI.setMainImage(currentEditingVehicle.id, imageId);
+        currentVehicleImages = currentVehicleImages.map((img) => ({ ...img, is_main: img.id === imageId }));
+        renderExistingImages();
+        showNotification('Imagen principal actualizada', 'success');
+    } catch (error) {
+        console.error('Error al marcar imagen principal:', error);
+        showNotification('Error al marcar la imagen como principal', 'error');
+    }
+}
+
+// ====================================
 // SUBMIT FORMULARIO
 // ====================================
 
@@ -426,15 +497,20 @@ async function handleVehicleSubmit(e) {
         // Subir imágenes si hay
         if (uploadedImages.length > 0) {
             showNotification(`Subiendo ${uploadedImages.length} imágenes...`, 'info');
-            
+
+            // Las fotos que ya tenía el vehículo (si se está editando) ocupan
+            // los order_index 0..N-1 — las nuevas siguen desde ahí en vez de
+            // reiniciar en 0, que las dejaba empatadas con las existentes.
+            const baseIndex = currentVehicleImages.length;
+
             for (let i = 0; i < uploadedImages.length; i++) {
                 const img = uploadedImages[i];
-                
+
                 try {
                     submitButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Subiendo imagen ${i + 1}/${uploadedImages.length}...`;
-                    
+
                     const imageUrl = await uploadImageToCloudinary(img.file);
-                    await vehicleAPI.addImage(vehicle.id, imageUrl, i === 0, i);
+                    await vehicleAPI.addImage(vehicle.id, imageUrl, baseIndex === 0 && i === 0, baseIndex + i);
                     img.uploaded = true;
                     
                     console.log(`✅ Imagen ${i + 1} subida correctamente`);
@@ -471,7 +547,11 @@ async function editVehicle(vehicleId) {
         
         const vehicle = await vehicleAPI.getVehicle(vehicleId);
         currentEditingVehicle = vehicle;
-        
+        currentVehicleImages = (vehicle.vehicle_images || [])
+            .slice()
+            .sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+        renderExistingImages();
+
         // Cambiar a tab de formulario
         switchToTab('add');
         
@@ -553,6 +633,8 @@ function resetForm() {
     uploadedImages = [];
     renderImagePreview();
     currentEditingVehicle = null;
+    currentVehicleImages = [];
+    renderExistingImages();
     
     document.getElementById('formTitle').textContent = 'Agregar Vehículo';
     document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Guardar Vehículo';
@@ -567,6 +649,8 @@ window.switchToTab = switchToTab;
 window.editVehicle = editVehicle;
 window.deleteVehicle = deleteVehicle;
 window.removeImage = removeImage;
+window.eliminarImagenExistente = eliminarImagenExistente;
+window.hacerImagenPrincipal = hacerImagenPrincipal;
 window.cancelForm = cancelForm;
 
 console.log('✅ Admin.js cargado correctamente');

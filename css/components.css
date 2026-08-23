@@ -695,6 +695,27 @@ button.share-btn-premium {
     justify-content: center;
 }
 
+.image-preview-star {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: var(--white);
+    border: none;
+    font-size: var(--font-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-preview-star.is-main {
+    background: var(--import-red);
+}
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .modal-content {
