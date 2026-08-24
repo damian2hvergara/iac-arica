@@ -83,13 +83,24 @@ async function procesarPago(req: Request, ordenId: string, formData: any, supaba
 
   const { data: orden, error: errOrden } = await supabase
     .from('ordenes')
-    .select('id, estado')
+    .select('id, estado, nombre, monto_total, cantidad_stickers, pack_id, packs_config(nombre)')
     .eq('id', ordenId)
     .maybeSingle();
   if (errOrden || !orden) return json({ error: 'orden_no_encontrada' }, 404);
   if (orden.estado !== 'pendiente_pago') {
     return json({ status: 'ya_procesado' }, 200);
   }
+
+  const titulo = orden.packs_config?.nombre
+    ? `Sticker Digital IAC Arica — ${orden.packs_config.nombre}`
+    : 'Sticker Digital IAC Arica 2026';
+
+  // Campos que pide la "medición de calidad" de Mercado Pago para el
+  // request de Pagos (distinto del de Preferencias, que ya se enriquece
+  // en mp-create-preference) — bajan el rechazo de pagos por el motor
+  // antifraude. Se arman acá con datos ya guardados en la orden, no con
+  // lo que mande el cliente.
+  const nombrePartes = orden.nombre ? String(orden.nombre).trim().split(/\s+/) : [];
 
   let mpRes: Response;
   try {
@@ -102,8 +113,24 @@ async function procesarPago(req: Request, ordenId: string, formData: any, supaba
       },
       body: JSON.stringify({
         ...formData,
+        payer: {
+          ...(formData?.payer || {}),
+          ...(nombrePartes[0] ? { first_name: nombrePartes[0] } : {}),
+          ...(nombrePartes.length > 1 ? { last_name: nombrePartes.slice(1).join(' ') } : {}),
+        },
         external_reference: String(ordenId),
         metadata: { orden_id: ordenId },
+        description: titulo,
+        statement_descriptor: 'IAC ARICA',
+        additional_info: {
+          items: [{
+            id: `sticker-${ordenId}`,
+            title: titulo,
+            description: titulo,
+            quantity: 1,
+            unit_price: orden.monto_total,
+          }],
+        },
         // Sin esto, Mercado Pago puede dejar el pago "in_process" en
         // revisión por tiempo indefinido en vez de resolverlo al toque
         // — con binary_mode el resultado SIEMPRE es approved o rejected,
