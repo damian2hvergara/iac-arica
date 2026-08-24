@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
 
   const { data: orden, error } = await supabase
     .from('ordenes')
-    .select('id, email, monto_total, cantidad_stickers, estado, pack_id, packs_config(nombre)')
+    .select('id, email, nombre, rut_pasaporte, monto_total, cantidad_stickers, estado, pack_id, packs_config(nombre)')
     .eq('id', ordenId)
     .single();
 
@@ -73,6 +73,24 @@ Deno.serve(async (req: Request) => {
   const title = orden.packs_config?.nombre
     ? `Sticker Digital IAC Arica — ${orden.packs_config.nombre} (${orden.cantidad_stickers} stickers)`
     : 'Sticker Digital IAC Arica 2026';
+
+  // Mercado Pago recomienda mandar toda la info disponible del comprador
+  // (mejora la tasa de aprobación y el puntaje de "medición de calidad" de
+  // la integración) — se arma acá en vez de solo el email. rut_pasaporte
+  // ya viene normalizado por normalizar_rut_pasaporte(): un RUT queda como
+  // "XX.XXX.XXX-D", cualquier otra cosa (pasaporte) queda tal cual. Solo se
+  // manda identification cuando matchea ese formato — para pasaporte se
+  // prefiere omitirlo antes que adivinar mal el tipo de documento y
+  // arriesgar que Mercado Pago rechace la preferencia completa.
+  const payer: Record<string, unknown> = { email: orden.email };
+  if (orden.nombre) {
+    const partes = String(orden.nombre).trim().split(/\s+/);
+    payer.name = partes[0];
+    if (partes.length > 1) payer.surname = partes.slice(1).join(' ');
+  }
+  if (orden.rut_pasaporte && /^\d{1,2}\.\d{3}\.\d{3}-[\dK]$/i.test(orden.rut_pasaporte)) {
+    payer.identification = { type: 'RUT', number: orden.rut_pasaporte.replace(/\./g, '') };
+  }
 
   const preference = {
     // Un solo ítem por el monto total exacto de la orden — nunca
