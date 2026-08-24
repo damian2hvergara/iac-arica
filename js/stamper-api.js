@@ -117,31 +117,25 @@ class StamperAPI {
         }
     }
 
-    // El 2026-08-23 create_pending_order() estuvo devolviendo "permission
-    // denied" (código Postgres 42501) de forma intermitente durante casi 3
-    // horas — no un error de código ni de datos, el mismo pedido volvía a
-    // funcionar segundos u minutos después (ver 05-Progreso/2026-08-23.md).
-    // Reintentar automáticamente ante ESE código puntual absorbe el
-    // parpadeo sin tocarle la experiencia a nadie que se equivocó
-    // escribiendo un dato — esos otros errores (nombre_invalido, etc.)
-    // nunca traen código 42501, así que no se reintentan de más.
-    async crearOrdenPendiente({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor }, intento = 1) {
+    // create_pending_order() perdió el EXECUTE de "anon" tres veces en un
+    // mismo día (23-ago-2026, "permission denied" / 42501, sin causa
+    // confirmada — ver 05-Progreso/2026-08-23.md) porque se llamaba directo
+    // con la anon key desde acá. Se reemplazó por la Edge Function
+    // create-pending-order, que llama al mismo RPC con la service role key
+    // — eso no depende de ningún grant sobre "anon", así que la clase
+    // entera de bug queda eliminada (ya no hace falta reintentar por
+    // 42501, es estructuralmente imposible que vuelva a pasar por acá).
+    async crearOrdenPendiente({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor }) {
         try {
-            const { data, error } = await this.client.rpc('create_pending_order', {
-                p_nombre: nombre,
-                p_email: email,
-                p_telefono: telefono,
-                p_rut_pasaporte: rutPasaporte,
-                p_pack_slug: packSlug,
-                p_referido_por: referidoPor || null
+            const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/create-pending-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}` },
+                body: JSON.stringify({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor: referidoPor || null })
             });
-            if (error) throw error;
-            return data && data[0];
+            const data = await res.json();
+            if (!res.ok) throw new Error(data?.error || 'No se pudo crear la orden.');
+            return data;
         } catch (error) {
-            if (error?.code === '42501' && intento < 3) {
-                await new Promise((r) => setTimeout(r, intento * 500));
-                return this.crearOrdenPendiente({ nombre, email, telefono, rutPasaporte, packSlug, referidoPor }, intento + 1);
-            }
             console.error('Error crearOrdenPendiente:', error);
             throw error;
         }
