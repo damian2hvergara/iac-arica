@@ -21,7 +21,7 @@
    Subir también SITE_VERSION cada vez que se edite este archivo.
    ======================================== */
 
-const SITE_VERSION = '20260823a';
+const SITE_VERSION = '20260823b';
 
 // ====================================
 // SUPABASE
@@ -38,7 +38,11 @@ const SUPABASE_CONFIG = {
 // en Supabase Edge Functions, nunca acá.
 // ====================================
 const MP_CONFIG = {
-    publicKey: 'APP_USR-d43b39cc-5148-4b31-a4cc-18a8eb676d27'
+    // Cuenta de Mercado Pago como Persona Jurídica (CV North Capital SpA,
+    // RUT 78.375.615-3) — antes era la cuenta personal del usuario, migrada
+    // el 23-ago-2026 para que las ventas se reporten al SII bajo el RUT
+    // correcto de la empresa (ver 05-Progreso/2026-08-23.md).
+    publicKey: 'APP_USR-96b45370-a67a-4bf6-b42c-c6654e0ddf64'
 };
 
 // ====================================
