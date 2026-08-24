@@ -80,8 +80,12 @@ referenciadores, plazos) están en las bases legales firmadas — el PDF real vi
 de este mismo repo (gitignoreado, nunca se sube), en
 `00-Inbox/Bases_Legales_Sorteo_IAC_Arica_5_actualizado.pdf` (actualizado 23-08-2026 —
 reemplazó a la versión firmada 17-08-2026, que vivía suelta en el Escritorio; se movió
-adentro del proyecto para no depender de una ruta fuera del repo). Aparte, hay una copia
-pública descargable del mismo PDF, sí versionada en git, en `bases-legales-sorteo-2026.pdf`
+adentro del proyecto para no depender de una ruta fuera del repo). La fecha de otorgamiento
+del documento ("En Arica, Chile, a ...") se corrigió a 24-08-2026 el mismo 24-ago, tanto en
+este PDF como en la copia pública y en `bases.html` — no así la fecha de inicio de venta de
+la cláusula Octava ("23 de agosto de 2026"), que es un hecho distinto (la venta ya empezó
+ese día de verdad) y se mantiene igual. Aparte, hay una copia pública descargable del mismo
+PDF, sí versionada en git, en `bases-legales-sorteo-2026.pdf`
 (raíz del repo) — esa es la que se enlaza desde `bases.html` vía
 `sorteo_config.bases_url`. Y hay una copia del texto en `bases.html` mismo, que debe
 reflejar fielmente el PDF. Ante cualquier cambio que toque premios, plazos o condiciones de
