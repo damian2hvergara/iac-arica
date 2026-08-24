@@ -163,10 +163,17 @@ async function procesarPago(req: Request, ordenId: string, formData: any, supaba
   const status: string = mpData.status;
   const paymentId: string = String(mpData.id);
   const paymentType: string | null = mpData.payment_type_id ?? null;
+  // fee_details trae la comisión real que cobró Mercado Pago por este
+  // pago específico — se suma en vez de asumir un % fijo, porque varía
+  // según medio de pago (Finanzas, parte 53).
+  const feeAmount: number = Array.isArray(mpData.fee_details)
+    ? mpData.fee_details.reduce((acc: number, f: any) => acc + (Number(f?.amount) || 0), 0)
+    : 0;
 
   if (status === 'approved') {
     const resultado = await confirmarPagoAprobado(supabase, {
       ordenId, mpPaymentId: paymentId, mpPaymentType: paymentType, source: 'mp-process-payment',
+      mpFeeAmount: feeAmount,
     });
     if (!resultado.ok) return json({ status: 'error', error: resultado.error }, 500);
     return json({ status: 'approved', folios: resultado.folios ?? [], alreadyProcessed: resultado.alreadyProcessed ?? false }, 200);

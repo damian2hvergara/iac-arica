@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Finanzas — IAC Arica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --red:#9B0000; --red-deep:#6B0000; --bg:#0C0C0C; --surface:#161616; --surface-2:#202020;
+  --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
+  --text:#F2F2F2; --muted:#8c8578; --green:#00C566; --gold:#F0D080; --orange:#F59E0B; --danger:#ff3b30;
+  --font-h:'Barlow Condensed',sans-serif; --font-b:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:inherit}
+
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.gate-box{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 28px}
+.gate-box h1{font-family:var(--font-h);font-size:22px;text-transform:uppercase;margin-bottom:4px}
+.gate-box .sub{color:var(--muted);font-size:12.5px;margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--red)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:8px;font-weight:600;font-size:13.5px;transition:opacity .15s}
+.btn:hover{opacity:.9}
+.btn-primary{background:var(--red);color:#fff;width:100%}
+.btn-ghost{background:transparent;border:1px solid var(--border-hi);color:var(--text)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:6px}
+.err-msg{color:var(--danger);font-size:12.5px;margin-top:10px;min-height:16px}
+
+#appWrap{display:none;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.topbar .brand{font-family:var(--font-h);font-size:18px;text-transform:uppercase;font-weight:700}
+.topbar .brand span{color:var(--red)}
+.topbar-right{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--muted)}
+
+.tabs{display:flex;gap:2px;padding:0 22px;border-bottom:1px solid var(--border);overflow-x:auto;background:var(--surface)}
+.tab-btn{padding:13px 16px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;background:transparent}
+.tab-btn.active{color:var(--text);border-color:var(--red)}
+
+main{padding:22px;max-width:1200px;margin:0 auto}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.kpi .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi .val{font-family:var(--font-h);font-size:26px;font-weight:700}
+.kpi .val.gold{color:var(--gold)}
+.kpi .val.green{color:var(--green)}
+.kpi .val.orange{color:var(--orange)}
+.kpi .val.danger{color:var(--danger)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px}
+.card h2{font-family:var(--font-h);font-size:18px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+.disclaimer{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--text);margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
+.disclaimer i{color:var(--orange);margin-top:1px}
+
+.filtros{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:18px}
+.filtros .field{margin-bottom:0;min-width:150px}
+.filtros-atajos{display:flex;gap:6px;flex-wrap:wrap}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 10px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border-hi)}
+td{padding:10px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+.empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:13px}
+
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+.pill-fijo{background:rgba(0,102,204,0.16);color:#5fa8ff}
+.pill-variable{background:rgba(245,158,11,0.16);color:var(--orange)}
+.pill-auto{background:rgba(0,197,102,0.16);color:var(--green)}
+.pill-manual{background:rgba(140,133,120,0.16);color:var(--muted)}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.form-grid .full{grid-column:1/-1}
+textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);resize:vertical;min-height:60px}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:11px 0}
+.toggle input{width:18px;height:18px}
+
+.icon-btn{background:transparent;color:var(--muted);padding:4px 8px;border-radius:6px}
+.icon-btn:hover{color:var(--danger);background:rgba(255,59,48,0.1)}
+
+@media(max-width:640px){
+  main{padding:14px}
+  .kpi .val{font-size:21px}
+}
+</style>
+</head>
+<body>
+
+<div class="gate" id="loginWrap">
+  <div class="gate-box">
+    <h1>Finanzas <span style="color:var(--red)">IAC</span></h1>
+    <p class="sub">Ingresos, costos y estimación de impuestos</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()"><i class="fas fa-lock"></i> Ingresar</button>
+    <div class="err-msg" id="loginError"></div>
+  </div>
+</div>
+
+<div id="appWrap">
+  <div class="topbar">
+    <div class="brand">IAC <span>Finanzas</span></div>
+    <div class="topbar-right">
+      <span id="adminEmail"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="resumen" onclick="switchTab('resumen')">Resumen</button>
+    <button class="tab-btn" data-tab="costos" onclick="switchTab('costos')">Costos</button>
+    <button class="tab-btn" data-tab="socios" onclick="switchTab('socios')">Socios</button>
+  </div>
+
+  <main>
+
+    <!-- ============ RESUMEN ============ -->
+    <section class="tab-panel active" id="panel-resumen">
+      <div class="disclaimer">
+        <i class="fas fa-triangle-exclamation"></i>
+        <div><strong>Esto es una estimación para planificar caja, no un cálculo tributario válido.</strong>
+        El IVA neto y el PPM son obligaciones mensuales reales, pero el IDPC anual proyectado es solo
+        informativo — se determina en la Operación Renta (abril), y el PPM ya pagado durante el año se
+        descuenta de él. Confirma siempre las cifras reales con tu contador antes de tomar decisiones.</div>
+      </div>
+
+      <div class="filtros">
+        <div class="field">
+          <label>Desde</label>
+          <input type="date" id="resDesde">
+        </div>
+        <div class="field">
+          <label>Hasta</label>
+          <input type="date" id="resHasta">
+        </div>
+        <button class="btn btn-primary" style="width:auto" onclick="loadResumen()"><i class="fas fa-filter"></i> Filtrar</button>
+        <div class="filtros-atajos">
+          <button class="btn btn-ghost btn-sm" onclick="atajoFecha('mes')">Este mes</button>
+          <button class="btn btn-ghost btn-sm" onclick="atajoFecha('anio')">Este año</button>
+          <button class="btn btn-ghost btn-sm" onclick="atajoFecha('todo')">Todo</button>
+        </div>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi"><div class="lbl">Ingresos del sorteo</div><div class="val gold" id="kpiIngresos">—</div></div>
+        <div class="kpi"><div class="lbl">Costos fijos</div><div class="val" id="kpiCostosFijos">—</div></div>
+        <div class="kpi"><div class="lbl">Costos variables</div><div class="val" id="kpiCostosVariables">—</div></div>
+        <div class="kpi"><div class="lbl">Utilidad operativa</div><div class="val green" id="kpiUtilidadOperativa">—</div></div>
+      </div>
+
+      <div class="card">
+        <h2>Estimación de impuestos del período</h2>
+        <div class="kpi-grid">
+          <div class="kpi"><div class="lbl">IVA débito</div><div class="val" id="kpiIvaDebito">—</div></div>
+          <div class="kpi"><div class="lbl">IVA crédito (costos con factura)</div><div class="val" id="kpiIvaCredito">—</div></div>
+          <div class="kpi"><div class="lbl">IVA neto a pagar</div><div class="val orange" id="kpiIvaNeto">—</div></div>
+          <div class="kpi"><div class="lbl">PPM (0,25% s/ingresos)</div><div class="val orange" id="kpiPpm">—</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Utilidad disponible estimada del período</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:10px">Ingresos − costos − IVA neto − PPM (no incluye IDPC, que se paga una vez al año)</p>
+        <div class="val green" style="font-size:36px" id="kpiUtilidadDisponible">—</div>
+      </div>
+
+      <div class="card">
+        <h2>IDPC anual proyectado <span style="font-size:11px;color:var(--muted);text-transform:none;font-weight:400">(informativo, no se resta arriba)</span></h2>
+        <div class="val" style="font-size:30px" id="kpiIdpc">—</div>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">12,5% sobre la utilidad operativa del período — tasa transitoria Pro Pyme 2025-2027 (Ley 21.755). Sube a 15% en 2028 y a 25% desde 2029.</p>
+      </div>
+    </section>
+
+    <!-- ============ COSTOS ============ -->
+    <section class="tab-panel" id="panel-costos">
+      <div class="card">
+        <h2>Registrar costo</h2>
+        <div class="form-grid">
+          <div class="field"><label>Fecha</label><input type="date" id="cFecha"></div>
+          <div class="field">
+            <label>Tipo</label>
+            <select id="cTipo"><option value="fijo">Fijo</option><option value="variable">Variable</option></select>
+          </div>
+          <div class="field">
+            <label>Categoría</label>
+            <select id="cCategoria">
+              <option value="arriendo">Arriendo</option>
+              <option value="sueldos">Sueldos</option>
+              <option value="comision_mp">Comisión Mercado Pago</option>
+              <option value="marketing">Marketing / Publicidad</option>
+              <option value="hosting_software">Hosting / Software</option>
+              <option value="importacion">Importación (flete/aduana)</option>
+              <option value="premio_sorteo">Premio del sorteo</option>
+              <option value="premio_ranking">Premio del ranking</option>
+              <option value="legal_contable">Legal / Contable</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+          <div class="field"><label>Monto (CLP)</label><input type="number" id="cMonto" min="1" step="1"></div>
+          <div class="field">
+            <label>Pagado por</label>
+            <select id="cPagadoPor"><option value="">La empresa</option></select>
+          </div>
+          <div class="field full"><label>Descripción</label><textarea id="cDescripcion"></textarea></div>
+          <div class="field full">
+            <label class="toggle"><input type="checkbox" id="cConFactura"> Tiene factura (genera crédito fiscal de IVA)</label>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;margin-top:6px" onclick="guardarCosto()"><i class="fas fa-plus"></i> Registrar costo</button>
+        <div class="err-msg" id="costoError"></div>
+      </div>
+
+      <div class="card">
+        <h2>Historial de costos</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Descripción</th><th>Monto</th><th>Factura</th><th>Pagado por</th><th>Origen</th><th></th></tr></thead>
+            <tbody id="costosBody"><tr><td colspan="9" class="empty">Cargando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SOCIOS ============ -->
+    <section class="tab-panel" id="panel-socios">
+      <div class="card">
+        <h2>Registrar socio</h2>
+        <div class="form-grid">
+          <div class="field"><label>Nombre</label><input type="text" id="sNombre"></div>
+          <div class="field"><label>RUT</label><input type="text" id="sRut"></div>
+          <div class="field"><label>% Participación</label><input type="number" id="sPorcentaje" min="0" max="100" step="0.01"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;margin-top:6px" onclick="guardarSocio()"><i class="fas fa-plus"></i> Registrar socio</button>
+        <div class="err-msg" id="socioError"></div>
+      </div>
+
+      <div class="card">
+        <h2>Socios registrados</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>RUT</th><th>% Participación</th></tr></thead>
+            <tbody id="sociosBody"><tr><td colspan="3" class="empty">Cargando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/config.js?v=20260823b"></script>
+<script src="js/stamper-api.js?v=20260823c"></script>
+<script>
+let sociosCache = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  stamperAPI.init();
+  stamperAPI.client.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').style.display = 'block';
+      document.getElementById('adminEmail').textContent = session.user.email;
+      initApp();
+    } else {
+      document.getElementById('appWrap').style.display = 'none';
+      document.getElementById('loginWrap').style.display = 'flex';
+    }
+  });
+});
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  try {
+    await stamperAPI.signIn(email, pass);
+  } catch (e) {
+    errEl.textContent = 'Credenciales incorrectas.';
+  }
+}
+
+async function doLogout() {
+  await stamperAPI.signOut();
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  if (name === 'resumen') loadResumen();
+  if (name === 'costos') loadCostos();
+  if (name === 'socios') loadSocios();
+}
+
+function initApp() {
+  document.getElementById('cFecha').value = new Date().toISOString().slice(0, 10);
+  loadSocios().then(loadResumen);
+}
+
+/* ---------- Resumen ---------- */
+function atajoFecha(tipo) {
+  const hoy = new Date();
+  let desde = '', hasta = '';
+  if (tipo === 'mes') {
+    desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().slice(0, 10);
+    hasta = new Date().toISOString().slice(0, 10);
+  } else if (tipo === 'anio') {
+    desde = new Date(hoy.getFullYear(), 0, 1).toISOString().slice(0, 10);
+    hasta = new Date().toISOString().slice(0, 10);
+  }
+  document.getElementById('resDesde').value = desde;
+  document.getElementById('resHasta').value = hasta;
+  loadResumen();
+}
+
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return '$' + Number(n).toLocaleString('es-CL');
+}
+
+async function loadResumen() {
+  const desde = document.getElementById('resDesde').value || null;
+  const hasta = document.getElementById('resHasta').value || null;
+  try {
+    const r = await stamperAPI.getResumenFinanciero(desde, hasta);
+    if (!r) return;
+    document.getElementById('kpiIngresos').textContent = fmt(r.ingresos_sorteo);
+    document.getElementById('kpiCostosFijos').textContent = fmt(r.costos_fijos);
+    document.getElementById('kpiCostosVariables').textContent = fmt(r.costos_variables);
+    document.getElementById('kpiUtilidadOperativa').textContent = fmt(r.utilidad_operativa);
+    document.getElementById('kpiIvaDebito').textContent = fmt(r.iva_debito_estimado);
+    document.getElementById('kpiIvaCredito').textContent = fmt(r.iva_credito_estimado);
+    document.getElementById('kpiIvaNeto').textContent = fmt(r.iva_neto_estimado);
+    document.getElementById('kpiPpm').textContent = fmt(r.ppm_estimado);
+    document.getElementById('kpiIdpc').textContent = fmt(r.idpc_anual_proyectado);
+    document.getElementById('kpiUtilidadDisponible').textContent = fmt(r.utilidad_disponible_estimada);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+/* ---------- Costos ---------- */
+async function loadCostos() {
+  const body = document.getElementById('costosBody');
+  body.innerHTML = '<tr><td colspan="9" class="empty">Cargando…</td></tr>';
+  try {
+    const costos = await stamperAPI.getCostos();
+    if (!costos.length) {
+      body.innerHTML = '<tr><td colspan="9" class="empty">Todavía no hay costos registrados.</td></tr>';
+      return;
+    }
+    body.innerHTML = costos.map(c => `
+      <tr>
+        <td>${c.fecha}</td>
+        <td><span class="pill pill-${c.tipo}">${c.tipo}</span></td>
+        <td>${c.categoria.replace(/_/g, ' ')}</td>
+        <td>${escapeHtml(c.descripcion || '')}</td>
+        <td>${fmt(c.monto)}</td>
+        <td>${c.con_factura ? '<i class="fas fa-check" style="color:var(--green)"></i>' : '—'}</td>
+        <td>${c.socios?.nombre || 'La empresa'}</td>
+        <td><span class="pill pill-${c.origen === 'automatico' ? 'auto' : 'manual'}">${c.origen}</span></td>
+        <td><button class="icon-btn" onclick="eliminarCosto('${c.id}')" title="Eliminar"><i class="fas fa-trash"></i></button></td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    console.error(e);
+    body.innerHTML = '<tr><td colspan="9" class="empty">Error al cargar.</td></tr>';
+  }
+}
+
+async function guardarCosto() {
+  const errEl = document.getElementById('costoError');
+  errEl.textContent = '';
+  const monto = Number(document.getElementById('cMonto').value);
+  if (!monto || monto <= 0) { errEl.textContent = 'El monto debe ser mayor a 0.'; return; }
+  try {
+    await stamperAPI.addCosto({
+      fecha: document.getElementById('cFecha').value,
+      tipo: document.getElementById('cTipo').value,
+      categoria: document.getElementById('cCategoria').value,
+      descripcion: document.getElementById('cDescripcion').value.trim() || null,
+      monto,
+      con_factura: document.getElementById('cConFactura').checked,
+      pagado_por: document.getElementById('cPagadoPor').value || null,
+    });
+    document.getElementById('cMonto').value = '';
+    document.getElementById('cDescripcion').value = '';
+    document.getElementById('cConFactura').checked = false;
+    loadCostos();
+  } catch (e) {
+    errEl.textContent = 'No se pudo registrar el costo.';
+  }
+}
+
+async function eliminarCosto(id) {
+  if (!confirm('¿Eliminar este costo?')) return;
+  try {
+    await stamperAPI.deleteCosto(id);
+    loadCostos();
+  } catch (e) {
+    alert('No se pudo eliminar.');
+  }
+}
+
+/* ---------- Socios ---------- */
+async function loadSocios() {
+  const body = document.getElementById('sociosBody');
+  try {
+    sociosCache = await stamperAPI.getSocios();
+    const select = document.getElementById('cPagadoPor');
+    select.innerHTML = '<option value="">La empresa</option>' +
+      sociosCache.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+
+    if (!sociosCache.length) {
+      body.innerHTML = '<tr><td colspan="3" class="empty">Todavía no hay socios registrados.</td></tr>';
+      return;
+    }
+    body.innerHTML = sociosCache.map(s => `
+      <tr>
+        <td>${escapeHtml(s.nombre)}</td>
+        <td>${escapeHtml(s.rut || '—')}</td>
+        <td>${s.porcentaje_participacion !== null ? s.porcentaje_participacion + '%' : '—'}</td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    console.error(e);
+    body.innerHTML = '<tr><td colspan="3" class="empty">Error al cargar.</td></tr>';
+  }
+}
+
+async function guardarSocio() {
+  const errEl = document.getElementById('socioError');
+  errEl.textContent = '';
+  const nombre = document.getElementById('sNombre').value.trim();
+  if (!nombre) { errEl.textContent = 'El nombre es obligatorio.'; return; }
+  try {
+    await stamperAPI.saveSocio({
+      nombre,
+      rut: document.getElementById('sRut').value.trim() || null,
+      porcentaje_participacion: document.getElementById('sPorcentaje').value || null,
+    });
+    document.getElementById('sNombre').value = '';
+    document.getElementById('sRut').value = '';
+    document.getElementById('sPorcentaje').value = '';
+    loadSocios();
+  } catch (e) {
+    errEl.textContent = 'No se pudo registrar el socio.';
+  }
+}
+</script>
+</body>
+</html>

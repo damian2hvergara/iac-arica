@@ -107,8 +107,14 @@ Deno.serve(async (req: Request) => {
   }
 
   if (status === 'approved') {
+    // Ver mp-process-payment: misma lógica para el costo automático de
+    // comisión de Mercado Pago (Finanzas, parte 53).
+    const feeAmount: number = Array.isArray(mpData.fee_details)
+      ? mpData.fee_details.reduce((acc: number, f: any) => acc + (Number(f?.amount) || 0), 0)
+      : 0;
     const resultado = await confirmarPagoAprobado(supabase, {
       ordenId, mpPaymentId: String(mpData.id), mpPaymentType: mpData.payment_type_id ?? null, source: 'mp-webhook',
+      mpFeeAmount: feeAmount,
     });
     return json({ ok: resultado.ok, confirmed: resultado.ok, status }, resultado.ok ? 200 : 500);
   }

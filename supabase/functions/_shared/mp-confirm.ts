@@ -17,13 +17,19 @@ interface ConfirmarPagoOpts {
   mpPaymentId: string;
   mpPaymentType: string | null;
   source: string; // 'mp-process-payment' | 'mp-webhook' — para los logs
+  // Suma de fee_details[].amount que devuelve Mercado Pago en el pago
+  // real — se usa para cargar la comisión como costo automático en el
+  // módulo de Finanzas (parte 53). Si no viene (webhook viejo, o MP no
+  // lo informó), simplemente no se carga ese costo — nunca bloquea la
+  // confirmación del pago, que es lo único que de verdad importa acá.
+  mpFeeAmount?: number | null;
 }
 
 export async function confirmarPagoAprobado(
   supabase: any,
   opts: ConfirmarPagoOpts
 ): Promise<{ ok: boolean; folios?: any[]; alreadyProcessed?: boolean; error?: string }> {
-  const { ordenId, mpPaymentId, mpPaymentType, source } = opts;
+  const { ordenId, mpPaymentId, mpPaymentType, source, mpFeeAmount } = opts;
 
   const { data: folios, error } = await supabase.rpc('confirmar_orden', { p_orden_id: ordenId });
   if (error) {
@@ -42,6 +48,20 @@ export async function confirmarPagoAprobado(
   await supabase.from('ordenes').update({
     mp_payment_id: mpPaymentId, mp_payment_status: 'approved', mp_payment_type: mpPaymentType,
   }).eq('id', ordenId);
+
+  // Costo automático de la comisión que cobra Mercado Pago por esta
+  // venta (módulo de Finanzas, parte 53) — nunca debe bloquear ni
+  // retrasar la confirmación real del pago, por eso va suelto y en
+  // silencio si falla.
+  if (mpFeeAmount && mpFeeAmount > 0) {
+    supabase.from('costos').insert({
+      tipo: 'variable', categoria: 'comision_mp', origen: 'automatico',
+      descripcion: `Comisión Mercado Pago — pago ${mpPaymentId}`,
+      monto: Math.round(mpFeeAmount), orden_id: ordenId,
+    }).then(({ error: errCosto }: any) => {
+      if (errCosto) console.error(`${source}: no se pudo registrar el costo de comisión MP:`, errCosto);
+    });
+  }
 
   try {
     const { data: orden } = await supabase

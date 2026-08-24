@@ -602,6 +602,94 @@ class StamperAPI {
             return null;
         }
     }
+
+    // ====================================
+    // FINANZAS — admin-only (parte 53)
+    // ====================================
+
+    // p_desde/p_hasta en formato 'YYYY-MM-DD', o null para "todo el histórico".
+    async getResumenFinanciero(desde = null, hasta = null) {
+        try {
+            const { data, error } = await this.client
+                .rpc('resumen_financiero', { p_desde: desde, p_hasta: hasta });
+            if (error) throw error;
+            return data && data[0];
+        } catch (error) {
+            console.error('Error getResumenFinanciero:', error);
+            throw error;
+        }
+    }
+
+    async getCostos(desde = null, hasta = null) {
+        try {
+            let query = this.client
+                .from('costos')
+                .select('*, socios(nombre)')
+                .order('fecha', { ascending: false })
+                .order('created_at', { ascending: false });
+            if (desde) query = query.gte('fecha', desde);
+            if (hasta) query = query.lte('fecha', hasta);
+            const { data, error } = await query;
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error getCostos:', error);
+            throw error;
+        }
+    }
+
+    async addCosto(costo) {
+        try {
+            const { data, error } = await this.client
+                .from('costos').insert([costo]).select().single();
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error addCosto:', error);
+            throw error;
+        }
+    }
+
+    async deleteCosto(id) {
+        try {
+            const { error } = await this.client.from('costos').delete().eq('id', id);
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error deleteCosto:', error);
+            throw error;
+        }
+    }
+
+    async getSocios() {
+        try {
+            const { data, error } = await this.client
+                .from('socios').select('*').order('created_at', { ascending: true });
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error getSocios:', error);
+            throw error;
+        }
+    }
+
+    async saveSocio(socio) {
+        try {
+            const { id, ...fields } = socio;
+            if (id) {
+                const { data, error } = await this.client
+                    .from('socios').update(fields).eq('id', id).select().single();
+                if (error) throw error;
+                return data;
+            }
+            const { data, error } = await this.client
+                .from('socios').insert([fields]).select().single();
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error saveSocio:', error);
+            throw error;
+        }
+    }
 }
 
 /**
