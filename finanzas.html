@@ -127,6 +127,8 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
   <div class="tabs">
     <button class="tab-btn active" data-tab="resumen" onclick="switchTab('resumen')">Resumen</button>
     <button class="tab-btn" data-tab="costos" onclick="switchTab('costos')">Costos</button>
+    <button class="tab-btn" data-tab="retiros" onclick="switchTab('retiros')">Retiros</button>
+    <button class="tab-btn" data-tab="cierres" onclick="switchTab('cierres')">Cierres Mensuales</button>
     <button class="tab-btn" data-tab="socios" onclick="switchTab('socios')">Socios</button>
   </div>
 
@@ -171,19 +173,35 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
         <div class="kpi-grid">
           <div class="kpi"><div class="lbl">IVA débito</div><div class="val" id="kpiIvaDebito">—</div></div>
           <div class="kpi"><div class="lbl">IVA crédito (costos con factura)</div><div class="val" id="kpiIvaCredito">—</div></div>
-          <div class="kpi"><div class="lbl">IVA neto a pagar</div><div class="val orange" id="kpiIvaNeto">—</div></div>
-          <div class="kpi"><div class="lbl">PPM (0,25% s/ingresos)</div><div class="val orange" id="kpiPpm">—</div></div>
+          <div class="kpi"><div class="lbl">IVA neto estimado</div><div class="val orange" id="kpiIvaNeto">—</div></div>
+          <div class="kpi"><div class="lbl">PPM estimado (0,25% s/ingresos)</div><div class="val orange" id="kpiPpm">—</div></div>
+        </div>
+        <p style="color:var(--muted);font-size:11.5px;margin-top:6px">"Estimado" = lo que calcula esta pantalla en vivo. Lo que realmente se pagó en el F29 de cada mes se registra aparte en la pestaña <strong>Cierres Mensuales</strong>.</p>
+        <div class="kpi-grid" style="margin-top:14px">
+          <div class="kpi"><div class="lbl">IVA realmente pagado (cierres)</div><div class="val" id="kpiIvaReal">—</div></div>
+          <div class="kpi"><div class="lbl">PPM realmente pagado (cierres)</div><div class="val" id="kpiPpmReal">—</div></div>
         </div>
       </div>
 
       <div class="card">
         <h2>Utilidad disponible estimada del período</h2>
-        <p style="color:var(--muted);font-size:12.5px;margin-bottom:10px">Ingresos − costos − IVA neto − PPM (no incluye IDPC, que se paga una vez al año)</p>
-        <div class="val green" style="font-size:36px" id="kpiUtilidadDisponible">—</div>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:10px">Ingresos − costos − IVA neto − PPM (no incluye IDPC, que se paga una vez al año) — antes de descontar retiros</p>
+        <div class="val" style="font-size:26px" id="kpiUtilidadDisponible">—</div>
         <p style="color:var(--orange);font-size:12px;margin-top:10px"><i class="fas fa-clock"></i>
         Mercado Pago libera el dinero de cada venta 10 días después de confirmada (crédito,
         débito, transferencia, dinero en cuenta MP y tarjetas prepago) — esta cifra es lo que
         ya se ganó, no necesariamente lo que ya está disponible en la cuenta bancaria hoy.</p>
+      </div>
+
+      <div class="card">
+        <h2>Efectivo disponible tras retiros</h2>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:10px">Utilidad disponible − retiros de socios del período. Un retiro NO es un gasto tributario (no baja el IDPC), pero sí baja la plata que queda — por eso se resta acá, no en los costos.</p>
+        <div class="val green" style="font-size:36px" id="kpiEfectivoTrasRetiros">—</div>
+        <p style="color:var(--muted);font-size:12px;margin-top:8px">Retiros del período: <span id="kpiRetiros">—</span></p>
+        <p style="color:var(--orange);font-size:12px;margin-top:6px"><i class="fas fa-triangle-exclamation"></i>
+        Cada retiro genera impuesto personal (Global Complementario) para el socio que lo hizo,
+        liquidado en la Operación Renta de abril del año siguiente — con crédito por el IDPC
+        que ya pagó la empresa, pero no es plata 100% libre de impuesto para el socio.</p>
       </div>
 
       <div class="card">
@@ -243,6 +261,84 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
       </div>
     </section>
 
+    <!-- ============ RETIROS ============ -->
+    <section class="tab-panel" id="panel-retiros">
+      <div class="disclaimer">
+        <i class="fas fa-triangle-exclamation"></i>
+        <div>Un retiro <strong>no es un gasto tributario</strong> — no reduce la utilidad ni el IDPC
+        de la empresa, es un reparto de utilidad ya generada. Solo reduce el efectivo disponible.
+        Cada retiro genera impuesto personal (Global Complementario) para el socio, liquidado en
+        la Operación Renta de abril del año siguiente, con crédito por el IDPC que pagó la empresa.</div>
+      </div>
+
+      <div class="card">
+        <h2>Registrar retiro</h2>
+        <div class="form-grid">
+          <div class="field"><label>Fecha</label><input type="date" id="rFecha"></div>
+          <div class="field">
+            <label>Socio</label>
+            <select id="rSocio"></select>
+          </div>
+          <div class="field"><label>Monto (CLP)</label><input type="number" id="rMonto" min="1" step="1"></div>
+          <div class="field full"><label>Descripción</label><textarea id="rDescripcion"></textarea></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;margin-top:6px" onclick="guardarRetiro()"><i class="fas fa-plus"></i> Registrar retiro</button>
+        <div class="err-msg" id="retiroError"></div>
+      </div>
+
+      <div class="card">
+        <h2>Historial de retiros</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Socio</th><th>Monto</th><th>Descripción</th><th></th></tr></thead>
+            <tbody id="retirosBody"><tr><td colspan="5" class="empty">Cargando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CIERRES MENSUALES ============ -->
+    <section class="tab-panel" id="panel-cierres">
+      <div class="disclaimer">
+        <i class="fas fa-circle-info"></i>
+        <div>Registra acá lo que <strong>realmente</strong> se pagó en el F29 de cada mes (IVA y PPM)
+        una vez que el mes queda cerrado — es un registro histórico fijo, distinto de la estimación
+        en vivo que calcula la pestaña Resumen. Si vuelves a guardar el mismo mes/año, se actualiza.</div>
+      </div>
+
+      <div class="card">
+        <h2>Cerrar un mes</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label>Mes</label>
+            <select id="czMes">
+              <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option>
+              <option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option>
+              <option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option>
+              <option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+            </select>
+          </div>
+          <div class="field"><label>Año</label><input type="number" id="czAnio" min="2026" step="1"></div>
+          <div class="field"><label>IVA pagado (CLP)</label><input type="number" id="czIva" min="0" step="1"></div>
+          <div class="field"><label>PPM pagado (CLP)</label><input type="number" id="czPpm" min="0" step="1"></div>
+          <div class="field"><label>Fecha de pago</label><input type="date" id="czFechaPago"></div>
+          <div class="field full"><label>Nota</label><textarea id="czNota"></textarea></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;margin-top:6px" onclick="guardarCierre()"><i class="fas fa-check"></i> Guardar cierre del mes</button>
+        <div class="err-msg" id="cierreError"></div>
+      </div>
+
+      <div class="card">
+        <h2>Historial de cierres</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Mes</th><th>IVA pagado</th><th>PPM pagado</th><th>Fecha de pago</th><th>Nota</th></tr></thead>
+            <tbody id="cierresBody"><tr><td colspan="5" class="empty">Cargando…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ SOCIOS ============ -->
     <section class="tab-panel" id="panel-socios">
       <div class="card">
@@ -271,7 +367,7 @@ textarea{width:100%;padding:11px 12px;background:var(--surface-2);border:1px sol
 </div>
 
 <script src="js/config.js?v=20260823b"></script>
-<script src="js/stamper-api.js?v=20260823c"></script>
+<script src="js/stamper-api.js?v=20260824a"></script>
 <script>
 let sociosCache = [];
 
@@ -311,11 +407,17 @@ function switchTab(name) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
   if (name === 'resumen') loadResumen();
   if (name === 'costos') loadCostos();
+  if (name === 'retiros') loadRetiros();
+  if (name === 'cierres') loadCierres();
   if (name === 'socios') loadSocios();
 }
 
 function initApp() {
   document.getElementById('cFecha').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('rFecha').value = new Date().toISOString().slice(0, 10);
+  const hoy = new Date();
+  document.getElementById('czMes').value = hoy.getMonth() + 1;
+  document.getElementById('czAnio').value = hoy.getFullYear();
   loadSocios().then(loadResumen);
 }
 
@@ -353,9 +455,13 @@ async function loadResumen() {
     document.getElementById('kpiIvaDebito').textContent = fmt(r.iva_debito_estimado);
     document.getElementById('kpiIvaCredito').textContent = fmt(r.iva_credito_estimado);
     document.getElementById('kpiIvaNeto').textContent = fmt(r.iva_neto_estimado);
+    document.getElementById('kpiIvaReal').textContent = fmt(r.iva_pagado_real);
     document.getElementById('kpiPpm').textContent = fmt(r.ppm_estimado);
+    document.getElementById('kpiPpmReal').textContent = fmt(r.ppm_pagado_real);
     document.getElementById('kpiIdpc').textContent = fmt(r.idpc_anual_proyectado);
     document.getElementById('kpiUtilidadDisponible').textContent = fmt(r.utilidad_disponible_estimada);
+    document.getElementById('kpiRetiros').textContent = fmt(r.retiros_socios);
+    document.getElementById('kpiEfectivoTrasRetiros').textContent = fmt(r.efectivo_disponible_tras_retiros);
   } catch (e) {
     console.error(e);
   }
@@ -424,6 +530,114 @@ async function eliminarCosto(id) {
   }
 }
 
+/* ---------- Retiros ---------- */
+async function loadRetiros() {
+  const body = document.getElementById('retirosBody');
+  body.innerHTML = '<tr><td colspan="5" class="empty">Cargando…</td></tr>';
+  try {
+    const retiros = await stamperAPI.getRetiros();
+    if (!retiros.length) {
+      body.innerHTML = '<tr><td colspan="5" class="empty">Todavía no hay retiros registrados.</td></tr>';
+      return;
+    }
+    body.innerHTML = retiros.map(r => `
+      <tr>
+        <td>${r.fecha}</td>
+        <td>${escapeHtml(r.socios?.nombre || '—')}</td>
+        <td>${fmt(r.monto)}</td>
+        <td>${escapeHtml(r.descripcion || '')}</td>
+        <td><button class="icon-btn" onclick="eliminarRetiro('${r.id}')" title="Eliminar"><i class="fas fa-trash"></i></button></td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    console.error(e);
+    body.innerHTML = '<tr><td colspan="5" class="empty">Error al cargar.</td></tr>';
+  }
+}
+
+async function guardarRetiro() {
+  const errEl = document.getElementById('retiroError');
+  errEl.textContent = '';
+  const socioId = document.getElementById('rSocio').value;
+  const monto = Number(document.getElementById('rMonto').value);
+  if (!socioId) { errEl.textContent = 'Elige un socio.'; return; }
+  if (!monto || monto <= 0) { errEl.textContent = 'El monto debe ser mayor a 0.'; return; }
+  try {
+    await stamperAPI.addRetiro({
+      socio_id: socioId,
+      fecha: document.getElementById('rFecha').value,
+      monto,
+      descripcion: document.getElementById('rDescripcion').value.trim() || null,
+    });
+    document.getElementById('rMonto').value = '';
+    document.getElementById('rDescripcion').value = '';
+    loadRetiros();
+  } catch (e) {
+    errEl.textContent = 'No se pudo registrar el retiro.';
+  }
+}
+
+async function eliminarRetiro(id) {
+  if (!confirm('¿Eliminar este retiro?')) return;
+  try {
+    await stamperAPI.deleteRetiro(id);
+    loadRetiros();
+  } catch (e) {
+    alert('No se pudo eliminar.');
+  }
+}
+
+/* ---------- Cierres mensuales ---------- */
+const NOMBRES_MES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+async function loadCierres() {
+  const body = document.getElementById('cierresBody');
+  body.innerHTML = '<tr><td colspan="5" class="empty">Cargando…</td></tr>';
+  try {
+    const cierres = await stamperAPI.getCierresMensuales();
+    if (!cierres.length) {
+      body.innerHTML = '<tr><td colspan="5" class="empty">Todavía no hay meses cerrados.</td></tr>';
+      return;
+    }
+    body.innerHTML = cierres.map(c => `
+      <tr>
+        <td>${NOMBRES_MES[c.mes]} ${c.anio}</td>
+        <td>${fmt(c.iva_pagado)}</td>
+        <td>${fmt(c.ppm_pagado)}</td>
+        <td>${c.fecha_pago || '—'}</td>
+        <td>${escapeHtml(c.nota || '')}</td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    console.error(e);
+    body.innerHTML = '<tr><td colspan="5" class="empty">Error al cargar.</td></tr>';
+  }
+}
+
+async function guardarCierre() {
+  const errEl = document.getElementById('cierreError');
+  errEl.textContent = '';
+  const anio = Number(document.getElementById('czAnio').value);
+  if (!anio) { errEl.textContent = 'Ingresa el año.'; return; }
+  try {
+    await stamperAPI.saveCierreMensual({
+      anio,
+      mes: Number(document.getElementById('czMes').value),
+      iva_pagado: Number(document.getElementById('czIva').value) || 0,
+      ppm_pagado: Number(document.getElementById('czPpm').value) || 0,
+      fecha_pago: document.getElementById('czFechaPago').value || null,
+      nota: document.getElementById('czNota').value.trim() || null,
+    });
+    document.getElementById('czIva').value = '';
+    document.getElementById('czPpm').value = '';
+    document.getElementById('czFechaPago').value = '';
+    document.getElementById('czNota').value = '';
+    loadCierres();
+  } catch (e) {
+    errEl.textContent = 'No se pudo guardar el cierre.';
+  }
+}
+
 /* ---------- Socios ---------- */
 async function loadSocios() {
   const body = document.getElementById('sociosBody');
@@ -432,6 +646,8 @@ async function loadSocios() {
     const select = document.getElementById('cPagadoPor');
     select.innerHTML = '<option value="">La empresa</option>' +
       sociosCache.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
+    const selectRetiro = document.getElementById('rSocio');
+    selectRetiro.innerHTML = sociosCache.map(s => `<option value="${s.id}">${escapeHtml(s.nombre)}</option>`).join('');
 
     if (!sociosCache.length) {
       body.innerHTML = '<tr><td colspan="3" class="empty">Todavía no hay socios registrados.</td></tr>';

@@ -690,6 +690,77 @@ class StamperAPI {
             throw error;
         }
     }
+
+    // Retiros de socios — separado de costos a propósito: no son un
+    // gasto deducible tributariamente, solo reducen el efectivo
+    // disponible (ver 05-Progreso/2026-08-24.md).
+    async getRetiros(desde = null, hasta = null) {
+        try {
+            let query = this.client
+                .from('retiros_socios')
+                .select('*, socios(nombre)')
+                .order('fecha', { ascending: false });
+            if (desde) query = query.gte('fecha', desde);
+            if (hasta) query = query.lte('fecha', hasta);
+            const { data, error } = await query;
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error getRetiros:', error);
+            throw error;
+        }
+    }
+
+    async addRetiro(retiro) {
+        try {
+            const { data, error } = await this.client
+                .from('retiros_socios').insert([retiro]).select().single();
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error addRetiro:', error);
+            throw error;
+        }
+    }
+
+    async deleteRetiro(id) {
+        try {
+            const { error } = await this.client.from('retiros_socios').delete().eq('id', id);
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error deleteRetiro:', error);
+            throw error;
+        }
+    }
+
+    // Cierres mensuales — lo realmente pagado de IVA/PPM cada mes (F29),
+    // separado de la estimación en vivo del Resumen.
+    async getCierresMensuales() {
+        try {
+            const { data, error } = await this.client
+                .from('cierres_mensuales').select('*')
+                .order('anio', { ascending: false }).order('mes', { ascending: false });
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error getCierresMensuales:', error);
+            throw error;
+        }
+    }
+
+    async saveCierreMensual(cierre) {
+        try {
+            const { data, error } = await this.client
+                .from('cierres_mensuales')
+                .upsert([cierre], { onConflict: 'anio,mes' })
+                .select().single();
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('Error saveCierreMensual:', error);
+            throw error;
+        }
+    }
 }
 
 /**
