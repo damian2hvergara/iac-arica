@@ -21,7 +21,7 @@
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { logEvent } from '../_shared/log-event.ts';
-import { confirmarPagoAprobado, marcarPagoRechazado } from '../_shared/mp-confirm.ts';
+import { confirmarPagoAprobado, marcarPagoRechazado, registrarComisionMpSiFalta } from '../_shared/mp-confirm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -103,6 +103,12 @@ Deno.serve(async (req: Request) => {
   const { data: orden } = await supabase.from('ordenes').select('estado').eq('id', ordenId).maybeSingle();
   if (!orden) return json({ ok: false, error: 'orden_no_encontrada' }, 404);
   if (orden.estado !== 'pendiente_pago') {
+    // La orden ya se confirmó (normalmente vía mp-process-payment, que a
+    // veces no alcanza a traer fee_details) — este webhook igual sirve
+    // para completar el costo de comisión si quedó sin registrar.
+    if (orden.estado === 'completado' && status === 'approved') {
+      await registrarComisionMpSiFalta(supabase, ordenId, mpData);
+    }
     return json({ ok: true, confirmed: orden.estado === 'completado', alreadyProcessed: true, status }, 200);
   }
 

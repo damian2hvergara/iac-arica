@@ -195,6 +195,46 @@ export async function confirmarPagoAprobado(
   return { ok: true, folios };
 }
 
+/**
+ * El POST de creación del pago (mp-process-payment) a veces no trae
+ * fee_details poblado todavía — Mercado Pago calcula esa comisión con
+ * un servicio aparte ("processing_fee_charge") que no siempre llega a
+ * tiempo para la respuesta síncrona del pago. El webhook sí lo trae bien
+ * (es un GET al pago ya resuelto), pero normalmente no vuelve a tocar
+ * una orden que ya quedó "completada". Esta función corre esa ventana:
+ * si la orden ya está confirmada y el costo de comisión quedó en $0 o
+ * nunca se registró, lo completa acá — nunca genera un segundo costo si
+ * ya existe uno real.
+ */
+export async function registrarComisionMpSiFalta(
+  supabase: any,
+  ordenId: string,
+  mpData: any
+): Promise<void> {
+  try {
+    const { count } = await supabase
+      .from('costos')
+      .select('id', { count: 'exact', head: true })
+      .eq('orden_id', ordenId)
+      .eq('categoria', 'comision_mp');
+    if (count && count > 0) return;
+
+    const feeAmount = Array.isArray(mpData.fee_details)
+      ? mpData.fee_details.reduce((acc: number, f: any) => acc + (Number(f?.amount) || 0), 0)
+      : 0;
+    if (feeAmount <= 0) return;
+
+    const { error } = await supabase.from('costos').insert({
+      tipo: 'variable', categoria: 'comision_mp', origen: 'automatico',
+      descripcion: `Comisión Mercado Pago — pago ${mpData.id} (completado vía webhook)`,
+      monto: Math.round(feeAmount), orden_id: ordenId,
+    });
+    if (error) console.error('registrarComisionMpSiFalta: no se pudo insertar:', error);
+  } catch (e) {
+    console.error('registrarComisionMpSiFalta: error inesperado (no se propaga):', e);
+  }
+}
+
 export async function marcarPagoRechazado(
   supabase: any,
   opts: { ordenId: string; mpPaymentId: string; mpPaymentStatus: string; mpPaymentType: string | null }
