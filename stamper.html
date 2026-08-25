@@ -12,12 +12,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>No Sueñes, Gánatelo | Sorteo Dodge Challenger — Import American Cars</title>
-<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo con veedores independientes de un vehículo del inventario real de IAC Arica. Packs desde $5.500.">
+<meta name="description" content="Compra tu Sticker Digital y participa en el sorteo con veedores independientes de un vehículo del inventario real de IAC Stickers. Packs desde $5.500.">
 <link rel="canonical" href="https://iac-arica.cl/stamper.html">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="No Sueñes, Gánatelo">
-<meta property="og:description" content="Sorteo con veedores independientes de un vehículo importado por IAC Arica. Compra tu Sticker Digital coleccionable desde $5.500.">
+<meta property="og:description" content="Sorteo con veedores independientes de un vehículo importado por IAC Stickers. Compra tu Sticker Digital coleccionable desde $5.500.">
 <meta property="og:url" content="https://iac-arica.cl/stamper.html">
 <meta property="og:image" content="https://iac-arica.cl/img/challenger-og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -684,7 +684,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <a href="privacidad.html">Privacidad</a>
       <a href="contacto.html">Contacto</a>
     </div>
-    <div class="foot-brand">CV North Capital SpA — Import American Cars / IAC Arica · iac-arica.cl</div>
+    <div class="foot-brand">CV North Capital SpA — Import American Cars / IAC Stickers · iac-arica.cl</div>
   </footer>
 </main>
 
@@ -1641,7 +1641,7 @@ function showSuccess(orden, folios, comprador) {
 
   const shareUrl = `${window.location.origin}${window.location.pathname}?ref=${encodeURIComponent(orden.codigo_referido)}`;
   const waBtn = document.getElementById('shareWaBtn');
-  waBtn.href = `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Arica! Consigue tu sticker → ' + shareUrl)}`;
+  waBtn.href = `https://wa.me/?text=${encodeURIComponent('🏆 Estoy participando en el sorteo de IAC Stickers! Consigue tu sticker → ' + shareUrl)}`;
   waBtn.onclick = () => gaEcommerce('share_referral_link', { method: 'whatsapp' });
   window.__shareUrl = shareUrl;
   window.__codigoReferido = orden.codigo_referido;
@@ -1706,7 +1706,7 @@ async function shareImage() {
   ctx.textAlign = 'center';
   ctx.fillStyle = '#e9c876';
   ctx.font = '700 30px "DM Sans",sans-serif';
-  ctx.fillText('SORTEO CON VEEDORES · IAC ARICA', 540, 150);
+  ctx.fillText('SORTEO CON VEEDORES · IAC STICKERS', 540, 150);
 
   ctx.fillStyle = '#fff';
   ctx.font = '900 84px "Barlow Condensed",sans-serif';
@@ -1746,7 +1746,7 @@ async function shareImage() {
 
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
-        await navigator.share({ files: [file], title: 'Sorteo IAC Arica', text: 'Participa conmigo en el sorteo de IAC Arica → ' + shareUrl });
+        await navigator.share({ files: [file], title: 'Sorteo IAC Stickers', text: 'Participa conmigo en el sorteo de IAC Stickers → ' + shareUrl });
         return;
       } catch (e) {
         if (e?.name === 'AbortError') return; // el usuario canceló, no mostrar error
