@@ -906,7 +906,18 @@ async function renderRefBanner() {
 async function loadTopReferidores() {
   try {
     const top = await stamperAPI.topReferidores(20);
-    if (!top.length) return;
+    document.getElementById('referidoresSection').style.display = 'block';
+
+    if (!top.length) {
+      document.getElementById('referidoresList').innerHTML = `
+        <div class="ref-row" style="justify-content:center;text-align:center">
+          <span class="nm" style="flex:none;color:var(--muted)"><i class="fas fa-flag-checkered"></i> Todavía no hay referidos — ¡sé el primero del ranking!</span>
+        </div>
+      `;
+      document.getElementById('refToggleBtn').style.display = 'none';
+      return;
+    }
+
     const PRIZES = ['$300.000', '$150.000', '$50.000'];
     document.getElementById('referidoresList').innerHTML = top.map((r, i) => `
       <div class="ref-row ${i < 3 ? 'medal-' + (i + 1) : ''} ${i >= 5 ? 'ref-row-extra' : ''}" ${i >= 5 ? 'style="display:none"' : ''}>
@@ -935,8 +946,6 @@ async function loadTopReferidores() {
     } else {
       toggleBtn.style.display = 'none';
     }
-
-    document.getElementById('referidoresSection').style.display = 'block';
   } catch (e) {
     console.error('Error cargando top referidores:', e);
   }
