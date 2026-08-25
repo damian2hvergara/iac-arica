@@ -132,6 +132,7 @@ main{padding-top:56px}
   display:flex;align-items:center;justify-content:center;
   color:#0B0A09;font-size:10px;
 }
+.sticky-ref-link{display:flex;width:fit-content;max-width:calc(100% - 8px);margin:0 auto 8px;pointer-events:all}
 
 /* Trust badges */
 .trust-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:22px}
@@ -570,7 +571,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
       <div class="rule"></div>
       <div class="tag">Bronce · Plata · Oro</div>
     </div>
-    <p class="packs-intro">Cada pack trae una selección distinta de stickers digitales coleccionables de nuestro vehículo en sorteo. Cada Sticker Digital que compras suma tu número a la promoción del vehículo — mientras más stickers coleccionas, más números tienes participando.</p>
+    <p class="packs-intro">Cada pack incluye stickers digitales coleccionables. Cada sticker que compras suma un número para participar por el vehículo. ¡Colecciona más y aumenta tus oportunidades de ganar!</p>
     <div class="packs-grid" id="packsGrid">
       <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
       <div class="pack-card skeleton" style="height:220px;border-radius:16px"></div>
@@ -691,6 +692,7 @@ footer{border-top:1px solid var(--line);padding:32px 0 40px;margin-top:20px}
 
 <!-- ===== COMPRAR STICKER — visible en todo momento ===== -->
 <div class="buy-sticky needs-sorteo" id="buySticky">
+  <a href="#referidoresSection" class="hero-ref-link sticky-ref-link"><span class="ref-ico"><i class="fas fa-sack-dollar"></i></span> Invita y participa por $300.000</a>
   <a href="#packsSection" class="buy-sticky-btn"><i class="fas fa-ticket-alt"></i> Comprar mi Sticker Digital</a>
 </div>
 
