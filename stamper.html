@@ -23,9 +23,13 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="preconnect" href="https://api.mercadopago.com">
+<link rel="preconnect" href="https://www.mercadopago.cl">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
 <style>
 :root{
@@ -774,12 +778,23 @@ footer{border-top:1px solid var(--line);padding:32px 0 140px;margin-top:20px}
 </div>
 
 <script src="https://sdk.mercadopago.com/js/v2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js?v=20260823b"></script>
 <script src="js/stamper-api.js?v=20260824a"></script>
 <script>
 let sorteo = null, vehicle = null, packs = [], selectedPack = null;
 let countdownInterval = null;
 let galleryImages = [], galleryIndex = 0, galleryAutoTimer = null;
+
+// Las fotos vienen de Cloudinary a resolución completa (varias pesan
+// 500-630 KiB) — se usaban tal cual hasta para las miniaturas de 120px,
+// desperdiciando ancho de banda y disparando el LCP (hallazgo Lighthouse
+// 25-ago-2026). Inyecta f_auto,q_auto (formato/compresión automática) y
+// un ancho acorde al uso real justo después de "/upload/" en la URL.
+function cldUrl(url, transform) {
+  if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+  return url.replace('/upload/', `/upload/${transform}/`);
+}
 
 // Único método de pago: Mercado Pago (Payment Brick, embebido en este
 // mismo checkout). El checkout SIEMPRE pasa por Mercado Pago real
@@ -822,6 +837,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderRefBanner();
   checkMpReturn();
 
+  // packs_config y top_referidores no dependen del sorteo/vehículo —
+  // se piden en paralelo desde el arranque en vez de esperar a que
+  // termine la cadena sorteo→vehículo primero (hallazgo Lighthouse
+  // 25-ago-2026: esa cadena serial era la principal causante del
+  // retraso del LCP).
+  (async () => {
+    try {
+      packs = await stamperAPI.getPacks();
+      renderPacks();
+    } catch (e) {
+      console.error('Error cargando packs:', e);
+    }
+  })();
+  loadTopReferidores();
+
   try {
     sorteo = await stamperAPI.getSorteoPublico();
   } catch (e) {
@@ -846,15 +876,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Error cargando vehículo:', e);
     }
   }
-
-  try {
-    packs = await stamperAPI.getPacks();
-    renderPacks();
-  } catch (e) {
-    console.error('Error cargando packs:', e);
-  }
-
-  loadTopReferidores();
 });
 
 // La urgencia se comunica solo por tiempo (countdown), nunca mostrando
@@ -971,7 +992,7 @@ function renderHero() {
   }
   if (sorteo.hero_imagen_url) {
     const heroBg = document.getElementById('heroBg');
-    heroBg.style.backgroundImage = `url("${sorteo.hero_imagen_url}")`;
+    heroBg.style.backgroundImage = `url("${cldUrl(sorteo.hero_imagen_url, 'f_auto,q_auto,w_1600')}")`;
     heroBg.classList.add('show');
   }
 }
@@ -985,26 +1006,26 @@ function renderPremio() {
   let galleryIdx = 0;
   const showGalleryIdx = (idx) => {
     galleryIdx = idx;
-    mainImg.src = galleryImages[idx];
+    mainImg.src = cldUrl(galleryImages[idx], 'f_auto,q_auto,w_900');
     document.querySelectorAll('#premioThumbs img').forEach((t, i) => t.classList.toggle('active', i === idx));
   };
 
   if (galleryImages.length) {
-    mainImg.src = galleryImages[0];
+    mainImg.src = cldUrl(galleryImages[0], 'f_auto,q_auto,w_900');
     mainImg.classList.remove('skeleton');
     mainImg.alt = vehicle.name;
     mainImg.addEventListener('click', () => openLightbox(galleryIdx));
 
     if (!sorteo.hero_imagen_url) {
       const heroBg = document.getElementById('heroBg');
-      heroBg.style.backgroundImage = `url("${galleryImages[0]}")`;
+      heroBg.style.backgroundImage = `url("${cldUrl(galleryImages[0], 'f_auto,q_auto,w_1600')}")`;
       heroBg.classList.add('show');
     }
   }
 
   const thumbs = document.getElementById('premioThumbs');
   thumbs.innerHTML = galleryImages.map((url, i) => `
-    <img src="${url}" class="${i === 0 ? 'active' : ''}" data-idx="${i}" alt="Foto ${i + 1} de ${escapeHtml(vehicle.name)}">
+    <img src="${cldUrl(url, 'f_auto,q_auto,w_150,h_150,c_fill')}" class="${i === 0 ? 'active' : ''}" data-idx="${i}" alt="Foto ${i + 1} de ${escapeHtml(vehicle.name)}">
   `).join('');
   thumbs.querySelectorAll('img').forEach(img => img.addEventListener('click', () => {
     clearInterval(galleryAutoTimer);
@@ -1037,13 +1058,13 @@ function renderPremio() {
 function openLightbox(idx) {
   if (!galleryImages.length) return;
   galleryIndex = idx;
-  document.getElementById('lightboxImg').src = galleryImages[galleryIndex];
+  document.getElementById('lightboxImg').src = cldUrl(galleryImages[galleryIndex], 'f_auto,q_auto,w_1600');
   document.getElementById('lightbox').classList.add('show');
 }
 function closeLightbox() { document.getElementById('lightbox').classList.remove('show'); }
 function lightboxNav(dir) {
   galleryIndex = (galleryIndex + dir + galleryImages.length) % galleryImages.length;
-  document.getElementById('lightboxImg').src = galleryImages[galleryIndex];
+  document.getElementById('lightboxImg').src = cldUrl(galleryImages[galleryIndex], 'f_auto,q_auto,w_1600');
 }
 
 /* ---------- Zona Franca / Reembolso / Banco (editables desde el admin) ---------- */
