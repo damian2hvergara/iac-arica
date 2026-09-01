@@ -280,7 +280,14 @@ main{padding-top:56px}
 .buy-cta:disabled{opacity:.5;box-shadow:none}
 
 /* Comprar sticker — barra fija, visible en todo momento */
-.buy-sticky{position:fixed;left:0;right:0;bottom:0;z-index:850;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--ink) 0%,rgba(11,10,9,0.92) 65%,transparent 100%);pointer-events:none}
+.buy-sticky{position:fixed;left:0;right:0;bottom:0;z-index:850;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to top,var(--ink) 0%,rgba(11,10,9,0.92) 65%,transparent 100%);pointer-events:none;opacity:0;transition:opacity .25s ease}
+/* Recién visible cuando el CTA propio del hero (#heroCtaRow) sale de
+   vista (ver IntersectionObserver en el script) — antes se mostraba
+   "en todo momento" desde el load, así que en desktop (donde el hero
+   completo suele caber en el viewport inicial) quedaba apilado encima
+   del CTA/badge del hero y tapaba la barra de confianza. */
+.buy-sticky.visible{opacity:1}
+.buy-sticky:not(.visible) .buy-sticky-btn,.buy-sticky:not(.visible) .sticky-ref-link{pointer-events:none}
 .buy-sticky-btn{pointer-events:all;display:flex;align-items:center;justify-content:center;gap:9px;width:100%;max-width:444px;margin:0 auto;padding:14px;background:var(--red);color:#fff;font-family:var(--font-h);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border-radius:var(--r-full);box-shadow:0 8px 24px rgba(155,0,0,0.4)}
 
 /* Invita y gana — tiene que notarse a simple vista, no solo leerse */
@@ -836,6 +843,28 @@ document.addEventListener('DOMContentLoaded', async () => {
   storeTestModeFromUrl();
   renderRefBanner();
   checkMpReturn();
+
+  // El CTA fijo inferior (#buySticky) es redundante mientras el CTA
+  // propio del hero (#heroCtaRow) está a la vista — se muestra recién
+  // cuando este último sale del viewport al hacer scroll. Bug real
+  // encontrado 2026-08-25/26: sin este observer, #buySticky se mostraba
+  // "en todo momento" desde el load, así que en desktop (donde el hero
+  // completo suele caber en el viewport inicial sin scroll) el botón y
+  // el badge quedaban apilados encima de los del hero, y el fondo
+  // opaco del bar fijo tapaba la barra de confianza (veedores/folio
+  // verificable) — grave porque esa barra es clave para la
+  // credibilidad legal del sorteo.
+  const heroCtaRow = document.getElementById('heroCtaRow');
+  const buySticky = document.getElementById('buySticky');
+  if (heroCtaRow && buySticky) {
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => {
+        buySticky.classList.toggle('visible', !entry.isIntersecting);
+      }, { threshold: 0 }).observe(heroCtaRow);
+    } else {
+      buySticky.classList.add('visible'); // sin soporte: mejor mostrarlo siempre que nunca
+    }
+  }
 
   // packs_config y top_referidores no dependen del sorteo/vehículo —
   // se piden en paralelo desde el arranque en vez de esperar a que
