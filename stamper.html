@@ -81,7 +81,7 @@ input{font-family:inherit;font-size:15px}
 .brand span{color:var(--red-hi)}
 .topbar-nav{display:none}
 .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.topbar-wa{display:flex;align-items:center;gap:7px;padding:9px 13px;background:var(--red);color:#fff;border-radius:var(--r-full);font-size:13px;font-weight:600}
+.topbar-wa{display:flex;align-items:center;gap:7px;padding:9px 13px;background:#25D366;color:#fff;border-radius:var(--r-full);font-size:13px;font-weight:600}
 .topbar-wa-label{display:none}
 /* Ícono solo en pantallas muy angostas — con el WhatsApp + Instagram +
    TikTok + hamburguesa, el texto "WhatsApp" no entra junto al logo sin
@@ -90,8 +90,11 @@ input{font-family:inherit;font-size:15px}
   .topbar-wa{padding:9px 16px}
   .topbar-wa-label{display:inline}
 }
-.topbar-social{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line-hi);color:var(--paper);font-size:14.5px;flex-shrink:0}
-.topbar-social:hover{border-color:var(--red);color:var(--red)}
+/* Colores de marca reales en vez de monocromo — reconocibles al toque. */
+.topbar-social{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-size:15px;flex-shrink:0;transition:transform .15s ease}
+.topbar-social:hover{transform:scale(1.08)}
+.topbar-social.ig{background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%)}
+.topbar-social.tiktok{background:#000;text-shadow:-1.5px -1.5px 0 #25F4EE,1.5px 1.5px 0 #FE2C55}
 .topbar-burger{display:block;font-size:18px;color:var(--paper);padding:6px}
 .topbar-dropdown{display:none;position:fixed;top:56px;left:0;right:0;z-index:899;background:rgba(11,10,9,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--line);flex-direction:column;padding:6px 18px 12px}
 .topbar-dropdown.show{display:flex}
@@ -477,8 +480,8 @@ footer{border-top:1px solid var(--line);padding:32px 0 140px;margin-top:20px}
   </nav>
   <div class="topbar-right">
     <a class="topbar-wa" href="#" id="waTopbarLink" target="_blank"><i class="fab fa-whatsapp"></i><span class="topbar-wa-label">WhatsApp</span></a>
-    <a class="topbar-social" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" aria-label="Instagram" onclick="trackEvent('social_click','Instagram','Topbar')"><i class="fab fa-instagram"></i></a>
-    <a class="topbar-social" href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener" aria-label="TikTok" onclick="trackEvent('social_click','TikTok','Topbar')"><i class="fab fa-tiktok"></i></a>
+    <a class="topbar-social ig" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" aria-label="Instagram" onclick="trackEvent('social_click','Instagram','Topbar')"><i class="fab fa-instagram"></i></a>
+    <a class="topbar-social tiktok" href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener" aria-label="TikTok" onclick="trackEvent('social_click','TikTok','Topbar')"><i class="fab fa-tiktok"></i></a>
     <button class="topbar-burger" id="topbarBurger" type="button" aria-label="Abrir menú" aria-expanded="false"><i class="fas fa-bars"></i></button>
   </div>
 </div>
