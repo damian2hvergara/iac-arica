@@ -81,16 +81,11 @@ input{font-family:inherit;font-size:15px}
 .brand span{color:var(--red-hi)}
 .topbar-nav{display:none}
 .topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.topbar-wa{display:flex;align-items:center;gap:7px;padding:9px 13px;background:#25D366;color:#fff;border-radius:var(--r-full);font-size:13px;font-weight:600}
-.topbar-wa-label{display:none}
-/* Ícono solo en pantallas muy angostas — con el WhatsApp + Instagram +
-   TikTok + PDF de bases + hamburguesa, el texto "WhatsApp" y el espacio
-   entre íconos no entran junto al logo sin que se encimen (ej. iPhone
-   SE, 375px). */
+/* Gap chico por defecto — con Instagram + TikTok + PDF de bases +
+   hamburguesa junto al logo, no entran holgados en pantallas angostas
+   (ej. iPhone SE, 375px). */
 @media(min-width:400px){
   .topbar-right{gap:12px}
-  .topbar-wa{padding:9px 16px}
-  .topbar-wa-label{display:inline}
 }
 /* Colores de marca reales en vez de monocromo — reconocibles al toque. */
 .topbar-social{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;color:#fff;font-size:15px;flex-shrink:0;transition:transform .15s ease}
@@ -482,7 +477,6 @@ footer{border-top:1px solid var(--line);padding:32px 0 140px;margin-top:20px}
     <a href="ganadores.html">Ganadores</a>
   </nav>
   <div class="topbar-right">
-    <a class="topbar-wa" href="#" id="waTopbarLink" target="_blank"><i class="fab fa-whatsapp"></i><span class="topbar-wa-label">WhatsApp</span></a>
     <a class="topbar-social ig" href="https://www.instagram.com/import_american_cars?igsh=YWpuMGZtOHc2YWVz" target="_blank" rel="noopener" aria-label="Instagram" onclick="trackEvent('social_click','Instagram','Topbar')"><i class="fab fa-instagram"></i></a>
     <a class="topbar-social tiktok" href="https://www.tiktok.com/@import_american_cars" target="_blank" rel="noopener" aria-label="TikTok" onclick="trackEvent('social_click','TikTok','Topbar')"><i class="fab fa-tiktok"></i></a>
     <a class="topbar-social pdf" href="bases-legales-sorteo-2026.pdf" target="_blank" rel="noopener" aria-label="Bases legales del sorteo (PDF)" onclick="trackEvent('social_click','BasesPDF','Topbar')"><i class="fas fa-file-pdf"></i></a>
@@ -835,7 +829,6 @@ function cldUrl(url, transform) {
 
 document.addEventListener('DOMContentLoaded', async () => {
   stamperAPI.init();
-  document.getElementById('waTopbarLink').href = `https://wa.me/${CONTACT_CONFIG.whatsapp}`;
 
   // Inicializa el SDK de Mercado Pago apenas carga la página en vez de
   // esperar a que el comprador llegue al paso de pago — el constructor
