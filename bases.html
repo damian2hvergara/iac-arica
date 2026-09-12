@@ -68,6 +68,10 @@ p{margin-bottom:12px}
   <a class="pdf-download" id="pdfDownloadLink" href="#" target="_blank" style="display:none">
     <i class="fas fa-file-pdf"></i> Descargar el documento original firmado (PDF)
   </a>
+  <p id="pdfVerifyNote" style="display:none;text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px">
+    <i class="fas fa-shield-halved"></i> Firmado electrónicamente conforme a la Ley 19.799 (CVE: 8BE91481) —
+    verificable en <a href="https://validador.firmaya.cl" target="_blank" rel="noopener" style="color:var(--gold)">validador.firmaya.cl</a>
+  </p>
 
   <div class="jump">
     <a href="#primero">1. Definiciones</a>
@@ -228,6 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const link = document.getElementById('pdfDownloadLink');
       link.href = sorteo.bases_url;
       link.style.display = 'flex';
+      document.getElementById('pdfVerifyNote').style.display = 'block';
     }
   } catch (e) {
     console.error('Error cargando link de bases:', e);
