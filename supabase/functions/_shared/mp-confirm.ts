@@ -117,6 +117,7 @@ export async function confirmarPagoAprobado(
         pack: orden.packs_config?.nombre || '',
         monto: orden.monto_total,
         codigoReferido: orden.codigo_referido,
+        tipo: orden.tipo,
       }),
     }).then(async (res) => {
       if (!res.ok) {

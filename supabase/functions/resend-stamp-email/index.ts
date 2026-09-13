@@ -62,7 +62,7 @@ Deno.serve(async (req: Request) => {
   try {
     const { data: orden, error: errOrden } = await supabase
       .from('ordenes')
-      .select('id, nombre, email, estado, monto_total, vehicle_id, codigo_referido, sorteo_id, packs_config(nombre)')
+      .select('id, nombre, email, estado, monto_total, vehicle_id, codigo_referido, sorteo_id, tipo, packs_config(nombre)')
       .eq('id', ordenId)
       .eq('email', email)
       .maybeSingle();
@@ -134,6 +134,7 @@ Deno.serve(async (req: Request) => {
         pack: (orden as any).packs_config?.nombre || '',
         monto: orden.monto_total,
         codigoReferido: orden.codigo_referido,
+        tipo: orden.tipo,
       }),
     });
 

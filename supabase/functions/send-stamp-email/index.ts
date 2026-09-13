@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
     return new Response('Invalid JSON', { status: 400, headers: corsHeaders });
   }
 
-  const { estampillas, vehicleImg, fechaSorteo, pack, monto, codigoReferido } = body;
+  const { estampillas, vehicleImg, fechaSorteo, pack, monto, codigoReferido, tipo } = body;
   const nombre = escapeHtml(body.nombre);
   const email = body.email;
   const vehicleName = escapeHtml(body.vehicleName);
@@ -159,6 +159,18 @@ Deno.serve(async (req: Request) => {
         <p style="font-family:'Arial Black',sans-serif;font-size:13px;font-weight:900;color:#F0D080;margin:0 0 6px;text-transform:uppercase;">🏆 Invita y gana hasta $300.000</p>
         <p style="font-size:12.5px;color:#F2F2F2;margin:0 0 8px;line-height:1.5;">Los <strong style="color:#F0D080;">3 que más refieran</strong> se llevan dinero en efectivo el mismo día del sorteo: <strong style="color:#F0D080;">1° $300.000 · 2° $150.000 · 3° $50.000</strong>. Y de paso, cada 4 estampillas que tus amigos compren con tu link, te ganas 1 gratis. Guarda este correo — tu link para referir siempre es este:</p>
         <a href="${refLink}" style="display:inline-block;background:#202020;border:1px solid #2a2a2a;border-radius:8px;padding:10px 16px;font-family:monospace;font-size:12px;color:#F0D080;text-decoration:none;word-break:break-all;">${refLink}</a>
+      </td></tr>
+    </table>
+  </td></tr>` : ''}
+  ${tipo === 'gratis_redes_sociales' ? `
+  <tr><td style="background:#161616;border-left:1px solid #2a2a2a;border-right:1px solid #2a2a2a;padding:0 20px 24px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:rgba(0,197,102,0.08);border:1px solid rgba(0,197,102,0.3);border-radius:10px;padding:16px;">
+      <tr><td style="text-align:center;">
+        <p style="font-family:'Arial Black',sans-serif;font-size:13px;font-weight:900;color:#00C566;margin:0 0 8px;text-transform:uppercase;">🎉 ¡Ganaste este Sticker en nuestra dinámica de Instagram!</p>
+        <p style="font-size:12.5px;color:#F2F2F2;margin:0 0 14px;line-height:1.5;">(Por eso ves "$0" en el resumen — fue un regalo, todo está correcto 😊)</p>
+        <p style="font-family:'Arial Black',sans-serif;font-size:12.5px;font-weight:900;color:#F0D080;margin:0 0 6px;text-transform:uppercase;">🏆 Además, puedes ganar más</p>
+        <p style="font-size:12.5px;color:#F2F2F2;margin:0 0 12px;line-height:1.5;">Tienes tu propio código de referido — por cada 4 Stickers que se vendan con tu link, ganas 1 Sticker gratis adicional (también participa en el sorteo). Si quedas entre los 3 mejores referenciadores, ganas hasta $300.000 en efectivo.</p>
+        <p style="font-size:12.5px;color:#6E6E6E;margin:0;line-height:1.5;">¡Cualquier duda, escríbenos! 🔑<br>No sueñes, gánatelo.</p>
       </td></tr>
     </table>
   </td></tr>` : ''}
