@@ -38,6 +38,16 @@ Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders });
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: corsHeaders });
 
+  // Cierre del sorteo (Anexo Modificatorio N° 1, 09-oct-2026): la venta cesó
+  // y no se reabre. Este secret es el freno de emergencia más rápido de
+  // desplegar — corta ANTES de tocar la base de datos, sin depender de que
+  // alguien haya corrido la migración que apaga sorteo_config.activo. No se
+  // borra el resto del código a propósito: si alguna vez se necesitara una
+  // venta nueva (otro sorteo), basta con `supabase secrets set SALES_OPEN=true`.
+  if (Deno.env.get('SALES_OPEN') !== 'true') {
+    return json({ error: 'La venta de Stickers Digitales se encuentra cerrada' }, 403);
+  }
+
   let body: any;
   try {
     body = await req.json();
