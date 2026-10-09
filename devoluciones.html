@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel de Devoluciones — IAC Arica</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --red:#9B0000; --red-deep:#6B0000; --bg:#0C0C0C; --surface:#161616; --surface-2:#202020;
+  --border:rgba(255,255,255,0.08); --border-hi:rgba(255,255,255,0.14);
+  --text:#F2F2F2; --muted:#8c8578; --green:#00C566; --gold:#F0D080; --orange:#F59E0B; --danger:#ff3b30;
+  --font-h:'Barlow Condensed',sans-serif; --font-b:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+button{font-family:inherit;cursor:pointer;border:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:inherit}
+
+.gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.gate-box{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px 28px}
+.gate-box h1{font-family:var(--font-h);font-size:22px;text-transform:uppercase;margin-bottom:4px}
+.gate-box .sub{color:var(--muted);font-size:12.5px;margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:11px 12px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--red)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border-radius:8px;font-weight:600;font-size:13.5px;transition:opacity .15s}
+.btn:hover{opacity:.9}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--red);color:#fff;width:100%}
+.btn-ghost{background:transparent;border:1px solid var(--border-hi);color:var(--text)}
+.btn-sm{padding:7px 12px;font-size:12.5px;border-radius:6px;width:auto}
+.err-msg{color:var(--danger);font-size:12.5px;margin-top:10px;min-height:16px}
+
+#appWrap{display:none;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid var(--border);background:var(--surface)}
+.topbar .brand{font-family:var(--font-h);font-size:18px;text-transform:uppercase;font-weight:700}
+.topbar .brand span{color:var(--red)}
+.topbar-right{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--muted)}
+
+main{padding:22px;max-width:1400px;margin:0 auto}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.kpi .lbl{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi .val{font-family:var(--font-h);font-size:24px;font-weight:700}
+.kpi .val.gold{color:var(--gold)}
+.kpi .val.green{color:var(--green)}
+.kpi .val.orange{color:var(--orange)}
+.kpi .val.danger{color:var(--danger)}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:18px}
+.card h2{font-family:var(--font-h);font-size:17px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:9px 10px;color:var(--muted);font-weight:600;font-size:10.5px;text-transform:uppercase;border-bottom:1px solid var(--border-hi);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.table-wrap{overflow-x:auto}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;text-transform:uppercase;white-space:nowrap}
+.pill-pend{background:rgba(245,158,11,0.16);color:var(--orange)}
+.pill-ok{background:rgba(0,197,102,0.16);color:var(--green)}
+.pill-rej{background:rgba(255,59,48,0.16);color:var(--danger)}
+.pill-low{background:rgba(140,133,120,0.16);color:var(--muted)}
+
+.empty{color:var(--muted);text-align:center;padding:30px 10px;font-size:13px}
+
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.filters select,.filters input{padding:8px 10px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:8px;color:var(--text);font-size:12.5px}
+.filters input[type="search"]{min-width:220px}
+
+.row-select{padding:5px 7px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:6px;color:var(--text);font-size:12px}
+.row-input{padding:5px 7px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:6px;color:var(--text);font-size:12px;width:100px}
+.row-input.notas{width:160px}
+.copy-btn{padding:3px 7px;font-size:11px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:5px;color:var(--muted)}
+.copy-btn:hover{color:var(--text);border-color:var(--gold)}
+.save-indicator{font-size:10.5px;color:var(--green);margin-left:6px;opacity:0;transition:opacity .2s}
+.save-indicator.show{opacity:1}
+
+.email-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:950;align-items:center;justify-content:center;padding:20px}
+.email-modal-overlay.show{display:flex}
+.email-modal{background:var(--surface);border:1px solid var(--border-hi);border-radius:14px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;padding:24px}
+.email-modal h3{font-family:var(--font-h);font-size:16px;text-transform:uppercase;margin-bottom:14px}
+.email-preview-frame{background:#f4f4f4;border-radius:8px;overflow:hidden;margin-bottom:14px;border:1px solid var(--border-hi)}
+.email-preview-frame iframe{width:100%;height:520px;border:0;display:block}
+
+@media(max-width:640px){
+  main{padding:14px}
+  .kpi .val{font-size:19px}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN (solo Supabase Auth) ============ -->
+<div class="gate" id="loginWrap">
+  <div class="gate-box">
+    <h1>Panel de <span style="color:var(--red)">Devoluciones</span></h1>
+    <p class="sub">Sorteo IAC Arica 2026 — cierre</p>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()"><i class="fas fa-lock"></i> Ingresar</button>
+    <div class="err-msg" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="appWrap">
+  <div class="topbar">
+    <div class="brand">IAC <span>Devoluciones</span></div>
+    <div class="topbar-right">
+      <a href="stamper-admin.html" style="color:var(--muted);text-decoration:none"><i class="fas fa-arrow-left"></i> Admin Sorteo</a>
+      <span id="adminEmail"></span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+    </div>
+  </div>
+
+  <main>
+    <div class="kpi-grid" id="kpiGrid">
+      <div class="kpi"><div class="lbl">Compras confirmadas</div><div class="val gold" id="kpiTotal">—</div></div>
+      <div class="kpi"><div class="lbl">Devueltas</div><div class="val green" id="kpiDevueltas">—</div></div>
+      <div class="kpi"><div class="lbl">Pendientes</div><div class="val orange" id="kpiPendientes">—</div></div>
+      <div class="kpi"><div class="lbl">Con problema</div><div class="val danger" id="kpiConProblema">—</div></div>
+      <div class="kpi"><div class="lbl">Monto devuelto</div><div class="val green" id="kpiMontoDevuelto">—</div></div>
+      <div class="kpi"><div class="lbl">Monto pendiente</div><div class="val orange" id="kpiMontoPendiente">—</div></div>
+    </div>
+
+    <div class="card">
+      <h2>
+        📣 Correo de devolución
+        <span style="font-weight:400;color:var(--muted);font-size:11.5px">Un correo por persona, nunca duplicado</span>
+      </h2>
+      <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+        Avisa a cada comprador que el sorteo no se realizará y que se le devolverá el 100% de lo
+        pagado (Anexo Modificatorio N° 1). Excluye automáticamente a quienes solo tienen Stickers
+        gratis o de bono — esos quedan en la tabla aparte más abajo.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="vistaPreviaCorreo()"><i class="fas fa-eye"></i> Vista previa (3 ejemplos)</button>
+        <button class="btn btn-ghost btn-sm" onclick="enviarPrueba()"><i class="fas fa-flask"></i> Enviar prueba (solo a mí)</button>
+        <button class="btn btn-primary btn-sm" style="width:auto" onclick="enviarATodosPendientes()" id="btnEnviarTodos"><i class="fas fa-paper-plane"></i> Enviar a todos los pendientes</button>
+      </div>
+      <div id="envioResultado" style="margin-top:12px;font-size:12.5px;color:var(--muted)"></div>
+    </div>
+
+    <div class="card">
+      <h2>
+        Compras confirmadas
+        <button class="btn btn-ghost btn-sm" onclick="exportarDevolucionesCSV()"><i class="fas fa-download"></i> Exportar CSV</button>
+      </h2>
+      <div class="filters">
+        <select id="filtroDevolucion" onchange="renderTabla()">
+          <option value="">Todos los estados de devolución</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="devuelta">Devuelta</option>
+          <option value="con_problema">Con problema</option>
+        </select>
+        <select id="filtroCorreo" onchange="renderTabla()">
+          <option value="">Todos los estados de correo</option>
+          <option value="no_enviado">No enviado</option>
+          <option value="enviado">Enviado</option>
+          <option value="fallo">Falló</option>
+        </select>
+        <input type="search" id="filtroBusqueda" placeholder="Buscar por nombre, correo o ID de pago…" oninput="renderTabla()">
+      </div>
+      <div class="table-wrap">
+        <table id="devolucionesTable">
+          <thead><tr>
+            <th>Nombre</th><th>RUT</th><th>Correo</th><th>Teléfono</th><th>Pack</th><th>Cant.</th>
+            <th>Monto</th><th>Fecha compra</th><th>ID pago MP</th><th>Medio</th><th>Correo aviso</th>
+            <th>Estado devolución</th><th>Fecha devolución</th><th>N° operación MP</th><th>Notas</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="empty" id="devolucionesEmpty" style="display:none">No hay compras que calcen con el filtro.</div>
+    </div>
+
+    <div class="card">
+      <h2>Solo Stickers gratis / bono — sin devolución ni correo</h2>
+      <p style="color:var(--muted);font-size:12.5px;margin-bottom:14px">
+        Personas que nunca pagaron nada (solo recibieron Stickers gratis por redes sociales o bono
+        por referido) — no entran en el correo masivo ni tienen nada que devolver.
+      </p>
+      <div class="table-wrap">
+        <table id="soloGratisTable">
+          <thead><tr><th>Nombre</th><th>Correo</th><th>Tipo</th><th>Cantidad</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="empty" id="soloGratisEmpty" style="display:none">No hay nadie en esta situación.</div>
+    </div>
+  </main>
+</div>
+
+<!-- ============ MODAL VISTA PREVIA CORREO ============ -->
+<div class="email-modal-overlay" id="emailModalOverlay">
+  <div class="email-modal">
+    <h3>Vista previa del correo de devolución</h3>
+    <div id="emailPreviewList"></div>
+    <button class="btn btn-ghost btn-sm" onclick="cerrarVistaPrevia()" style="margin-top:10px">Cerrar</button>
+  </div>
+</div>
+
+<script src="js/config.js?v=20260823b"></script>
+<script src="js/stamper-api.js?v=20260824a"></script>
+<script>
+let currentUser = null;
+let ordenesComprado = [];     // completadas, tipo='comprado'
+let ordenesSoloGratis = [];   // personas cuyo ÚNICO tipo es gratis/bono
+let trackingPorOrden = {};    // orden_id -> fila de devolucion_tracking
+let avisoPorEmail = {};       // email (lower) -> fila de aviso_devolucion_email
+let personasAgrupadas = [];   // una fila por persona, para el correo
+
+document.addEventListener('DOMContentLoaded', () => {
+  stamperAPI.init();
+  stamperAPI.client.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').style.display = 'block';
+      document.getElementById('adminEmail').textContent = session.user.email;
+      cargarTodo();
+    } else {
+      document.getElementById('appWrap').style.display = 'none';
+      document.getElementById('loginWrap').style.display = 'flex';
+    }
+  });
+});
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  try {
+    await stamperAPI.signIn(email, pass);
+  } catch (e) {
+    errEl.textContent = 'Credenciales incorrectas.';
+  }
+}
+
+async function doLogout() {
+  await stamperAPI.signOut();
+}
+
+/* ---------- Carga y agrupación ---------- */
+async function cargarTodo() {
+  try {
+    const [ordenes, tracking, avisos] = await Promise.all([
+      stamperAPI.getOrdenesAll(),
+      stamperAPI.getDevolucionTracking(),
+      stamperAPI.getAvisoDevolucionEmail(),
+    ]);
+
+    trackingPorOrden = {};
+    tracking.forEach(t => { trackingPorOrden[t.orden_id] = t; });
+
+    avisoPorEmail = {};
+    avisos.forEach(a => { avisoPorEmail[a.email] = a; });
+
+    const completadas = ordenes.filter(o => o.estado === 'completado');
+    ordenesComprado = completadas.filter(o => o.tipo === 'comprado');
+
+    // Personas que SOLO tienen órdenes gratis/bono (nunca una 'comprado') —
+    // se excluyen del correo y de la devolución, se listan aparte.
+    const emailsConCompra = new Set(ordenesComprado.map(o => (o.email || '').toLowerCase()));
+    const gratisPorEmail = new Map();
+    completadas.filter(o => o.tipo !== 'comprado').forEach(o => {
+      const key = (o.email || '').toLowerCase();
+      if (emailsConCompra.has(key)) return;
+      if (!gratisPorEmail.has(key)) gratisPorEmail.set(key, { nombre: o.nombre, email: o.email, tipo: o.tipo, cantidad: 0 });
+      gratisPorEmail.get(key).cantidad += (o.cantidad_stickers || 0);
+    });
+    ordenesSoloGratis = [...gratisPorEmail.values()];
+
+    // Agrupa por persona (email+RUT normalizado-simple por email, igual
+    // criterio usado en el resto del admin) para el correo masivo —
+    // suma cantidad y monto de TODAS sus órdenes compradas.
+    const porPersona = new Map();
+    ordenesComprado.forEach(o => {
+      const key = (o.email || '').toLowerCase().trim();
+      if (!key) return;
+      if (!porPersona.has(key)) {
+        porPersona.set(key, { nombre: o.nombre, email: o.email, cantidad: 0, monto: 0 });
+      }
+      const p = porPersona.get(key);
+      p.cantidad += (o.cantidad_stickers || 0);
+      p.monto += (o.monto_total || 0);
+      // nombre más reciente
+      if (new Date(o.created_at) > (p._fecha || 0)) { p.nombre = o.nombre; p._fecha = new Date(o.created_at); }
+    });
+    personasAgrupadas = [...porPersona.values()];
+
+    renderResumen();
+    renderTabla();
+    renderSoloGratis();
+  } catch (e) {
+    console.error(e);
+    alert('Error al cargar el panel: ' + (e.message || e));
+  }
+}
+
+function getTracking(ordenId) {
+  return trackingPorOrden[ordenId] || { estado: 'pendiente', fecha_devolucion: '', numero_operacion_mp: '', notas: '' };
+}
+function getAviso(email) {
+  return avisoPorEmail[(email || '').toLowerCase()] || { estado: 'no_enviado' };
+}
+
+/* ---------- Resumen (KPIs) ---------- */
+function renderResumen() {
+  let devueltas = 0, pendientes = 0, conProblema = 0, montoDevuelto = 0, montoPendiente = 0;
+  ordenesComprado.forEach(o => {
+    const t = getTracking(o.id);
+    const monto = o.monto_total || 0;
+    if (t.estado === 'devuelta') { devueltas++; montoDevuelto += monto; }
+    else if (t.estado === 'con_problema') { conProblema++; montoPendiente += monto; }
+    else { pendientes++; montoPendiente += monto; }
+  });
+  document.getElementById('kpiTotal').textContent = ordenesComprado.length.toLocaleString('es-CL');
+  document.getElementById('kpiDevueltas').textContent = devueltas.toLocaleString('es-CL');
+  document.getElementById('kpiPendientes').textContent = pendientes.toLocaleString('es-CL');
+  document.getElementById('kpiConProblema').textContent = conProblema.toLocaleString('es-CL');
+  document.getElementById('kpiMontoDevuelto').textContent = '$' + montoDevuelto.toLocaleString('es-CL');
+  document.getElementById('kpiMontoPendiente').textContent = '$' + montoPendiente.toLocaleString('es-CL');
+}
+
+/* ---------- Tabla principal ---------- */
+function renderTabla() {
+  const fDevolucion = document.getElementById('filtroDevolucion').value;
+  const fCorreo = document.getElementById('filtroCorreo').value;
+  const busqueda = document.getElementById('filtroBusqueda').value.trim().toLowerCase();
+
+  const filas = ordenesComprado.filter(o => {
+    const t = getTracking(o.id);
+    const a = getAviso(o.email);
+    if (fDevolucion && t.estado !== fDevolucion) return false;
+    if (fCorreo && a.estado !== fCorreo) return false;
+    if (busqueda) {
+      const texto = `${o.nombre || ''} ${o.email || ''} ${o.mp_payment_id || ''}`.toLowerCase();
+      if (!texto.includes(busqueda)) return false;
+    }
+    return true;
+  });
+
+  const tbody = document.querySelector('#devolucionesTable tbody');
+  const empty = document.getElementById('devolucionesEmpty');
+  if (!filas.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const pillCorreo = { no_enviado: 'pill-low', enviado: 'pill-ok', fallo: 'pill-rej' };
+  const labelCorreo = { no_enviado: 'No enviado', enviado: 'Enviado', fallo: 'Falló' };
+
+  tbody.innerHTML = filas.map(o => {
+    const t = getTracking(o.id);
+    const a = getAviso(o.email);
+    return `
+      <tr data-orden="${o.id}">
+        <td>${escapeHtml(o.nombre)}</td>
+        <td>${escapeHtml(o.rut_pasaporte || '')}</td>
+        <td>${escapeHtml(o.email)}</td>
+        <td>${escapeHtml(o.telefono || '')}</td>
+        <td>${escapeHtml(o.packs_config?.nombre || '')}</td>
+        <td>${o.cantidad_stickers}</td>
+        <td>$${(o.monto_total || 0).toLocaleString('es-CL')}</td>
+        <td>${new Date(o.created_at).toLocaleDateString('es-CL')}</td>
+        <td>
+          ${o.mp_payment_id ? `<span style="font-family:monospace;font-size:11px">${escapeHtml(o.mp_payment_id)}</span>
+          <button class="copy-btn" onclick="copiarAlPortapapeles('${escapeHtml(o.mp_payment_id)}', this)"><i class="fas fa-copy"></i></button>` : '<span style="color:var(--muted)">—</span>'}
+        </td>
+        <td>${escapeHtml(o.mp_payment_type || o.modo_pago || '')}</td>
+        <td>
+          <span class="pill ${pillCorreo[a.estado] || 'pill-low'}">${labelCorreo[a.estado] || a.estado}</span>
+          <button class="copy-btn" title="Reenviar correo a esta persona" onclick="reenviarA('${escapeHtml(o.email)}')"><i class="fas fa-rotate"></i></button>
+        </td>
+        <td>
+          <select class="row-select" onchange="editarDevolucion('${o.id}', this)">
+            <option value="pendiente" ${t.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+            <option value="devuelta" ${t.estado === 'devuelta' ? 'selected' : ''}>Devuelta</option>
+            <option value="con_problema" ${t.estado === 'con_problema' ? 'selected' : ''}>Con problema</option>
+          </select>
+        </td>
+        <td><input type="date" class="row-input" value="${t.fecha_devolucion || ''}" onchange="editarDevolucion('${o.id}', this)"></td>
+        <td><input type="text" class="row-input" placeholder="N° operación" value="${escapeHtml(t.numero_operacion_mp || '')}" onchange="editarDevolucion('${o.id}', this)"></td>
+        <td><input type="text" class="row-input notas" placeholder="Notas" value="${escapeHtml(t.notas || '')}" onchange="editarDevolucion('${o.id}', this)"></td>
+      </tr>`;
+  }).join('');
+}
+
+async function editarDevolucion(ordenId, triggerEl) {
+  const row = triggerEl.closest('tr');
+  const estado = row.querySelector('.row-select').value;
+  const fecha = row.querySelectorAll('.row-input')[0].value || null;
+  const numeroOp = row.querySelectorAll('.row-input')[1].value || null;
+  const notas = row.querySelectorAll('.row-input')[2].value || null;
+
+  try {
+    await stamperAPI.actualizarDevolucion(ordenId, {
+      estado, fecha_devolucion: fecha, numero_operacion_mp: numeroOp, notas,
+    });
+    trackingPorOrden[ordenId] = { orden_id: ordenId, estado, fecha_devolucion: fecha, numero_operacion_mp: numeroOp, notas };
+    renderResumen();
+  } catch (e) {
+    alert('Error al guardar: ' + (e.message || e));
+  }
+}
+
+function copiarAlPortapapeles(texto, btn) {
+  navigator.clipboard.writeText(texto).then(() => {
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => { btn.innerHTML = original; }, 1200);
+  });
+}
+
+/* ---------- Solo gratis/bono ---------- */
+function renderSoloGratis() {
+  const tbody = document.querySelector('#soloGratisTable tbody');
+  const empty = document.getElementById('soloGratisEmpty');
+  if (!ordenesSoloGratis.length) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  const labelTipo = { gratis_redes_sociales: 'Gratis (redes sociales)', bonus_referido: 'Bono por referido' };
+  tbody.innerHTML = ordenesSoloGratis.map(p => `
+    <tr>
+      <td>${escapeHtml(p.nombre)}</td>
+      <td>${escapeHtml(p.email)}</td>
+      <td>${labelTipo[p.tipo] || p.tipo}</td>
+      <td>${p.cantidad}</td>
+    </tr>`).join('');
+}
+
+/* ---------- Correo masivo ---------- */
+function renderEmailHtml(nombre, cantidad, monto) {
+  const montoStr = Number(monto).toLocaleString('es-CL');
+  return `<!DOCTYPE html><html lang="es"><body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 0;"><tr><td align="center">
+<table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border:1px solid #ddd;">
+  <tr><td style="padding:28px 32px 20px;border-bottom:2px solid #9B0000;">
+    <p style="font-size:17px;font-weight:700;color:#222;margin:0;">Import American Cars</p>
+    <p style="font-size:11px;color:#777;letter-spacing:1px;text-transform:uppercase;margin:4px 0 0;">Sorteo IAC Arica 2026</p>
+  </td></tr>
+  <tr><td style="padding:28px 32px;">
+    <p style="font-size:14px;color:#222;line-height:1.7;margin:0 0 16px;">Hola ${escapeHtml(nombre)}:</p>
+    <p style="font-size:14px;color:#222;line-height:1.7;margin:0 0 16px;">Te escribimos para informarte que el sorteo del Dodge Challenger 2018 no se realizará. No se cumplieron las condiciones establecidas en las bases para llevarlo a cabo, y preferimos ser transparentes antes que extender la fecha de forma indefinida.</p>
+    <p style="font-size:14px;color:#222;line-height:1.7;margin:0 0 10px;">Por eso vamos a devolverte el 100% de lo que pagaste, sin descuentos:</p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f7f7f7;border:1px solid #e0e0e0;margin:0 0 18px;">
+      <tr><td style="padding:10px 16px;font-size:13.5px;color:#555;border-bottom:1px solid #e0e0e0;">Tus Stickers Digitales</td>
+          <td style="padding:10px 16px;font-size:13.5px;color:#222;text-align:right;border-bottom:1px solid #e0e0e0;font-weight:700;">${cantidad}</td></tr>
+      <tr><td style="padding:10px 16px;font-size:13.5px;color:#555;">Monto a devolver</td>
+          <td style="padding:10px 16px;font-size:15px;color:#222;text-align:right;font-weight:700;">$${montoStr}</td></tr>
+    </table>
+    <p style="font-size:14px;color:#222;line-height:1.7;margin:0 0 16px;">La devolución se hará a través de Mercado Pago, al mismo medio de pago que usaste, en un plazo máximo de 30 días. No necesitas hacer ningún trámite.</p>
+    <p style="font-size:14px;color:#222;line-height:1.7;margin:0;">Gracias por tu confianza.<br>Equipo IAC Arica</p>
+  </td></tr>
+</table></td></tr></table>
+</body></html>`;
+}
+
+function vistaPreviaCorreo() {
+  if (!personasAgrupadas.length) { alert('No hay compradores todavía.'); return; }
+  const ejemplos = personasAgrupadas.slice(0, 3);
+  const cont = document.getElementById('emailPreviewList');
+  cont.innerHTML = ejemplos.map((p, i) => `
+    <p style="font-size:12px;color:var(--muted);margin:${i ? '18px' : '0'} 0 6px">${escapeHtml(p.nombre)} — ${escapeHtml(p.email)}</p>
+    <div class="email-preview-frame"><iframe id="previewFrame${i}"></iframe></div>
+  `).join('');
+  ejemplos.forEach((p, i) => {
+    document.getElementById(`previewFrame${i}`).srcdoc = renderEmailHtml(p.nombre, p.cantidad, p.monto);
+  });
+  document.getElementById('emailModalOverlay').classList.add('show');
+}
+function cerrarVistaPrevia() {
+  document.getElementById('emailModalOverlay').classList.remove('show');
+}
+
+async function llamarSendRefundNotice(nombre, email, cantidad, montoTotal) {
+  const { data: sessionData } = await stamperAPI.client.auth.getSession();
+  const adminToken = sessionData?.session?.access_token;
+  const res = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/send-refund-notice`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+    body: JSON.stringify({ nombre, email, cantidad, montoTotal }),
+  });
+  return res;
+}
+
+async function enviarPrueba() {
+  if (!personasAgrupadas.length) { alert('No hay compradores todavía.'); return; }
+  const ejemplo = personasAgrupadas[0];
+  if (!confirm(`Se enviará un correo de PRUEBA (con los datos de ${ejemplo.nombre}) solo a tu dirección: ${currentUser.email}\n\n¿Continuar?`)) return;
+  try {
+    const res = await llamarSendRefundNotice(ejemplo.nombre, currentUser.email, ejemplo.cantidad, ejemplo.monto);
+    if (res.ok) alert('Correo de prueba enviado a ' + currentUser.email);
+    else { const d = await res.json(); alert('Error: ' + (d.error || res.status)); }
+  } catch (e) {
+    alert('Error al enviar la prueba: ' + (e.message || e));
+  }
+}
+
+async function enviarATodosPendientes() {
+  const pendientes = personasAgrupadas.filter(p => getAviso(p.email).estado !== 'enviado');
+  if (!pendientes.length) {
+    document.getElementById('envioResultado').textContent = 'No hay nadie pendiente de este correo — todos ya lo recibieron.';
+    return;
+  }
+  if (!confirm(`Se enviará el correo de devolución a ${pendientes.length} comprador(es) que todavía NO lo han recibido.\n\nEste envío no se puede deshacer. ¿Continuar?`)) return;
+
+  const btn = document.getElementById('btnEnviarTodos');
+  const resultado = document.getElementById('envioResultado');
+  btn.disabled = true;
+
+  let enviados = 0, fallidos = 0;
+  const fallosDetalle = [];
+  resultado.textContent = `Enviando 0 / ${pendientes.length}…`;
+
+  for (const p of pendientes) {
+    try {
+      const res = await llamarSendRefundNotice(p.nombre, p.email, p.cantidad, p.monto);
+      if (res.ok) {
+        enviados++;
+        await marcarAvisoEnviado(p.email, 'enviado', null);
+      } else {
+        fallidos++;
+        let motivo = `HTTP ${res.status}`;
+        try { const d = await res.json(); motivo = d?.error ? String(d.error).slice(0, 200) : motivo; } catch {}
+        fallosDetalle.push({ email: p.email, motivo });
+        await marcarAvisoEnviado(p.email, 'fallo', motivo);
+      }
+    } catch (e) {
+      fallidos++;
+      const motivo = 'Error de red: ' + (e.message || e);
+      fallosDetalle.push({ email: p.email, motivo });
+      await marcarAvisoEnviado(p.email, 'fallo', motivo);
+    }
+    resultado.textContent = `Enviando ${enviados + fallidos} / ${pendientes.length}…`;
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  let resumenHtml = `Listo: ${enviados} correo(s) enviados${fallidos ? `, ${fallidos} fallaron` : ''}.`;
+  if (fallosDetalle.length) {
+    resumenHtml += '<ul style="margin:8px 0 0;padding-left:18px">' +
+      fallosDetalle.map(f => `<li>${escapeHtml(f.email)} — ${escapeHtml(f.motivo)}</li>`).join('') + '</ul>';
+  }
+  resultado.innerHTML = resumenHtml;
+  btn.disabled = false;
+  renderTabla();
+}
+
+async function reenviarA(email) {
+  const persona = personasAgrupadas.find(p => p.email.toLowerCase() === email.toLowerCase());
+  if (!persona) return;
+  if (!confirm(`¿Reenviar el correo de devolución a ${persona.nombre} (${email})?`)) return;
+  try {
+    const res = await llamarSendRefundNotice(persona.nombre, persona.email, persona.cantidad, persona.monto);
+    if (res.ok) {
+      await marcarAvisoEnviado(email, 'enviado', null);
+      alert('Reenviado.');
+    } else {
+      const d = await res.json();
+      await marcarAvisoEnviado(email, 'fallo', d.error || String(res.status));
+      alert('Error: ' + (d.error || res.status));
+    }
+    renderTabla();
+  } catch (e) {
+    alert('Error al reenviar: ' + (e.message || e));
+  }
+}
+
+async function marcarAvisoEnviado(email, estado, error) {
+  const key = email.toLowerCase();
+  const { error: errUpsert } = await stamperAPI.client
+    .from('aviso_devolucion_email')
+    .upsert({ email: key, estado, enviado_at: estado === 'enviado' ? new Date().toISOString() : null, error }, { onConflict: 'email' });
+  if (!errUpsert) avisoPorEmail[key] = { email: key, estado, error };
+}
+
+/* ---------- CSV ---------- */
+function exportarDevolucionesCSV() {
+  if (!ordenesComprado.length) { alert('No hay datos para exportar.'); return; }
+  const header = ['Nombre','RUT','Correo','Telefono','Pack','Cantidad','Monto','Fecha compra','ID pago MP','Medio','Estado correo','Estado devolucion','Fecha devolucion','N operacion MP','Notas'];
+  const esc = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = ordenesComprado.map(o => {
+    const t = getTracking(o.id);
+    const a = getAviso(o.email);
+    return [
+      o.nombre, o.rut_pasaporte || '', o.email, o.telefono || '', o.packs_config?.nombre || '',
+      o.cantidad_stickers, o.monto_total, new Date(o.created_at).toLocaleDateString('es-CL'),
+      o.mp_payment_id || '', o.mp_payment_type || o.modo_pago || '', a.estado,
+      t.estado, t.fecha_devolucion || '', t.numero_operacion_mp || '', t.notas || '',
+    ];
+  });
+  const csv = '﻿sep=,\r\n' + [header, ...rows].map(r => r.map(esc).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `devoluciones-sorteo-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>

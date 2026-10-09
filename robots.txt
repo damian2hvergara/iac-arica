@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /devoluciones.html
+Disallow: /stamper-admin.html
+Disallow: /admin.html

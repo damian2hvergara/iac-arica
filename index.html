@@ -24,6 +24,7 @@
    TOKENS
    ============================================ */
 :root {
+  --banner-h:  40px;
   --red:       #9B0000;
   --red-deep:  #6B0000;
   --red-glow:  rgba(155,0,0,0.22);
@@ -63,8 +64,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 /* ============================================
    TOPBAR
    ============================================ */
+.cierre-banner{
+  position:fixed;top:0;left:0;right:0;z-index:901;
+  display:flex;align-items:center;justify-content:center;
+  min-height:var(--banner-h);padding:7px 14px;
+  background:var(--surface-3);border-bottom:1px solid var(--border-hi);
+  text-align:center;
+}
+.cierre-banner a{
+  color:var(--text);font-size:12px;line-height:1.4;text-decoration:none;
+}
+.cierre-banner a b{color:var(--gold,#F0D080)}
+.cierre-banner a:hover{text-decoration:underline}
 .topbar{
-  position:fixed;top:0;left:0;right:0;z-index:900;
+  position:fixed;top:var(--banner-h);left:0;right:0;z-index:900;
   height:52px;
   display:flex;align-items:center;justify-content:space-between;
   padding:0 18px;
@@ -110,8 +123,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
    ============================================ */
 .hero{
   position:relative;
-  margin-top:52px;
-  min-height:calc(100svh - 52px);
+  margin-top:calc(52px + var(--banner-h));
+  min-height:calc(100svh - 52px - var(--banner-h));
   display:flex;flex-direction:column;justify-content:flex-end;
   overflow:hidden;
 }
@@ -1081,6 +1094,11 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 </style>
 </head>
 <body>
+
+<!-- ========= AVISO: CIERRE DEL SORTEO ========= -->
+<div class="cierre-banner">
+  <a href="stamper.html"><b>El sorteo IAC Arica 2026 no se realizará</b> — devolvemos el 100% de lo pagado. Ver detalles →</a>
+</div>
 
 <!-- ========= TOPBAR ========= -->
 <header class="topbar">

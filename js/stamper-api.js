@@ -271,6 +271,46 @@ class StamperAPI {
         }
     }
 
+    // ---- Panel de devoluciones (cierre del sorteo, Anexo N°1) ----
+
+    async getDevolucionTracking() {
+        try {
+            const { data, error } = await this.client.from('devolucion_tracking').select('*');
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error getDevolucionTracking:', error);
+            throw error;
+        }
+    }
+
+    async getAvisoDevolucionEmail() {
+        try {
+            const { data, error } = await this.client.from('aviso_devolucion_email').select('*');
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('Error getAvisoDevolucionEmail:', error);
+            throw error;
+        }
+    }
+
+    // Upsert — crea la fila de seguimiento la primera vez que se edita
+    // una orden, o actualiza la existente. actualizado_por/actualizado_at
+    // los pone el trigger de la base, no hace falta mandarlos.
+    async actualizarDevolucion(ordenId, fields) {
+        try {
+            const { error } = await this.client
+                .from('devolucion_tracking')
+                .upsert({ orden_id: ordenId, ...fields }, { onConflict: 'orden_id' });
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('Error actualizarDevolucion:', error);
+            throw error;
+        }
+    }
+
     async rechazarOrden(ordenId, nota) {
         try {
             const { error } = await this.client
